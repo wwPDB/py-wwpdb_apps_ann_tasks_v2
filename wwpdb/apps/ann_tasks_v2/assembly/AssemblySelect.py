@@ -41,7 +41,7 @@ import os
 import traceback
 import shutil
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.rcsb.DataFileAdapter import DataFileAdapter
+from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
 from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
 from wwpdb.apps.seqmodule.io.PdbxIoUtils import PdbxFileIo, ModelFileIo
 from mmcif.api.PdbxContainers import *

@@ -31,7 +31,7 @@ import shutil
 
 from wwpdb.apps.ann_tasks_v2.status.StatusHistory import StatusHistory
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
-from wwpdb.utils.rcsb.DataFile import DataFile
+from wwpdb.io.file.DataFile import DataFile
 from mmcif.io.IoAdapterPy import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
 

@@ -18,7 +18,7 @@ __version__   = "V0.07"
 
 import sys,os.path,os,traceback
 from wwpdb.utils.dp.RcsbDpUtility       import RcsbDpUtility
-from wwpdb.utils.rcsb.DataFile            import DataFile
+from wwpdb.io.file.DataFile            import DataFile
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 class TransformCoord(SessionWebDownloadUtils):

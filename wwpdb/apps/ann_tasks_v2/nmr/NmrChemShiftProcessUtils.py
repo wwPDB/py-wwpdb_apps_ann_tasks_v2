@@ -14,7 +14,7 @@ __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.07"
 
 import json,os,sys,time,traceback
-from wwpdb.utils.rcsb.mmCIFUtil import mmCIFUtil
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 

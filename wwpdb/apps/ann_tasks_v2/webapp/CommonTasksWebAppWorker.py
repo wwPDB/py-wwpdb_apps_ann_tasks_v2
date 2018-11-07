@@ -59,15 +59,15 @@ import json
 # from json import loads, dumps
 
 from time import localtime, strftime, sleep
-from wwpdb.utils.rcsb.WebAppWorkerBase import WebAppWorkerBase
+from wwpdb.utils.session.WebAppWorkerBase import WebAppWorkerBase
 
-from wwpdb.utils.rcsb.WebRequest import ResponseContent, InputRequest
-from wwpdb.utils.rcsb.DataFileAdapter import DataFileAdapter
-from wwpdb.utils.rcsb.DataFile import DataFile
-from wwpdb.utils.rcsb.DataExchange import DataExchange
-from wwpdb.utils.rcsb.DetachUtils import DetachUtils
-from wwpdb.utils.rcsb.WebUploadUtils import WebUploadUtils
-from wwpdb.utils.rcsb.UtilDataStore import UtilDataStore
+from wwpdb.utils.session.WebRequest import ResponseContent, InputRequest
+from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
+from wwpdb.io.file.DataFile import DataFile
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.utils.detach.DetachUtils import DetachUtils
+from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
+from wwpdb.utils.session.UtilDataStore import UtilDataStore
 from wwpdb.io.locator.PathInfo import PathInfo
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
@@ -130,7 +130,7 @@ from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsMiscChecks import NmrChemShiftsMis
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 from wwpdb.apps.ann_tasks_v2.nmr.NmrModelUtils import NmrModelUtils
 
-from pdbx_v2.pdbx.PdbxIo import PdbxEntryInfoIo
+from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 
 
 class CommonTasksWebAppWorker(WebAppWorkerBase):

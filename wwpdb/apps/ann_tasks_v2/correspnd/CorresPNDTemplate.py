@@ -19,7 +19,7 @@ from wwpdb.utils.config.ConfigInfo                   import ConfigInfo
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.releasemodule.utils.Utility        import getFileName
 from wwpdb.apps.releasemodule.utils.Utility        import RunScript
-from wwpdb.utils.rcsb.mmCIFUtil                    import mmCIFUtil
+from wwpdb.io.file.mmCIFUtil                    import mmCIFUtil
 
 class CorresPNDTemplate(object):
     """

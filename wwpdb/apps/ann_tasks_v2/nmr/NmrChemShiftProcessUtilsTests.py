@@ -18,7 +18,7 @@ __version__ = "V0.01"
 import os, shutil, sys, time, traceback, unittest
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.utils.rcsb.WebRequest import InputRequest
+from wwpdb.utils.session.WebRequest import InputRequest
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 
 

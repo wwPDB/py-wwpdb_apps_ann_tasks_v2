@@ -43,7 +43,6 @@ import shutil
 import datetime
 from dateutil.relativedelta import *
 #
-# from wwpdb.utils.rcsb.WebAppWorkerBase import WebAppWorkerBase
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
 from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
@@ -54,11 +53,11 @@ from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
 from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.rcsb.DataFileAdapter import DataFileAdapter
+from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.utils.rcsb.DataExchange import DataExchange
-from wwpdb.utils.rcsb.WebUploadUtils import WebUploadUtils
-from wwpdb.utils.rcsb.WebRequest import ResponseContent
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
+from wwpdb.utils.session.WebRequest import ResponseContent
 #
 from wwpdb.apps.wf_engine.engine.WFEapplications import killAllWF
 

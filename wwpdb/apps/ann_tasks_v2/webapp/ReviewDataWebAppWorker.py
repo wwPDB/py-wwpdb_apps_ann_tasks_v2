@@ -42,8 +42,8 @@ from wwpdb.apps.ann_tasks_v2.check.Check import Check
 
 # from wwpdb.utils.config.ConfigInfo import ConfigInfo
 # from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.rcsb.DataExchange import DataExchange
-from wwpdb.utils.rcsb.WebRequest import ResponseContent
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.utils.session.WebRequest import ResponseContent
 #
 
 

@@ -30,7 +30,7 @@ import os
 import json
 import math
 import traceback
-from wwpdb.utils.rcsb.DataExchange import DataExchange
+from wwpdb.io.file.DataExchange import DataExchange
 from wwpdb.io.locator.PathInfo import PathInfo
 
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils

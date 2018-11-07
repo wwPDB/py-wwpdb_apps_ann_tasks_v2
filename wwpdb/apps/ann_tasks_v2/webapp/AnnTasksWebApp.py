@@ -26,7 +26,7 @@ __version__   = "V0.07"
 
 import os, sys, time, types, string, traceback, ntpath,  shutil, glob
 
-from wwpdb.utils.rcsb.WebRequest                        import ResponseContent,InputRequest
+from wwpdb.utils.session.WebRequest                        import ResponseContent,InputRequest
 from wwpdb.utils.config.ConfigInfo                        import ConfigInfo
 
 from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebAppWorker        import AnnTasksWebAppWorker

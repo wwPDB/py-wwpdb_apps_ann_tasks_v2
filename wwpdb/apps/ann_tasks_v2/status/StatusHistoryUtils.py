@@ -40,7 +40,7 @@ from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from pdbx_v2.pdbx.PdbxIo import PdbxEntryInfoIo
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.utils.rcsb.DataFile import DataFile
+from wwpdb.io.file.DataFile import DataFile
 
 
 from wwpdb.utils.db.MyConnectionBase import MyConnectionBase

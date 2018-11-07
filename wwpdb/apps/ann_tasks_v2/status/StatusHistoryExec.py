@@ -26,7 +26,7 @@ from optparse import OptionParser
 
 from wwpdb.apps.ann_tasks_v2.status.StatusHistoryUtils import StatusHistoryUtils
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
-from wwpdb.utils.rcsb.WebRequest import InputRequest
+from wwpdb.utils.session.WebRequest import InputRequest
 
 
 class StatusHistoryExec(object):

@@ -38,8 +38,8 @@ from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 from wwpdb.apps.ann_tasks_v2.utils.TlsRange import TlsRange
 
-from wwpdb.utils.rcsb.WebRequest import ResponseContent
-from wwpdb.utils.rcsb.DataExchange import DataExchange
+from wwpdb.utils.session.WebRequest import ResponseContent
+from wwpdb.io.file.DataExchange import DataExchange
 from wwpdb.io.locator.PathInfo import PathInfo
 
 

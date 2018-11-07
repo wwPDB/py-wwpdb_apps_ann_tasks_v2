@@ -23,7 +23,7 @@ import traceback
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.wwpdb.utils.wf.DataReference import ReferenceFileComponents
+from wwpdb.io.locator.DataReference import ReferenceFileComponents
 
 
 class SessionDownloadUtils(object):

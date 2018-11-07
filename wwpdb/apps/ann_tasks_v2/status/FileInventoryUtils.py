@@ -14,7 +14,7 @@ import scandir
 import datetime
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
-from wwpdb.utils.rcsb.DataMaintenance import DataMaintenance
+from wwpdb.utils.dp.DataMaintenance import DataMaintenance
 
 from mmcif.io.PdbxWriter import PdbxWriter
 from mmcif.api.PdbxContainers import *

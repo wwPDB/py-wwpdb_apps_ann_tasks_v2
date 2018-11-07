@@ -239,7 +239,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
         return pdbid
 
 if __name__ == "__main__":
-    from wwpdb.utils.rcsb.WebRequest import InputRequest
+    from wwpdb.utils.session.WebRequest import InputRequest
     #
     siteId = os.getenv("WWPDB_SITE_ID")
     cI = ConfigInfo(siteId)
