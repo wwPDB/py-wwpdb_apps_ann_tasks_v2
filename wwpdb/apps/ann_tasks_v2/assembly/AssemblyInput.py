@@ -23,11 +23,11 @@ __version__ = "V0.07"
 import sys
 import os.path
 import os
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.apps.seqmodule.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
-# from pdbx_v2.adapter.IoAdapterPy import IoAdapterPy
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+# from mmcif.io.IoAdapterPy import IoAdapterPy
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 class AssemblyInput(object):
 

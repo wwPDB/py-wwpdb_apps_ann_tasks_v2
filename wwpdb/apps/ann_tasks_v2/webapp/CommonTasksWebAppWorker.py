@@ -68,7 +68,7 @@ from wwpdb.utils.rcsb.DataExchange import DataExchange
 from wwpdb.utils.rcsb.DetachUtils import DetachUtils
 from wwpdb.utils.rcsb.WebUploadUtils import WebUploadUtils
 from wwpdb.utils.rcsb.UtilDataStore import UtilDataStore
-from wwpdb.utils.rcsb.PathInfo import PathInfo
+from wwpdb.io.locator.PathInfo import PathInfo
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
 

@@ -20,10 +20,10 @@ __version__   = "V0.07"
 
 import os,sys,re,traceback
 
-from pdbx_v2.adapter.IoAdapterPy                     import IoAdapterPy
-from pdbx_v2.adapter.IoAdapterCore                   import IoAdapterCore
-from pdbx_v2.reader.PdbxContainers                   import *
-from pdbx_v2.reader.DataCategory                     import DataCategory
+from mmcif.io.IoAdapterPy                     import IoAdapterPy
+from mmcif.io.IoAdapterCore                   import IoAdapterCore
+from mmcif.api.PdbxContainers                   import *
+from mmcif.api.DataCategory                     import DataCategory
 
 
 class PdbxExpFileIo(object):

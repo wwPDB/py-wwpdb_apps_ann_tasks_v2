@@ -18,7 +18,7 @@ __version__   = "V0.01"
 import os, sys, time, types, string, shutil, traceback
 
 
-from wwpdb.api.facade.ConfigInfo                               import ConfigInfo
+from wwpdb.utils.config.ConfigInfo                               import ConfigInfo
 from pdbx_v2.pdbx.PdbxIo                                       import PdbxReportIo,PdbxGeometryReportIo,PdbxXrayExpReportIo
 from pdbx_v2.style.PdbxGeometryReportCategoryStyle             import PdbxGeometryReportCategoryStyle
 from pdbx_v2.style.PdbxXrayExpReportCategoryStyle              import PdbxXrayExpReportCategoryStyle

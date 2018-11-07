@@ -16,8 +16,8 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
 import os, shutil, sys, time, traceback, unittest
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
-from wwpdb.utils.rcsb.PathInfo import PathInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.rcsb.WebRequest import InputRequest
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 

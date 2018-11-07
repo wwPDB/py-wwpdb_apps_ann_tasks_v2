@@ -20,9 +20,9 @@ except ImportError:
 
 import sys,os.path,os,traceback
 
-from wwpdb.api.facade.ConfigInfo    import ConfigInfo
-from pdbx.writer.PdbxWriter         import PdbxWriter
-from pdbx.reader.PdbxContainers     import *
+from wwpdb.utils.config.ConfigInfo    import ConfigInfo
+from mmcif.io.PdbxWriter         import PdbxWriter
+from mmcif.api.PdbxContainers     import *
 
 class CSEditorUpdate(object):
     """

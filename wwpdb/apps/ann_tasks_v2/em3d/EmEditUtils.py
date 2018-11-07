@@ -20,9 +20,9 @@ import os.path
 import os
 import json
 import traceback
-from wwpdb.utils.rcsb.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.rcsb.PathInfo import PathInfo
-from wwpdb.api.facade.DataReference import ReferenceFileComponents
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.wwpdb.utils.wf.DataReference import ReferenceFileComponents
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 

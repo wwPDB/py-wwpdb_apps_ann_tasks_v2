@@ -22,9 +22,9 @@ import os
 import json
 import traceback
 
-from pdbx_v2.style.PdbxStyleIoUtil import PdbxStyleIoUtil
+from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoUtil
 from pdbx_v2.style.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+from mmcif.io.IoAdapterCore import IoAdapterCore
 #
 
 

@@ -53,9 +53,9 @@ from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
 
 from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
 
-from wwpdb.utils.rcsb.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.rcsb.DataFileAdapter import DataFileAdapter
-from wwpdb.utils.rcsb.PathInfo import PathInfo
+from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.rcsb.DataExchange import DataExchange
 from wwpdb.utils.rcsb.WebUploadUtils import WebUploadUtils
 from wwpdb.utils.rcsb.WebRequest import ResponseContent

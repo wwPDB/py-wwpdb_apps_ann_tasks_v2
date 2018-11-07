@@ -21,9 +21,9 @@ import os.path
 import shutil
 import traceback
 
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
-from wwpdb.utils.rcsb.PathInfo import PathInfo
-from wwpdb.api.facade.DataReference import ReferenceFileComponents
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.wwpdb.utils.wf.DataReference import ReferenceFileComponents
 
 
 class SessionDownloadUtils(object):

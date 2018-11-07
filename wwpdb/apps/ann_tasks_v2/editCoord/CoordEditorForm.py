@@ -15,7 +15,7 @@ __version__   = "V0.07"
 
 import sys,os.path,os,traceback
 
-from wwpdb.api.facade.ConfigInfo    import ConfigInfo
+from wwpdb.utils.config.ConfigInfo    import ConfigInfo
 
 class CoordEditorForm(object):
     """

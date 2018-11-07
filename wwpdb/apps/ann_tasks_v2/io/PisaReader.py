@@ -29,7 +29,7 @@ import datetime
 import time
 from xml.dom import minidom
 
-from wwpdb.utils.rcsb.FormatOut import FormatOut
+from wwpdb.io.misc.FormatOut import FormatOut
 
 
 class PisaAssemblyReader(object):

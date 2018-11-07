@@ -18,8 +18,8 @@ import sys
 import os
 import traceback
 
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
-from wwpdb.utils.rcsb.PathInfo import PathInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.api.status.dbapi.DbLoadingApi import DbLoadingApi
 
 

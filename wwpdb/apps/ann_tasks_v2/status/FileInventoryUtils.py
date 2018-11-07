@@ -13,12 +13,12 @@ import traceback
 import scandir
 import datetime
 
-from wwpdb.api.facade.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.rcsb.DataMaintenance import DataMaintenance
 
-from pdbx_v2.writer.PdbxWriter import PdbxWriter
-from pdbx_v2.reader.PdbxContainers import *
-from pdbx_v2.reader.DataCategory import DataCategory
+from mmcif.io.PdbxWriter import PdbxWriter
+from mmcif.api.PdbxContainers import *
+from mmcif.api.DataCategory import DataCategory
 
 
 class FileInventoryUtils(object):

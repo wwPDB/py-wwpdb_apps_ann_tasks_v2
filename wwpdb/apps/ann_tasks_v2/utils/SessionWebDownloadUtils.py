@@ -18,9 +18,9 @@ __version__   = "V0.07"
 
 import sys, os, os.path, shutil, traceback
 
-from wwpdb.api.facade.ConfigInfo      import ConfigInfo
-from wwpdb.utils.rcsb.PathInfo        import PathInfo
-from wwpdb.api.facade.DataReference   import  ReferenceFileComponents
+from wwpdb.utils.config.ConfigInfo      import ConfigInfo
+from wwpdb.io.locator.PathInfo        import PathInfo
+from wwpdb.wwpdb.utils.wf.DataReference   import  ReferenceFileComponents
 
 class SessionWebDownloadUtils(object):
     """ Common methods for managing web download path information and markup.

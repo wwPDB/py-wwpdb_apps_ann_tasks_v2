@@ -40,15 +40,15 @@ import os.path
 import os
 import traceback
 import shutil
-from wwpdb.utils.rcsb.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.rcsb.DataFileAdapter import DataFileAdapter
 from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
 from wwpdb.apps.seqmodule.io.PdbxIoUtils import PdbxFileIo, ModelFileIo
-from pdbx_v2.reader.PdbxContainers import *
-from pdbx_v2.reader.DataCategory import DataCategory
+from mmcif.api.PdbxContainers import *
+from mmcif.api.DataCategory import DataCategory
 
-# from pdbx_v2.adapter.IoAdapterPy import IoAdapterPy
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+# from mmcif.io.IoAdapterPy import IoAdapterPy
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 
 class AssemblySelect(object):

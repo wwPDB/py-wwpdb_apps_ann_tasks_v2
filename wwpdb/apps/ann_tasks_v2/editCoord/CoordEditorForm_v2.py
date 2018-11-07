@@ -20,7 +20,7 @@ except ImportError:
 
 import json,os,shutil,sys,traceback
 
-from wwpdb.api.facade.ConfigInfo    import ConfigInfo
+from wwpdb.utils.config.ConfigInfo    import ConfigInfo
 
 class CoordEditorForm(object):
     """

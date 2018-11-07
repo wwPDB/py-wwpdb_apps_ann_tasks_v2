@@ -15,8 +15,8 @@ __version__   = "V0.07"
 
 import json,os,sys,time,traceback
 from wwpdb.utils.rcsb.mmCIFUtil import mmCIFUtil
-from wwpdb.utils.rcsb.PathInfo import PathInfo
-from wwpdb.utils.rcsb.RcsbDpUtility import RcsbDpUtility
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class NmrChemShiftProcessUtils(object):
     """

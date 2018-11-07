@@ -30,10 +30,10 @@ import shutil
 
 
 from wwpdb.apps.ann_tasks_v2.status.StatusHistory import StatusHistory
-from wwpdb.api.facade.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 from wwpdb.utils.rcsb.DataFile import DataFile
-from pdbx_v2.adapter.IoAdapterPy import IoAdapterPy
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+from mmcif.io.IoAdapterPy import IoAdapterPy
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 from pdbx_v2.pdbx.PdbxIo import PdbxEntryInfoIo
 

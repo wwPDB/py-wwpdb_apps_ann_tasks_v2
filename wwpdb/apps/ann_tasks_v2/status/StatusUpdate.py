@@ -24,13 +24,13 @@ import traceback
 import copy
 
 
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 from wwpdb.api.status.dbapi.DbLoadingApi import DbLoadingApi
-from wwpdb.api.status.dbapi.WfDbApi import WfDbApi
+from wwpdb.utils.wf.dbapi.WfDbApi import WfDbApi
 #
-from pdbx_v2.reader.DataCategory import DataCategory
+from mmcif.api.DataCategory import DataCategory
 
 import logging
 logger = logging.getLogger()

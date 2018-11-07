@@ -22,8 +22,8 @@ import os
 import datetime
 import traceback
 from pdbx_v2.pdbx.PdbxIo import PdbxStatusHistoryIo
-from wwpdb.utils.rcsb.PathInfo import PathInfo
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 
 
 class StatusHistory(object):

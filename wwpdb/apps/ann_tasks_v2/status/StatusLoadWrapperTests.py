@@ -25,7 +25,7 @@ import os.path
 
 
 from wwpdb.apps.ann_tasks_v2.status.StatusLoadWrapper import StatusLoadWrapper
-from wwpdb.api.facade.ConfigInfo import ConfigInfo, getSiteId
+from wwpdb.utils.config.ConfigInfo import ConfigInfo, getSiteId
 
 
 class StatusLoadWrapperTests(unittest.TestCase):

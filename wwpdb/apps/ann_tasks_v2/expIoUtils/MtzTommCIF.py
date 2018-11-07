@@ -15,7 +15,7 @@ __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.07"
 
 import sys,os.path,os,traceback
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo,PdbxExpIoUtils
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 

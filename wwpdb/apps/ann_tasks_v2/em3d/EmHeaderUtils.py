@@ -21,7 +21,7 @@ import os.path
 import traceback
 import logging
 import shutil
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from pdbx_v2.trans.InstanceMapper import InstanceMapper
 from wwpdb.utils.emdb.cif_emdb_translator.cif_emdb_translator import CifEMDBTranslator
 #

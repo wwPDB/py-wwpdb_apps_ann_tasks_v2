@@ -29,17 +29,17 @@ import traceback
 from itertools import izip_longest
 
 from wwpdb.apps.ann_tasks_v2.status.StatusHistory import StatusHistory
-from wwpdb.api.facade.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.utils.db.MyDbSqlGen import MyDbAdminSqlGen
 from wwpdb.utils.db.SchemaDefLoader import SchemaDefLoader
 from wwpdb.utils.db.MyDbUtil import MyDbConnect, MyDbQuery
 
-from wwpdb.utils.rcsb.MultiProcUtil import MultiProcUtil
+from rcsb.utils.multiproc.MultiProcUtil import MultiProcUtil
 
 from wwpdb.utils.db.StatusHistorySchemaDef import StatusHistorySchemaDef
-from pdbx_v2.adapter.IoAdapterCore import IoAdapterCore
+from mmcif.io.IoAdapterCore import IoAdapterCore
 from pdbx_v2.pdbx.PdbxIo import PdbxEntryInfoIo
-from wwpdb.utils.rcsb.PathInfo import PathInfo
+from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.rcsb.DataFile import DataFile
 
 

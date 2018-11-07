@@ -25,8 +25,8 @@ import sys
 import os.path
 import os
 import traceback
-from wwpdb.utils.rcsb.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.rcsb.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
