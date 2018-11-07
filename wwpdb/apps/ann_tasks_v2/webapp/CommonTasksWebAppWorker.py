@@ -123,7 +123,7 @@ from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpUpdate import PdbxExpUpdate
 from wwpdb.apps.ann_tasks_v2.em3d.EmUtils import EmUtils
 from wwpdb.apps.ann_tasks_v2.em3d.EmEditUtils import EmEditUtils
 from wwpdb.apps.ann_tasks_v2.em3d.EmModelUtils import EmModelUtils
-from wwpdb.apps.ann_tasks_v2.filer.FileUtils import FileUtils
+from wwpdb.utils.session.FileUtils import FileUtils
 #
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsUtils import NmrChemShiftsUtils
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsMiscChecks import NmrChemShiftsMiscChecks
