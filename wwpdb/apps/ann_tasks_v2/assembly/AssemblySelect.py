@@ -43,11 +43,9 @@ import shutil
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
 from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
-from wwpdb.apps.seqmodule.io.PdbxIoUtils import PdbxFileIo, ModelFileIo
+from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import PdbxFileIo, ModelFileIo
 from mmcif.api.PdbxContainers import *
 from mmcif.api.DataCategory import DataCategory
-
-# from mmcif.io.IoAdapterPy import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
 
 

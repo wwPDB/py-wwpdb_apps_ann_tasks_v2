@@ -23,7 +23,7 @@ import json
 import traceback
 
 from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoUtil
-from pdbx_v2.style.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
+from mmcif_utils.style.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
 from mmcif.io.IoAdapterCore import IoAdapterCore
 #
 

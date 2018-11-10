@@ -17,8 +17,6 @@ import sys,os.path,os,traceback
 
 from wwpdb.utils.config.ConfigInfo                   import ConfigInfo
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
-from wwpdb.apps.releasemodule.utils.Utility        import getFileName
-from wwpdb.apps.releasemodule.utils.Utility        import RunScript
 from wwpdb.io.file.mmCIFUtil                    import mmCIFUtil
 
 class CorresPNDTemplate(object):
@@ -78,13 +76,34 @@ class CorresPNDTemplate(object):
             traceback.print_exc(file=self.__lfh)
             return 'Generating correspondence template failed'
 
+    def __getFileName(self, path, root, ext):
+        """Create unique file name.
+        """
+        count = 1
+        while True:
+            filename = root + '_' + str(count) + '.' + ext
+            fullname = os.path.join(path, filename)
+            if not os.access(fullname, os.F_OK):
+                return filename
+            #
+            count += 1
+                #
+        return root + '_1.' + ext
+
+    def __RunScript(self, path, script, log):
+        """Run script command
+        """
+        cmd = 'cd ' + path + '; chmod 755 ' + script \
+            + '; ./' + script + ' >& ' + log
+        os.system(cmd)
+
     def __runGetCorresInfo(self):
         """
         """
-        scriptfile = getFileName(self.__sessionPath, 'corres', 'csh')
-        resultfile = getFileName(self.__sessionPath, 'corres', 'cif')
-        logfile    = getFileName(self.__sessionPath, 'corres', 'log')
-        clogfile   = getFileName(self.__sessionPath, 'corres_command', 'log')
+        scriptfile = self.__getFileName(self.__sessionPath, 'corres', 'csh')
+        resultfile = self.__getFileName(self.__sessionPath, 'corres', 'cif')
+        logfile    = self.__getFileName(self.__sessionPath, 'corres', 'log')
+        clogfile   = self.__getFileName(self.__sessionPath, 'corres_command', 'log')
         #
         script = os.path.join(self.__sessionPath, scriptfile)
         f = file(script, 'w')
@@ -99,7 +118,7 @@ class CorresPNDTemplate(object):
         f.write('#\n')
         f.close()
         #
-        RunScript(self.__sessionPath, scriptfile, clogfile)
+        self.__RunScript(self.__sessionPath, scriptfile, clogfile)
         #
         logfilename = os.path.join(self.__sessionPath, logfile)
         f = file(logfilename, 'r')

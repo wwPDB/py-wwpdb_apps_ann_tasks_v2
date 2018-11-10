@@ -15,7 +15,7 @@ __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.07"
 
 import sys,os.path,os,traceback
-from pdbx_v2.pdbx.PdbxIo                  import PdbxLocalMapIndexIo
+from mmcif_utils.pdbx.PdbxIo                  import PdbxLocalMapIndexIo
 
 class MapDisplay(object):
     """

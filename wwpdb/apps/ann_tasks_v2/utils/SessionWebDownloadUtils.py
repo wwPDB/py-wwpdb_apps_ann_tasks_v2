@@ -20,7 +20,6 @@ import sys, os, os.path, shutil, traceback
 
 from wwpdb.utils.config.ConfigInfo      import ConfigInfo
 from wwpdb.io.locator.PathInfo        import PathInfo
-from wwpdb.wwpdb.utils.wf.DataReference   import  ReferenceFileComponents
 
 class SessionWebDownloadUtils(object):
     """ Common methods for managing web download path information and markup.

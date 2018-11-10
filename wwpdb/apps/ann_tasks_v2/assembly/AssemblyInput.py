@@ -24,9 +24,8 @@ import sys
 import os.path
 import os
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
-from wwpdb.apps.seqmodule.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
+from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
-# from mmcif.io.IoAdapterPy import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
 
 class AssemblyInput(object):

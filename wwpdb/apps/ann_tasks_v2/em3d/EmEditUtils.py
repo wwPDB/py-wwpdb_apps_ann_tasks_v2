@@ -22,7 +22,7 @@ import json
 import traceback
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.wwpdb.utils.wf.DataReference import ReferenceFileComponents
+from wwpdb.io.locator.DataReference import ReferenceFileComponents
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
