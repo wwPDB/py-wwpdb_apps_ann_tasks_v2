@@ -254,4 +254,4 @@ if __name__ == "__main__":
     #
     calc = MtzTommCIF(reqObj=myReqObj, verbose=True, log=sys.stderr)
     calc.run("D_1000223249", "D_1000223249_sf_P1.cif")
-    print calc.getHtmlText()
+    print(calc.getHtmlText())

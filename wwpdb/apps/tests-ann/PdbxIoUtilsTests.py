@@ -70,7 +70,7 @@ class PdbxIoUtilsTests(unittest.TestCase):
             ed = sdf.getPolymerEntityChainDict()
             self.assertNotEqual(ed, {})
             
-	    polyEntityList=sdf.getEntityPolyList()
+            polyEntityList=sdf.getEntityPolyList()
             self.assertNotEqual(polyEntityList, [])
             
 if __name__ == '__main__':
