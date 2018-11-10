@@ -47,7 +47,7 @@ from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWe
 from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
 from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
 from wwpdb.apps.ann_tasks_v2.status.StatusUpdate import StatusUpdate
-from wwpdb.apps.ann_tasks_v2.status.StatusHistoryUtils import StatusHistoryUtils
+from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
 from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
 
 from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils

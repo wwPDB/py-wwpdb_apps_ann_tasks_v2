@@ -27,7 +27,7 @@ import copy
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from mmcif.io.IoAdapterCore import IoAdapterCore
 
-from wwpdb.api.status.dbapi.DbLoadingApi import DbLoadingApi
+from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 from wwpdb.utils.wf.dbapi.WfDbApi import WfDbApi
 #
 from mmcif.api.DataCategory import DataCategory
