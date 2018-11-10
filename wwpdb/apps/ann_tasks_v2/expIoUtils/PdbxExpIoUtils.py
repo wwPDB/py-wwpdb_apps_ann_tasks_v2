@@ -275,8 +275,11 @@ class PdbxExpIoUtils(object):
                 muId=str(catObj.getValue(attributeName='id',rowIndex=ii))
                 mu=catObj.getValue(attributeName='wavelength',rowIndex=ii)
                 if self.__isEmptyValue(mu):
-                    mu=None
-                wt=catObj.getValueOrDefault(attributeName='wt',rowIndex=ii,defaultValue='1.0')
+                    mu = None
+                if catObj.hasAttribute('wt'):
+                    wt = catObj.getValueOrDefault(attributeName='wt',rowIndex=ii,defaultValue='1.0')
+                else:
+                    wt = '1.0'
                 muList.append((muId,mu,wt))
         except:
             traceback.print_exc(file=self.__lfh)
