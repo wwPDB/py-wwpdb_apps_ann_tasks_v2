@@ -19,6 +19,7 @@ __version__   = "V0.07"
 
 
 import os,sys,re,traceback
+import tempfile
 
 from mmcif.io.IoAdapterPy                     import IoAdapterPy
 from mmcif.io.IoAdapterCore                   import IoAdapterCore
@@ -44,9 +45,16 @@ class PdbxExpFileIo(object):
         self.__verbose=verbose
         self.__lfh=log
 
+    def __getOutDir(self, fPath):
+        """Attempts to find a writeable place for log file during read"""
+        for dp in [ os.path.dirname(fPath), '.', tempfile.gettempdir()]:
+            if os.access(dp, os.W_OK):
+                return dp
+
     def getContainer(self,fPath,index=0):
+        outDirPath = self.__getOutDir(fPath)
         try:
-            cList=self.__ioObj.readFile(fPath)
+            cList=self.__ioObj.readFile(fPath, outDirPath = outDirPath)
             return cList[index]
         except:
             if (self.__verbose):
@@ -54,8 +62,9 @@ class PdbxExpFileIo(object):
             return None
 
     def getContainerList(self,fPath):
+        outDirPath = self.__getOutDir(fPath)
         try:
-            cList=self.__ioObj.readFile(fPath)
+            cList=self.__ioObj.readFile(fPath, outDirPath = outDirPath)
             return cList
         except:
             if (self.__verbose):

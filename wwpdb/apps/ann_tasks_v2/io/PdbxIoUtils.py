@@ -22,6 +22,7 @@ import os
 import sys
 import re
 import traceback
+import tempfile
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
 from mmcif.io.IoAdapterCore import IoAdapterCore
@@ -41,14 +42,21 @@ class PdbxFileIo(object):
         """  Input processing can be performed using either native Python or C++ Io libraries
              by choosing the appropriate input adapter.
         """
-
         self.__ioObj = ioObj
         self.__verbose = verbose
         self.__lfh = log
 
+
+    def __getOutDir(self, fPath):
+        """Attempts to find a writeable place for log file during read"""
+        for dp in [ os.path.dirname(fPath), '.', tempfile.gettempdir()]:
+            if os.access(dp, os.W_OK):
+                return dp
+        
     def getContainer(self, fPath, index=0):
+        outDirPath = self.__getOutDir(fPath)
         try:
-            cList = self.__ioObj.readFile(fPath)
+            cList = self.__ioObj.readFile(fPath, outDirPath = outDirPath)
             return cList[index]
         except:
             if (self.__verbose):
@@ -56,8 +64,9 @@ class PdbxFileIo(object):
             return None
 
     def getContainerList(self, fPath):
+        outDirPath = self.__getOutDir(fPath)
         try:
-            cList = self.__ioObj.readFile(fPath)
+            cList = self.__ioObj.readFile(fPath, outDirPath = fPath)
             return cList
         except:
             if (self.__verbose):
