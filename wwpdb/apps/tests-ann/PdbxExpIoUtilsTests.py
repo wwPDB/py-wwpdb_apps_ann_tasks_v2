@@ -21,6 +21,7 @@ import traceback
 import time
 import os
 import os.path
+import logging
 
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
 
@@ -32,6 +33,15 @@ TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
 if not os.path.exists(TESTOUTPUT):
     os.makedirs(TESTOUTPUT)
 
+# Create logger
+logger = logging.getLogger()
+ch = logging.StreamHandler()
+formatter = logging.Formatter('[%(levelname)s] [%(module)s.%(funcName)s] %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+logger.setLevel(logging.DEBUG)
+
+
 class PdbxExpIoUtilsTests(unittest.TestCase):
     def setUp(self):
         #
@@ -41,6 +51,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
         
         self.__pathExamples = os.path.join(mockTopPath, 'SF')
+        self.__pathModelExamples = os.path.join(mockTopPath, 'MODELS')
         self.__examSFFileList = ['3oqp-sf.cif']
 
         self.__examFileRegex = os.path.join(HERE, 'tests', 'regex-input.cif')
@@ -160,7 +171,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             # get model data --
             pIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
             for ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
-                fnInp = os.path.join(self.__pathExamples, sfFn)
+                fnInp = os.path.join(self.__pathModelExamples, mFn)
                 containerList = pIo.getContainerList(fnInp)
                 for container in containerList:
                     self.__lfh.write("In file %s found data set %s\n" % (fnInp, container.getName()))
@@ -182,7 +193,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     #
                     #
                     muD = pE.getDiffrnRadiationWavelengthList()
-                    self.__lfh.write(" +++ muD %r\n" % muD.items())
+                    self.__lfh.write(" +++ muD %r\n" % muD)
                     #
                     for diffrnId in diffrnIdList:
                         mu = pE.getDiffrnSourceWavelength(diffrnId=diffrnId)
@@ -207,7 +218,6 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                                                                                      time.localtime()),
                                                                        endTime - startTime))
 
-    @unittest.skip("Until ported")
     def testUpdateExpItems(self):
         """ update selected items from model and reflection data files -- 
 
@@ -225,7 +235,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             for ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
                 # First get the get model data --
                 #
-                modelPath = os.path.join(self.__pathExamples, mFn)
+                modelPath = os.path.join(self.__pathModelExamples, mFn)
                 mIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
                 mcList = mIo.getContainerList(modelPath)
                 if len(mcList) < 1:
@@ -274,9 +284,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     else:
                         dId = diffrnIdList[0]
                     #
-                    self.__lfh.write("XXX %s\n" % modelWavelengthD)
                     if dId in modelWavelengthD:
-                        self.__lfh.write("XXX %s\n" % dId)
                         muList = modelWavelengthD[dId]
                         muD = {}
                         for muId, mu, wt in muList:
