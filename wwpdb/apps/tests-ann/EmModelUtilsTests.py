@@ -27,6 +27,7 @@ import time
 from wwpdb.apps.ann_tasks_v2.em3d.EmModelUtils import EmModelUtils
 
 
+@unittest.skip("Until tests ported")
 class EmModelUtilsTests(unittest.TestCase):
 
     def setUp(self):
@@ -44,7 +45,7 @@ class EmModelUtilsTests(unittest.TestCase):
     def testUpdateModel(self):
         """Test case -  model file update with map header data
         """
-        startTime = time.clock()
+        startTime = time.time()
         self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__,
                                                        sys._getframe().f_code.co_name,
                                                        time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
@@ -71,7 +72,7 @@ class EmModelUtilsTests(unittest.TestCase):
             traceback.print_exc(file=sys.stdout)
             self.fail()
 
-        endTime = time.clock()
+        endTime = time.time()
         self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
                                                                        sys._getframe().f_code.co_name,
                                                                        time.strftime("%Y %m %d %H:%M:%S", time.localtime()),

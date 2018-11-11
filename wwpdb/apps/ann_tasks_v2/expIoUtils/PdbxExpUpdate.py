@@ -103,7 +103,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         """ Update selected items in reflection data file using the current contents of the model file.
 
         """
-        startTime=time.clock()        
+        startTime=time.time()        
         if self.__verbose:
             self.__lfh.write("\n\n========================================================================================================\n")
             self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name,
@@ -350,7 +350,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         self.__writeLog()
         #
         if self.__verbose:
-            endTime=time.clock()
+            endTime=time.time()
             self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__, sys._getframe().f_code.co_name,
                                                                            time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime-startTime))
         #

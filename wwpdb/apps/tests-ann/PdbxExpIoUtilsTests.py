@@ -98,7 +98,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
     def testInsertComments(self):
         """ Read and write operations --
         """
-        startTime = time.clock()
+        startTime = time.time()
         self.__lfh.write(
             "\n\n========================================================================================================\n")
         self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__,
@@ -112,7 +112,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
+        endTime = time.time()
         self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
                                                                        sys._getframe().f_code.co_name,
                                                                        time.strftime("%Y %m %d %H:%M:%S",
@@ -122,7 +122,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
     def testReadWriteSF(self):
         """ Read and write reflection data files adding comment terminators  ----
         """
-        startTime = time.clock()
+        startTime = time.time()
         self.__lfh.write(
             "\n\n========================================================================================================\n")
         self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__,
@@ -149,7 +149,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
+        endTime = time.time()
         self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
                                                                        sys._getframe().f_code.co_name,
                                                                        time.strftime("%Y %m %d %H:%M:%S",
@@ -161,7 +161,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
 
             This is an illustration of the available accessor methods -- 
         """
-        startTime = time.clock()
+        startTime = time.time()
         self.__lfh.write(
             "\n\n========================================================================================================\n")
         self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__,
@@ -211,7 +211,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
+        endTime = time.time()
         self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
                                                                        sys._getframe().f_code.co_name,
                                                                        time.strftime("%Y %m %d %H:%M:%S",
@@ -223,7 +223,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
 
             This is an illustration of the available accessor methods -- 
         """
-        startTime = time.clock()
+        startTime = time.time()
         self.__lfh.write(
             "\n\n========================================================================================================\n")
         self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__,
@@ -317,7 +317,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
-        endTime = time.clock()
+        endTime = time.time()
         self.__lfh.write("\nCompleted %s %s at %s (%.2f seconds)\n" % (self.__class__.__name__,
                                                                        sys._getframe().f_code.co_name,
                                                                        time.strftime("%Y %m %d %H:%M:%S",
