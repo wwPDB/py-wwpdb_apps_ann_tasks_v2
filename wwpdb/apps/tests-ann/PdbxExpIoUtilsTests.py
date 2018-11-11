@@ -309,9 +309,9 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     curContainerName, updMuList))
                     ok = sfIo.updateRadiationWavelength(updMuList, container)
                 #
-                sfOutPath = sfFn + '-out'
+                sfOutPath = os.path.join(TESTOUTPUT, sfFn + '-out')
                 sfIo.writeContainerList(sfOutPath, containerList)
-                fnCmt = sfFn + '-out-comment'
+                fnCmt = os.path.join(TESTOUTPUT,sfFn + '-out-comment')
                 self.__insertComments(sfOutPath, fnCmt)
         except:
             traceback.print_exc(file=self.__lfh)
