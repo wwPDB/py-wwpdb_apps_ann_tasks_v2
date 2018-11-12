@@ -41,6 +41,14 @@ from wwpdb.apps.ann_tasks_v2.utils.TlsRange import TlsRange
 from wwpdb.utils.session.WebRequest import ResponseContent
 from wwpdb.io.file.DataExchange import DataExchange
 from wwpdb.io.locator.PathInfo import PathInfo
+import logging
+# Create logger
+logger = logging.getLogger()
+ch = logging.StreamHandler()
+formatter = logging.Formatter('[%(levelname)s] [%(module)s.%(funcName)s] %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+logger.setLevel(logging.DEBUG)
 
 
 class AnnTasksWebAppWorker(CommonTasksWebAppWorker):

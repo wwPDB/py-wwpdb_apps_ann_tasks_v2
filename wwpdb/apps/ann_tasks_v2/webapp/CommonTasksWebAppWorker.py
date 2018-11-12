@@ -57,6 +57,7 @@ import shutil
 import glob
 import json
 # from json import loads, dumps
+import logging
 
 from time import localtime, strftime, sleep
 from wwpdb.utils.session.WebAppWorkerBase import WebAppWorkerBase
@@ -131,6 +132,7 @@ from wwpdb.apps.ann_tasks_v2.nmr.NmrModelUtils import NmrModelUtils
 
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 
+logger = logging.getLogger(__name__)
 
 class CommonTasksWebAppWorker(WebAppWorkerBase):
 
@@ -1773,9 +1775,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if (self._verbose):
             self._lfh.write("+CommonTasksWebAppWorker._updateCoordEditorOp() starting\n")
         self._getSession(useContext=True)
+
         #
-        coordEditorUpdateOp = CoordEditorUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        content = coordEditorUpdateOp.run()
+        try:
+            coordEditorUpdateOp = CoordEditorUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+            content = coordEditorUpdateOp.run()
+        except Exception as e:
+            logger.exception("In updatign editor value")
+            raise e
         #
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
