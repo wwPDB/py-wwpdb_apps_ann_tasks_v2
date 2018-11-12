@@ -19,10 +19,14 @@ except ImportError:
     import pickle as pickle
 
 import sys,os.path,os,traceback
+import logging
 
 from wwpdb.utils.config.ConfigInfo    import ConfigInfo
 from mmcif.io.PdbxWriter         import PdbxWriter
-from mmcif.api.PdbxContainers     import *
+from mmcif.api.PdbxContainers     import DataContainer
+from mmcif.api.DataCategory import DataCategory
+
+logger = logging.getLogger(__name__)
 
 class CoordEditorUpdate(object):
     """

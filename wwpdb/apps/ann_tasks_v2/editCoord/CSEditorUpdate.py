@@ -23,6 +23,8 @@ import sys,os.path,os,traceback
 from wwpdb.utils.config.ConfigInfo    import ConfigInfo
 from mmcif.io.PdbxWriter         import PdbxWriter
 from mmcif.api.PdbxContainers     import *
+from mmcif.api.DataCategory import DataCategory
+
 
 class CSEditorUpdate(object):
     """
