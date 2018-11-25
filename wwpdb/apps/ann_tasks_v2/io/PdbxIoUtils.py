@@ -135,6 +135,7 @@ class ModelFileIo(object):
                self.__lfh.write("+PdbxIoUtils.getPolymerEntityList() WARNING - Likely missing entity or entity_poly data categories\n")
 
        return []
+
     def getPdbChainIdList(self, entityId):
         catObj = self.__currentContainer.getObj('entity_poly')
         if catObj.hasAttribute('pdbx_strand_id'):
@@ -160,6 +161,21 @@ class ModelFileIo(object):
             rList.append(str(ch).strip())
         return rList
 
+    def getEntityDescription(self, entityId):
+        """
+        Return a the _entity.pdbx_description or empty string.
+        """
+        try:
+            catObj = self.__currentContainer.getObj('entity')
+            if catObj.hasAttribute('pdbx_description'):
+                vals = catObj.selectValuesWhere('pdbx_description', entityId, 'id')
+            elif catObj.hasAttribute('ndb_chain_id'):
+                vals = catObj.selectValuesWhere('ndb_description', entityId, 'id')
+            else:
+                vals = []
+            return self.__firstOrDefault(vals, '')
+        except:
+            return ''
 
     def getEntityPolyList(self):
         """Returns a list of polymer entity ids
