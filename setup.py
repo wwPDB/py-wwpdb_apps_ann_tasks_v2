@@ -48,7 +48,7 @@ setup(
                       'wwpdb.utils.wf', 'wwpdb.utils.session', 'mmcif >= 0.25',
                       'wwpdb.utils.dp >= 0.13', 'wwpdb.utils.detach',
                       'mmcif.utils >= 0.14', 'matplotlib', 'pygal'],
-    packages=find_packages(exclude=['wwpdb.apps.tests-ann']),
+    packages=find_packages(exclude=['wwpdb.apps.tests-ann', 'mock-data']),
     # Enables Manifest to be used
     #include_package_data = True,
     package_data={
