@@ -33,6 +33,7 @@ import json,os,sys,traceback
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.expIoUtils.MtzTommCIF import MtzTommCIF
+from wwpdb.apps.ann_tasks_v2.expIoUtils.ReSetFreeRinSFmmCIF import ReSetFreeRinSFmmCIF
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
@@ -99,6 +100,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/ann_tasks_v2/specialpositionupdate': '_specialPositionUpdateOp',
                            '/service/ann_tasks_v2/tlsrangecorrection': '_tlsRangeCorrectionOp',
                            '/service/ann_tasks_v2/mtz_mmcif_conversion': '_mtzCifConversionOp',
+                           '/service/ann_tasks_v2/correcting_sf_free_r_set': '_sfFreeRCorrectionOp',
                            '/service/ann_tasks_v2/reassignaltidscalc': '_reassignAltIdsCalcOp',
                            '/service/ann_tasks_v2/bisofullcalc': '_bisoFullCalcOp',
                            '/service/ann_tasks_v2/linkcalc': '_linkCalcOp',
@@ -506,6 +508,32 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
              rC.set("errorflag", True)
         #
 
+        return rC
+
+    def _sfFreeRCorrectionOp(self):
+        """ Correcting free R set of SF file
+        """
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._sfFreeRCorrectionOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        expFileName = self._reqObj.getValue("entryexpfilename")
+        entryId = self._reqObj.getValue("entryid")
+        taskArgs = ""
+        taskFormId = self._reqObj.getValue("taskformid")
+        #
+        calc = ReSetFreeRinSFmmCIF(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok = calc.run()
+        #
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._sfFreeRCorrectionOp() status %r\n" % ok)
+        #
+        tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
+        #
+        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        tss.assign(name="Correcting free R set form", formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryExpFileName=expFileName)
+        rC = self._makeTaskResponse(tssObj=tss)
+        #
         return rC
 
     def _nmrCsAutoProcessingOp(self):
