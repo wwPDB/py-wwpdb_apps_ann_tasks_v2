@@ -1325,7 +1325,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                           '#dict-check-task-form', '#reassign-altids-task-form', '#reflection-file-update-task-form',
                           '#nmr-cs-upload-check-form', '#nmr-cs-atom-name-check-form', '#nmr-rep-model-update-form',
                           '#nmr-cs-update-archive-form', '#nmr-cs-update-form', '#nmr-cs-processing-form', '#nmr-cs-edit-form',
-                          '#tls-range-correction-form', '#mtz-mmcif-conversion-form', '#mtz-mmcif-semi-auto-conversion-form' ]
+                          '#tls-range-correction-form', '#mtz-mmcif-conversion-form', '#mtz-mmcif-semi-auto-conversion-form',
+                          '#sf-mmcif-free-r-correction-form' ]
             tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             for key in formIdList:
                 val = uds.get(key)
