@@ -1547,6 +1547,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         pth = de.copyToSession(contentType="validation-report-full", formatType="pdf", version="latest", partitionNumber=1)
         pth = de.copyToSession(contentType="validation-report-slider", formatType="svg", version="latest", partitionNumber=1)
         pth = de.copyToSession(contentType="validation-data", formatType="xml", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-2fo-map-coef", formatType="pdbx", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-fo-map-coef", formatType="pdbx", version="latest", partitionNumber=1)
         #
         # dictionary check file
         #
