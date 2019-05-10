@@ -46,7 +46,7 @@ setup(
     install_requires=['wwpdb.utils.config ~= 0.8.dev1', 'wwpdb.apps.wf_engine',
                       'wwpdb.io', 'wwpdb.utils.db >= 0.6', 'wwpdb.utils.emdb',
                       'wwpdb.utils.wf', 'wwpdb.utils.session', 'mmcif >= 0.25',
-                      'wwpdb.utils.dp ~= 0.18.dev1', 'wwpdb.utils.detach',
+                      'wwpdb.utils.dp ~= 0.18.dev2', 'wwpdb.utils.detach',
                       'mmcif.utils >= 0.14', 'matplotlib', 'pygal'],
     packages=find_packages(exclude=['wwpdb.apps.tests-ann', 'mock-data']),
     # Enables Manifest to be used
