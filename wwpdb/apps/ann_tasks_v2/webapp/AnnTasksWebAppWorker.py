@@ -336,6 +336,16 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         filelist.append([entryFileName, "model", "pdbx"])
         #
         # copy reflection file if updated
+        resetFreeR = False
+        rPath = os.path.join(self._sessionPath, identifier + '-reset_freer.log')
+        if os.access(rPath, os.F_OK):
+            ifh = open(rPath, 'r')
+            data = ifh.read()
+            ifh.close()
+            if data.find("Free R set was successfully relabeled.") > 0:
+                resetFreeR = True
+            #
+        #
         tPath = os.path.join(self._sessionPath, 'update-reflection-file.log')
         wPath = os.path.join(self._sessionPath, expFileName)
         if (self._verbose):
@@ -344,7 +354,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             self._lfh.write("+%s.%s() checking for structure factor file filesource %s identifier %s path %s\n" %
                             (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, wPath))
 
-        if os.access(tPath, os.F_OK):
+        if resetFreeR or os.access(tPath, os.F_OK):
             filelist.append([expFileName, "structure-factors", "pdbx"])
         #
         if os.access(os.path.join(self._sessionPath, csFileName), os.F_OK):
