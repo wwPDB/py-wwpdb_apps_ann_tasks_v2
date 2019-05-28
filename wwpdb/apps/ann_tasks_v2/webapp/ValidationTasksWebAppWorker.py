@@ -75,6 +75,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/validation_tasks_v2/finish': '_finishOp',
                            '/service/validation_tasks_v2/getcorrespondencetemplate': '_getCorresPNDTemplateOp',
                            '/service/validation_tasks_v2/generatecorrespondence': '_generateCorresPNDOp',
+                           '/service/validation_tasks_v2/getbusterreport': '_getBusterReportOp',
                            '/service/validation_tasks_v2/manualcoordeditorform': '_getCoordEditorFormOp',
                            '/service/validation_tasks_v2/manualcoordeditorsave': '_saveCoordEditorOp',
                            '/service/validation_tasks_v2/manualcoordeditorupdate': '_updateCoordEditorOp',

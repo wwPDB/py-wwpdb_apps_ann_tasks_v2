@@ -129,7 +129,11 @@ from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsUtils import NmrChemShiftsUtils
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsMiscChecks import NmrChemShiftsMiscChecks
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 from wwpdb.apps.ann_tasks_v2.nmr.NmrModelUtils import NmrModelUtils
-
+#
+from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
+from wwpdb.apps.validation.src.lvw.LVW_GetHTML import LVW_GetHTML
+from wwpdb.apps.validation.src.lvw.LVW_Mogul import LVW_Mogul
+#
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 
 logger = logging.getLogger(__name__)
@@ -689,12 +693,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         taskArgs = self._reqObj.getValue("task-form-args")
         taskFormId = self._reqObj.getValue("taskformid")
-        #
 
         calc = Validate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         if taskArgs is not None and len(taskArgs) > 0:
             calc.setArguments(taskArgs)
-
+        #
         # implement test version selectively --
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() USING runAll VERSION on site %s\n" % self._siteId)
@@ -1614,6 +1617,43 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         rC.addDictionaryItems({'sessionid': str(sessionId)})
         rC.setStatusCode(str(rtrnCode))
 
+        return rC
+
+    def _getBusterReportOp(self):
+        """ Getting buster report html context
+        """
+        if (self._verbose):
+            self._lfh.write("+CommonTasksWebAppWorker._getBusterReportOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        #
+        content = ""
+        try:
+            entryId = self._reqObj.getValue("entryid")
+            rundir = os.path.join(self._sessionPath, "LVW_" + entryId.upper())
+            if os.access(rundir, os.F_OK):
+                loiUtil = LVW_GetLOI(siteId=self._siteId, rundir=rundir, verbose=self._verbose, log=self._lfh)
+                if loiUtil.readLOIMap():
+                    loiMap = loiUtil.getLOIMap()
+                    if loiMap:
+                        mogulUtil = LVW_Mogul(siteId=self._siteId, rundir=rundir, LOIMap=loiMap, verbose=self._verbose, log=self._lfh)
+                        mogulUtil.readMogulResult()
+                        loiMap = mogulUtil.getLOIMap()
+                        #
+                        topHtmlPath = os.path.join("/sessions", str(self._sessionId), "LVW_" + entryId.upper())
+                        htmlUtil = LVW_GetHTML(siteId=self._siteId, rundir=rundir, topHtmlPath=topHtmlPath, LOIMap=loiMap, \
+                                       verbose=self._verbose, log=self._lfh)
+                        htmlUtil.setLigandOfInterestingList(loiUtil.getLOIList())
+                        content = htmlUtil.getHtmlText()
+                    #
+                #
+            #
+        except:
+            traceback.print_exc(file=self._lfh)
+        #
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        rC.setHtmlText(content)
         return rC
 
     def _getCorresPNDTemplateOp(self):

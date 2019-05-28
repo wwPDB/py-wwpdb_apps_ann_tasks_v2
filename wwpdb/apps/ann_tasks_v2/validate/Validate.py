@@ -21,10 +21,7 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
-import traceback
+import os, shutil, sys, traceback
 #from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
@@ -120,6 +117,13 @@ class Validate(SessionWebDownloadUtils):
             dp.imp(inpPath)
 
             dp.addInput(name="entry_id", value=entryId)
+
+            rundir = os.path.join(self.__sessionPath, "LVW_" + entryId.upper())
+            if os.access(rundir, os.F_OK):
+                shutil.rmtree(rundir)
+            #
+            os.makedirs(rundir)
+            dp.addInput(name="run_dir", value=rundir)
 
             if os.access(sfPath, os.R_OK):
                 dp.addInput(name="sf_file_path", value=sfPath)
