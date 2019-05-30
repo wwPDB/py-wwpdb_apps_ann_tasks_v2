@@ -21,11 +21,9 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
-import traceback
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+import os, shutil, sys, traceback
+#from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -106,13 +104,26 @@ class Validate(SessionWebDownloadUtils):
 
             fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="svg", versionId=uploadVersionOp, partNumber='1')
             resultSvgPath = os.path.join(self.__sessionPath, fName)
+
+            fName = pI.getFileName(entryId, contentType="validation-report-2fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+            result2FoPath = os.path.join(self.__sessionPath, fName)
+
+            fName = pI.getFileName(entryId, contentType="validation-report-fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+            resultFoPath = os.path.join(self.__sessionPath, fName)
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_val-report.log")
             #
-            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp = ValidationWrapper(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
 
             dp.addInput(name="entry_id", value=entryId)
+
+            rundir = os.path.join(self.__sessionPath, "LVW_" + entryId.upper())
+            if os.access(rundir, os.F_OK):
+                shutil.rmtree(rundir)
+            #
+            os.makedirs(rundir)
+            dp.addInput(name="run_dir", value=rundir)
 
             if os.access(sfPath, os.R_OK):
                 dp.addInput(name="sf_file_path", value=sfPath)
@@ -130,15 +141,17 @@ class Validate(SessionWebDownloadUtils):
             #
             if (self.__validateArgs is not None):
                 dp.addInput(name="validate_arguments", value=self.__validateArgs)
-            dp.op("annot-wwpdb-validate-all")
+            dp.op("annot-wwpdb-validate-all-sf")
             dp.expLog(logPath)
-            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath])
+            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultFoPath, result2FoPath])
 
             self.addDownloadPath(resultPdfPath)
             self.addDownloadPath(resultXmlPath)
             self.addDownloadPath(resultFullPdfPath)
             self.addDownloadPath(resultPngPath)
             self.addDownloadPath(resultSvgPath)
+            self.addDownloadPath(resultFoPath)
+            self.addDownloadPath(result2FoPath)
             self.addDownloadPath(logPath)
             #
             if (self.__verbose):
