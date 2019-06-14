@@ -19,6 +19,7 @@
 #   3-Jul-2015   jdw  add def generateAssemblies(self, entryId, modelFilePath) and
 #                         def makeAssemblyDetailsTable(self, entryId, modelFilePath)
 #                     switch to core python IO adapter -
+#  14-Jun-2019   zf   add autoAssignDefaultAssembly()
 ##
 """
 Calculation, selection and depiction of coordinate assemblies.
@@ -283,6 +284,52 @@ class AssemblySelect(object):
                 self.__lfh.write("+AssemblySelect.updateModelFile() failed\n")
                 traceback.print_exc(file=self.__lfh)
             return False
+        #
+
+    def autoAssignDefaultAssembly(self, entryId, inpFile):
+        """  Automatically fill in default assembly. Merge the extra assembly data if assembly report xml file exists.
+        """
+        try:
+            inpPath = os.path.join(self.__sessionPath, inpFile)
+            retPath = os.path.join(self.__sessionPath, entryId + "_model-assembly-updated_P1.cif")
+            logPath = os.path.join(self.__sessionPath, entryId + "_assembly-merge.log")
+            assignPath = os.path.join(self.__sessionPath, entryId + "_assembly-assign_P1.cif")
+            reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
+            #
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(inpPath)
+            #
+            dp.addInput(name="auto_assembly_assignment", value="yes")
+            if os.access(reportPath, os.R_OK):
+                fth = open(assignPath, "w")
+                fth.write("data_assembly_assignments\n\n")
+                fth.write("_ann_tasks_assem_sw_assign.assem_id         1 \n")
+                fth.write("_ann_tasks_assem_sw_assign.provenance       author_defined_assembly \n")
+                fth.write("_ann_tasks_assem_sw_assign.method           ? \n")
+                fth.write("_ann_tasks_assem_sw_assign.method_version   ? \n")
+                fth.write("_ann_tasks_assem_sw_assign.method_assem_id  0 \n#\n")
+                fth.close()
+                #
+                dp.addInput(name="pisa_assembly_assignment_file_path", value=assignPath)
+                dp.addInput(name="pisa_assembly_file_path", value=reportPath)
+            #
+            dp.op("pisa-assembly-merge-cif")
+            dp.exp(retPath)
+            dp.expLog(logPath)
+            #
+            #  Added generation of assembly files to the model update.
+            if os.access(retPath, os.R_OK):
+                self.generateAssemblies(entryId, modelFilePath=retPath)
+
+            #
+            # dp.cleanup()
+            return True
+        except:
+            if (self.__verbose):
+                self.__lfh.write("+AssemblySelect.updateModelFile() failed\n")
+                traceback.print_exc(file=self.__lfh)
+            return False
+        #
 
     def getAssemblyFormDetails(self, entryId):
         sL, pD, fD, eD = self.__getAssemblySelectionDetails(entryId)

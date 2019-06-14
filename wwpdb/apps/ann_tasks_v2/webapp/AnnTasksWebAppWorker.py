@@ -8,6 +8,7 @@
 #   18-Sep-2015  jdw add NMR data file support
 #   13-Jan-2017  ep  add support for correcting occupancy on special position
 #   02-Oct-2017  zf  add /service/ann_tasks_v2/entityloadinfo, /service/ann_tasks_v2/symoploadinfo
+#   14-Jun-2019  zf  add automatical filling in assembly for NMR entry
 #
 ##
 """
@@ -31,6 +32,7 @@ __version__ = "V0.07"
 import json,os,sys,traceback
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
+from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.expIoUtils.MtzTommCIF import MtzTommCIF
 from wwpdb.apps.ann_tasks_v2.expIoUtils.ReSetFreeRinSFmmCIF import ReSetFreeRinSFmmCIF
@@ -41,6 +43,7 @@ from wwpdb.apps.ann_tasks_v2.utils.TlsRange import TlsRange
 
 from wwpdb.utils.session.WebRequest import ResponseContent
 from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
 import logging
 # Create logger
@@ -271,9 +274,36 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         entryCsFilePath = os.path.join(self._sessionPath, entryCsFileName)
         if os.access(entryCsFilePath, os.R_OK):
             csOk = True
-
+        #
+        nmr_assembly_status = ""
         if bIsWorkflow:
+            method = str(self._reqObj.getValue("method")).strip().upper()
+            if (method == "SOLUTION NMR") or (method == "SOLID-STATE NMR") or (method == "NMR"):
+                hasAssemblyInfo = self.__checkAssemblyInfo(os.path.join(self._sessionPath, entryFileName))
+                if hasAssemblyInfo:
+                    nmr_assembly_status = "existed"
+                else:
+                    assem = AssemblySelect(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                    assem.autoAssignDefaultAssembly(entryId, entryFileName)
+                    #
+                    updatedModelPath = os.path.join(self._sessionPath, entryId + "_model-assembly-updated_P1.cif")
+                    hasAssemblyInfo = self.__checkAssemblyInfo(updatedModelPath)
+                    if hasAssemblyInfo:
+                        nmr_assembly_status = "updated";
+                        os.rename(updatedModelPath, os.path.join(self._sessionPath, entryFileName))
+                    else:
+                        nmr_assembly_status = "failed";
+                        if os.access(updatedModelPath, os.F_OK):
+                            os.remove(updatedModelPath)
+                        #
+                    #
+                #
+            #
             self._setSessionInfoWf(entryId, entryFileName)
+        #
+        nmr_assembly_status_url = ""
+        if nmr_assembly_status:
+            nmr_assembly_status_url = "&nmrassemblystatus=" + nmr_assembly_status
         #
         htmlList = []
         htmlList.append('<!DOCTYPE html>')
@@ -281,14 +311,14 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         htmlList.append('<head>')
         htmlList.append('<title>Annotation Tasks Module</title>')
         if sfOk:
-            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s"></head>' %
-                            (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode))
+            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
+                            (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, nmr_assembly_status_url))
         elif csOk:
-            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrycsfilename=%s&wfstatus=%s&standalonemode=%s"></head>' %
-                            (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode))
+            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrycsfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
+                            (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode, nmr_assembly_status_url))
         else:
-            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&wfstatus=%s&standalonemode=%s"></head>' %
-                            (sessionId, entryId, entryFileName, wfStatus, standaloneMode))
+            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
+                            (sessionId, entryId, entryFileName, wfStatus, standaloneMode, nmr_assembly_status_url))
         # htmlList.append('<body>')
         # htmlList.append('</body>')
         # htmlList.append('</html>')
@@ -588,6 +618,21 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         rC.setHtmlText(self.__getNmrDiagnosticsHtmlText(entryId))
 
         return rC
+
+    def __checkAssemblyInfo(self, modelFile):
+        """ Check if model file already has assembly information
+        """
+        if not os.access(modelFile, os.F_OK):
+            return False
+        #
+        cifObj = mmCIFUtil(filePath=modelFile)
+        assemblyList = cifObj.GetValue("pdbx_struct_assembly")
+        genList = cifObj.GetValue("pdbx_struct_assembly_gen")
+        operList = cifObj.GetValue("pdbx_struct_oper_list")
+        if (len(assemblyList) > 0) and (len(genList) > 0) and (len(operList) > 0):
+            return True
+        #
+        return False
 
     def __getNmrDiagnosticsHtmlText(self, entryId):
         """ Get diagnostics from validation xml and nmr-shift-error-report json files
