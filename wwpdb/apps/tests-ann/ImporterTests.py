@@ -53,6 +53,7 @@ os.environ['IN_ANNOTATION'] = "no"
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebApp import AnnTasksWebApp
+from wwpdb.apps.ann_tasks_v2.em3d.EmAutoFix import EmAutoFix
 
 class ImportTests(unittest.TestCase):
     def setUp(self):
