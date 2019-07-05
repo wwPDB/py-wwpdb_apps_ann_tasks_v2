@@ -96,7 +96,7 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
             return False
 
-    def wfLoad(self, idCode, statusCode, annotatorInitials=None, initialDepositionDate=None, authRelCode=None):
+    def wfLoad(self, idCode, statusCode, annotatorInitials=None, initialDepositionDate=None, authRelCode=None, postRelStatusCode=None):
         """
              c=WfDbApi(self.__lfh, self.__verbose)
              rd = c.getObject('D_1100200206')
@@ -119,6 +119,9 @@ class StatusUpdate(object):
 
             self.__savedStatusD = copy.deepcopy(rd)
             rd['STATUS_CODE'] = statusCode
+
+            if postRelStatusCode and len(postRelStatusCode) > 1:
+                rd['POST_REL_STATUS'] = postRelStatusCode
 
             if (annotatorInitials is not None and len(annotatorInitials) > 1):
                 rd['ANNOTATOR_INITIALS'] = annotatorInitials
@@ -295,7 +298,7 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
         return False
 
-    def set(self, inpFilePath, outFilePath, statusCode, approvalType, annotatorInitials, authReleaseCode=None, holdCoordinatesDate=None, expMethods=None, processSite=None):
+    def set(self, inpFilePath, outFilePath, statusCode, approvalType, annotatorInitials, authReleaseCode=None, holdCoordinatesDate=None, expMethods=None, processSite=None, postRelStatusCode=None):
         """ Set selected status items in the input model file
 
         _pdbx_database_status.status_code                  (HPUB,REL,PROC,...)
@@ -306,8 +309,8 @@ class StatusUpdate(object):
 
         """
         #
-        self.__lfh.write("\n+StatusUpdate.set() statusCode %s approvalType %s initials %s authRelCode %s holdDate %s expMethod %r\n" %
-                         (statusCode, approvalType, annotatorInitials, authReleaseCode, holdCoordinatesDate, expMethods))
+        self.__lfh.write("\n+StatusUpdate.set() statusCode %s approvalType %s initials %s authRelCode %s holdDate %s expMethod %r postRelStatusCode %s\n" %
+                         (statusCode, approvalType, annotatorInitials, authReleaseCode, holdCoordinatesDate, expMethods, postRelStatusCode))
         try:
             cList = self.__io.readFile(inpFilePath)
             container = cList[0]
@@ -326,6 +329,13 @@ class StatusUpdate(object):
                 if dcObj.getAttributeIndex('status_code') < 0:
                     dcObj.appendAttribute('status_code')
                 dcObj.setValue(statusCode, attributeName='status_code', rowIndex=0)
+
+
+                # 
+                if postRelStatusCode and len(postRelStatusCode) > 1:
+                    if dcObj.getAttributeIndex('pos_rel_status') < 0:
+                        dcObj.appendAttribute('post_rel_status')
+                    dcObj.setValue(postRelStatusCode, attributeName='post_rel_status', rowIndex=0)
 
                 if expMethods is not None and self.__inMethod('X-RAY', expMethods):
                     if dcObj.getAttributeIndex('status_code_sf') < 0:
