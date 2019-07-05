@@ -428,44 +428,6 @@ class StatusUpdate(object):
         else:
             return default
 
-    # Deprecated interface - believe not used Feb 2018 - EP
-    def get_old(self, inpFilePath):
-        """ Return selected status items from the input model files.
-
-        """
-        #
-        try:
-            cList = self.__io.readFile(inpFilePath)
-            container = cList[0]
-            catObj = container.getObj('database_2')
-            vals = catObj.selectValuesWhere('database_code', 'PDB', 'database_id')
-            pdb_id = self._firstOrDefault(vals, default='')
-            vals = catObj.selectValuesWhere('database_code', 'EMDB', 'database_id')
-            emdb_id = self._firstOrDefault(vals, default='')
-
-            #
-            dcObj = container.getObj('pdbx_database_status')
-            if dcObj is not None:
-                statusCode = dcObj.getValueOrDefault(attributeName='status_code', rowIndex=0, defaultValue='')
-                authReleaseCode = dcObj.getValueOrDefault(attributeName='author_release_status_code', rowIndex=0, defaultValue='')
-                initialDepositionDate = dcObj.getValueOrDefault(attributeName='recvd_initial_deposition_date', rowIndex=0, defaultValue='')
-                holdCoordinatesDate = dcObj.getValueOrDefault(attributeName='date_hold_coordinates', rowIndex=0, defaultValue='')
-                coordinatesDate = dcObj.getValueOrDefault(attributeName='date_coordinates', rowIndex=0, defaultValue='')
-                # annotatorInitials = dcObj.getValueOrDefault(attributeName='pdbx_annotator', rowIndex=0, defaultValue='')
-                annotatorInitials = dcObj.getFirstValueOrDefault(attributeNameList=['pdbx_annotator', 'rcsb_annotator'], rowIndex=0, defaultValue='')
-                titlesupp = dcObj.getValueOrDefault(attributeName='title_suppression', rowIndex=0, defaultValue='')
-
-                return (statusCode, authReleaseCode, initialDepositionDate, holdCoordinatesDate, coordinatesDate, annotatorInitials, pdb_id, emdb_id, titlesupp)
-            else:
-                return ('', '', '', '', '', '', '', '', '')
-        except:
-            if (self.__verbose):
-                self.__lfh.write("+StatusUpdate.__get() failed file %s\n" % inpFilePath)
-            if self.__debug:
-                traceback.print_exc(file=self.__lfh)
-
-        return ('', '', '', '', '', '', '', '', '')
-
     def getV2(self, inpFilePath):
         """ Return selected status items from the input model files.
 
@@ -500,6 +462,7 @@ class StatusUpdate(object):
                 ret['coordinatesDate'] = dcObj.getValueOrDefault(attributeName='date_coordinates', rowIndex=0, defaultValue='')
                 ret['annotatorInitials'] = dcObj.getFirstValueOrDefault(attributeNameList=['pdbx_annotator', 'rcsb_annotator'], rowIndex=0, defaultValue='')
                 ret['titleSupp'] = dcObj.getValueOrDefault(attributeName='title_suppression', rowIndex=0, defaultValue='')
+                ret['postRelStatus'] = dcObj.getValueOrDefault(attributeName='post_rel_status', rowIndex=0, defaultValue='')
             dcObj = container.getObj('pdbx_depui_entry_details')
             if dcObj is not None:
                 ret['reqAccTypes'] = dcObj.getValueOrDefault(attributeName='requested_accession_types', rowIndex=0, defaultValue='')
