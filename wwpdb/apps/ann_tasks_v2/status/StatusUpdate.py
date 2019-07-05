@@ -357,7 +357,8 @@ class StatusUpdate(object):
                     dcObj.appendAttribute('recvd_author_approval')
                 dcObj.setValue(recApprov, attributeName='recvd_author_approval', rowIndex=0)
 
-                if approvalType in ['implicit', 'explicit']:
+                # If statusCode is REL when you come here, means that postRel entry - do not change approval date
+                if approvalType in ['implicit', 'explicit'] and statusCode != 'REL':
                     lt = time.strftime("%Y-%m-%d", time.localtime())
                     if dcObj.getAttributeIndex('date_author_approval') < 0:
                         dcObj.appendAttribute('date_author_approval')
