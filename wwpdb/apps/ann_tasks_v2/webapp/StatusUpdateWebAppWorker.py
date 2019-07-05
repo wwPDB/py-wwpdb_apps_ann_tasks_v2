@@ -175,6 +175,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         statusCode = ''
         authRelCode = ''
         annotatorId = ''
+        postRelStatusCode = ''
         if du.fetchId(identifier, contentType, formatType=formatType):
             aTagList.append(du.getAnchorTag())
             fP = du.getDownloadPath()
@@ -190,15 +191,19 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             coordinatesDate = sUD['coordinatesDate']
             holdCoordinatesDate = sUD['holdCoordinatesDate']
             reqAccTypes = sUD['reqAccTypes']
+            postRelStatusCode = sUD['postRelStatus']
 
             if (self._verbose):
                 self._lfh.write("\n+%s.%s starting with identifier %s statusCode %r authRelCode %r annotatorId %r\n" %
                                 (self.__class__.__name__, sys._getframe().f_code.co_name, identifier, statusCode, authRelCode, annotatorId))
+
+        # Prepare the Startup data items
         myD = {}
         myD['entryid'] = identifier
         myD['sessionid'] = self._sessionId
         myD['annotatorid'] = annotatorId
         myD['statuscode'] = statusCode
+        myD['postrelstatuscode'] = postRelStatusCode
         myD['authrelcode'] = authRelCode
         #
         #  Insert these dates into the page as global context values --
@@ -488,6 +493,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         # Values from the input form --
         #
         statusCode = self._reqObj.getValue('status-code')
+        postRelStatusCode = self._reqObj.getValue('postrel-status-code')
         approvalType = self._reqObj.getValue('approval-type')
         annotatorInitials = self._reqObj.getValue('annotator-initials')
         authStatusHoldDate = self._reqObj.getValue('auth-status-hold-date')
@@ -497,12 +503,16 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         #  Values from the current version of the model file --
         #
         orgStatusCode = self._reqObj.getValue('statuscode')
+        orgPostRelStatusCode = self._reqObj.getValue('postrelstatuscode')
         orgInitialDepositionDate = self._reqObj.getValue('initialdepositdate')
         orgHoldCoordinatesDate = self._reqObj.getValue('holdcoordinatesdate')
         orgCoordinatesDate = self._reqObj.getValue('coordinatesdate')
         orgAuthRelCode = self._reqObj.getValue('authrelcode')
         expMethods = self._reqObj.getValue('experimental_methods')
         #
+        # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
+        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s" % (orgStatusCode, statusCode, 
+                                                                                   orgPostRelStatusCode, postRelStatusCode))
         #
         try:
             #   Update status history - first create a new history file if required.
@@ -532,7 +542,11 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             msg = 'Processing status code change from PROC to HPUB or HOLD prohibited'
 
         if str(orgStatusCode).upper() =='REL':
-            msg = 'Processing status code change from REL prohibited'
+            if len(orgPostRelStatusCode) == 0:
+                msg = 'Processing status code change from REL prohibited'
+            else:
+                # Web form does not set in this case
+                statusCode='REL'
 
         if str(orgStatusCode).upper() =='OBS':
             msg = 'Processing status code change from OBS prohibited'
