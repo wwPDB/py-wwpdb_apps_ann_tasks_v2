@@ -45,7 +45,7 @@ setup(
     #
     install_requires=['wwpdb.utils.config ~= 0.8', 'wwpdb.apps.wf_engine',
                       'wwpdb.io', 'wwpdb.utils.db >= 0.6', 'wwpdb.utils.emdb',
-                      'wwpdb.utils.wf', 'wwpdb.utils.session', 'mmcif >= 0.25',
+                      'wwpdb.utils.wf ~= 0.13.dev1', 'wwpdb.utils.session', 'mmcif >= 0.25',
                       'wwpdb.utils.dp ~= 0.19', 'wwpdb.utils.detach',
                       'mmcif.utils >= 0.14', 'matplotlib', 'pygal',
                       'wwpdb.apps.validation ~= 2.3'],
