@@ -611,6 +611,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     myD['process_site'] = processSite
                     myD['annotator_initials'] = annotatorInitials
                     myD['initialdepositdate'] = orgInitialDepositionDate
+                    myD['postrelstatuscode'] = postRelStatusCode
+
                     for k, v in myD.items():
                         rC.set(k, v)
                     self._saveSessionParameter(pvD=myD)
