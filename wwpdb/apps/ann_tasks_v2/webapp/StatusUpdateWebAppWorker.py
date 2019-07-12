@@ -176,6 +176,9 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         authRelCode = ''
         annotatorId = ''
         postRelStatusCode = ''
+        # Original annotator in request from WFM. Stash so we can use elsewhere
+        origAnnotator = self._reqObj.getValueOrDefault('annotator', '')
+
         if du.fetchId(identifier, contentType, formatType=formatType):
             aTagList.append(du.getAnchorTag())
             fP = du.getDownloadPath()
@@ -202,6 +205,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         myD['entryid'] = identifier
         myD['sessionid'] = self._sessionId
         myD['annotatorid'] = annotatorId
+        myD['startannotator'] =  origAnnotator
         myD['statuscode'] = statusCode
         myD['postrelstatuscode'] = postRelStatusCode
         myD['authrelcode'] = authRelCode
