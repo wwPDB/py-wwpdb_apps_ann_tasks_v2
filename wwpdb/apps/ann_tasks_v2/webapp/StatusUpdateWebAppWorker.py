@@ -675,6 +675,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgHoldCoordinatesDate = self._reqObj.getValue('holdcoordinatesdate')
         orgCoordinatesDate = self._reqObj.getValue('coordinatesdate')
         orgAuthRelCode = self._reqObj.getValue('authrelcode')
+        orgPostRelStatusCode = self._reqObj.getValue('postrelstatuscode')
         expMethods = self._reqObj.getValue('experimental_methods')
         annotatorInitials = self._reqObj.getValue('annotator_initials')
         #
@@ -689,7 +690,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
 
             sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-            ok1 = sU.wfLoad(idCode, orgStatusCode, annotatorInitials=annotatorInitials, initialDepositionDate=orgInitialDepositionDate, authRelCode=orgAuthRelCode)
+            ok1 = sU.wfLoad(idCode, orgStatusCode, annotatorInitials=annotatorInitials, initialDepositionDate=orgInitialDepositionDate, authRelCode=orgAuthRelCode,
+                                         postRelStatusCode=orgPostRelStatusCode)
             if (self._verbose):
                 self._lfh.write("+StatusUpdateWebAppWorker._statusReloadOp() wf load completed %r\n" % ok1)
             if ok1:
