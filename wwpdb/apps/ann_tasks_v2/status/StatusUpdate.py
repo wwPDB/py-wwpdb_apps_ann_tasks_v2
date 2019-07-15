@@ -96,7 +96,8 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
             return False
 
-    def wfLoad(self, idCode, statusCode, annotatorInitials=None, initialDepositionDate=None, authRelCode=None, postRelStatusCode=None):
+    def wfLoad(self, idCode, statusCode, annotatorInitials=None, initialDepositionDate=None, authRelCode=None, postRelStatusCode=None, 
+               postRelRecvdCoord=None, postRelRecvdCoordDate=None):
         """
              c=WfDbApi(self.__lfh, self.__verbose)
              rd = c.getObject('D_1100200206')
@@ -136,6 +137,13 @@ class StatusUpdate(object):
 
             if ((authRelCode is not None) and (len(authRelCode) > 2)):
                 rd['AUTHOR_RELEASE_STATUS_CODE'] = authRelCode
+
+            if postRelRecvdCoord and len(postRelRecvdCoord) > 0:
+                rd['POST_REL_RECVD_COORD'] = postRelRecvdCoord
+
+
+            if postRelRecvdCoordDate and len(postRelRecvdCoordDate) > 0:
+                rd['POST_REL_RECVD_COORD_DATE'] = postRelRecvdCoordDate
 
             constDict = {}
             constDict['DEP_SET_ID'] = idCode

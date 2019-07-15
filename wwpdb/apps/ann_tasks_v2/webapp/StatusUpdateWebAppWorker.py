@@ -513,6 +513,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgCoordinatesDate = self._reqObj.getValue('coordinatesdate')
         orgAuthRelCode = self._reqObj.getValue('authrelcode')
         expMethods = self._reqObj.getValue('experimental_methods')
+        orgPostRelRecvdCoord = self._reqObj.getValue('postrelrecvdcoord')
+        orgPostRelRecvdCoordDate = self._reqObj.getValue('postrelrecvdcoorddate')
         #
         # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
         logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s" % (orgStatusCode, statusCode, 
@@ -584,7 +586,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
             sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             ok1 = sU.wfLoad(idCode, statusCode, annotatorInitials=annotatorInitials, initialDepositionDate=orgInitialDepositionDate, authRelCode=authStatusCode, \
-                            postRelStatusCode=postRelStatusCode)
+                            postRelStatusCode=orgPostRelStatusCode, postRelRecvdCoord=orgPostRelRecvdCoord, postRelRecvdCoordDate=orgPostRelRecvdCoordDate)
             if (self._verbose):
                 self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() wf load completed %r\n" % ok1)
             if ok1:
@@ -678,6 +680,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgPostRelStatusCode = self._reqObj.getValue('postrelstatuscode')
         expMethods = self._reqObj.getValue('experimental_methods')
         annotatorInitials = self._reqObj.getValue('annotator_initials')
+        orgPostRelRecvdCoord = self._reqObj.getValue('postrelrecvdcoord')
+        orgPostRelRecvdCoordDate = self._reqObj.getValue('postrelrecvdcoorddate')
         #
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat('json')
@@ -691,7 +695,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
             sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             ok1 = sU.wfLoad(idCode, orgStatusCode, annotatorInitials=annotatorInitials, initialDepositionDate=orgInitialDepositionDate, authRelCode=orgAuthRelCode,
-                                         postRelStatusCode=orgPostRelStatusCode)
+                                         postRelStatusCode=orgPostRelStatusCode, postRelRecvdCoord=orgPostRelRecvdCoord, postRelRecvdCoordDate=orgPostRelRecvdCoordDate)
             if (self._verbose):
                 self._lfh.write("+StatusUpdateWebAppWorker._statusReloadOp() wf load completed %r\n" % ok1)
             if ok1:

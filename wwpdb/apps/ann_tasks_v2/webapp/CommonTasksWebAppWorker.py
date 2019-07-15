@@ -2389,7 +2389,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                       ('deposit_site', 'deposit_site'),
                       ('process_site', 'process_site'),
                       ('reqacctypes', 'reqacctypes'),
-                      ('postrelstatuscode', 'post_rel_status_code')
+                      ('postrelstatuscode', 'post_rel_status_code'),
+                      ('postrelrecvdcoord', 'post_rel_recvd_coord'),
+                      ('postrelrecvdcoorddate', 'post_rel_recvd_coord_date')
                       ]
 
         kyPairListEm = [('em_entry_id', 'em_entry_id'),
