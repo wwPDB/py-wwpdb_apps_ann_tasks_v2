@@ -586,7 +586,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
             sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             ok1 = sU.wfLoad(idCode, statusCode, annotatorInitials=annotatorInitials, initialDepositionDate=orgInitialDepositionDate, authRelCode=authStatusCode, \
-                            postRelStatusCode=orgPostRelStatusCode, postRelRecvdCoord=orgPostRelRecvdCoord, postRelRecvdCoordDate=orgPostRelRecvdCoordDate)
+                            postRelStatusCode=postRelStatusCode, postRelRecvdCoord=orgPostRelRecvdCoord, postRelRecvdCoordDate=orgPostRelRecvdCoordDate)
             if (self._verbose):
                 self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() wf load completed %r\n" % ok1)
             if ok1:
