@@ -121,8 +121,11 @@ class StatusUpdate(object):
             self.__savedStatusD = copy.deepcopy(rd)
             rd['STATUS_CODE'] = statusCode
 
-            if postRelStatusCode and len(postRelStatusCode) > 1:
-                rd['POST_REL_STATUS'] = postRelStatusCode
+            if postRelStatusCode is not None:
+                if len(postRelStatusCode) > 0:
+                    rd['POST_REL_STATUS'] = postRelStatusCode
+                else:
+                    rd['POST_REL_STATUS'] = None
 
             if (annotatorInitials is not None and len(annotatorInitials) > 1):
                 rd['ANNOTATOR_INITIALS'] = annotatorInitials
@@ -138,12 +141,17 @@ class StatusUpdate(object):
             if ((authRelCode is not None) and (len(authRelCode) > 2)):
                 rd['AUTHOR_RELEASE_STATUS_CODE'] = authRelCode
 
-            if postRelRecvdCoord and len(postRelRecvdCoord) > 0:
-                rd['POST_REL_RECVD_COORD'] = postRelRecvdCoord
+            if postRelRecvdCoord is not None:
+                if postRelRecvdCoord != '':
+                    rd['POST_REL_RECVD_COORD'] = postRelRecvdCoord
+                else:
+                    rd['POST_REL_RECVD_COORD'] = None
 
-
-            if postRelRecvdCoordDate and len(postRelRecvdCoordDate) > 0:
-                rd['POST_REL_RECVD_COORD_DATE'] = postRelRecvdCoordDate
+            if postRelRecvdCoordDate is not None:
+                if postRelRecvdCoordDate != '':
+                    rd['POST_REL_RECVD_COORD_DATE'] = postRelRecvdCoordDate
+                else:
+                    rd['POST_REL_RECVD_COORD_DATE'] = None
 
             constDict = {}
             constDict['DEP_SET_ID'] = idCode
