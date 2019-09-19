@@ -105,14 +105,14 @@ class CoordEditorUpdate(object):
         myDataList.append(container)
         #
         filename = os.path.join(self.__sessionPath, self.__entryId + '_select.cif')
-        f = file(filename, 'w')
+        f = open(filename, 'w')
         pdbxW = PdbxWriter(f)
         pdbxW.write(myDataList)
         f.close()
 
     def __runCheckScript(self):
         script = os.path.join(self.__sessionPath, self.__entryId + '_check.csh')
-        f = file(script, 'w')
+        f = open(script, 'w')
         f.write('#!/bin/tcsh -f\n')
         f.write('#\n')
         f.write('setenv RCSBROOT   ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
@@ -132,7 +132,7 @@ class CoordEditorUpdate(object):
 
     def __runUpdateScript(self):
         script = os.path.join(self.__sessionPath, self.__entryId + '_update.csh')
-        f = file(script, 'w')
+        f = open(script, 'w')
         f.write('#!/bin/tcsh -f\n')
         f.write('#\n')
         f.write('setenv RCSBROOT   ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
@@ -154,7 +154,7 @@ class CoordEditorUpdate(object):
     def __readLogFile(self, extension, default_message):
         filename = os.path.join(self.__sessionPath, self.__entryId + extension)
         if os.access(filename, os.F_OK):
-            f = file(filename, 'r')
+            f = open(filename, 'r')
             content = f.read()
             f.close()
             #

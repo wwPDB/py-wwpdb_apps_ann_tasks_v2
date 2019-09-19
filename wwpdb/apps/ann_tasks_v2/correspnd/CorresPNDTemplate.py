@@ -106,7 +106,7 @@ class CorresPNDTemplate(object):
         clogfile   = self.__getFileName(self.__sessionPath, 'corres_command', 'log')
         #
         script = os.path.join(self.__sessionPath, scriptfile)
-        f = file(script, 'w')
+        f = open(script, 'w')
         f.write('#!/bin/tcsh -f\n')
         f.write('#\n')
         f.write('setenv RCSBROOT ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
@@ -121,7 +121,7 @@ class CorresPNDTemplate(object):
         self.__RunScript(self.__sessionPath, scriptfile, clogfile)
         #
         logfilename = os.path.join(self.__sessionPath, logfile)
-        f = file(logfilename, 'r')
+        f = open(logfilename, 'r')
         data = f.read()
         f.close()
         #
@@ -517,7 +517,7 @@ class CorresPNDTemplate(object):
         # write out default letter
         depid = self.__reqObj.getValue('entryid')
         filename = os.path.join(self.__sessionPath, depid + '_correspondence-to-depositor_P1.txt')
-        f = file(filename, 'w')
+        f = open(filename, 'w')
         f.write(myD['full_text'] + '\n')
         f.close()
         #

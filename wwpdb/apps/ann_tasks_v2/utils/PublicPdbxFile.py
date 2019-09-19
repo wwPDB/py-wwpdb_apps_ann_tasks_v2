@@ -48,7 +48,7 @@ class PublicPdbxFile(SessionWebDownloadUtils):
             retPath=os.path.join(self.__sessionPath,entryId+"_model-review_P1.cif")
             #
             script = os.path.join(self.__sessionPath, entryId + '_pub_pdbx.csh')
-            f = file(script, 'w')
+            f = open(script, 'w')
             f.write('#!/bin/tcsh -f\n')
             f.write('#\n')
             f.write('setenv DICPATH ' + self.__cI.get('SITE_PDBX_DICT_PATH') + '\n')

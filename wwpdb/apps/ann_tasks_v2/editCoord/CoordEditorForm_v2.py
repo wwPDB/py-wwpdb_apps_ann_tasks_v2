@@ -246,7 +246,7 @@ class CoordEditorForm(object):
     def __topSuccessfulHtml(self, filename):
         """ return entry successful html
         """
-        f = file(filename, "r")
+        f = open(filename, "r")
         chainids = f.read()
         f.close()
         #
@@ -304,7 +304,7 @@ class CoordEditorForm(object):
         if not os.access(logFile, os.F_OK):
             return ""
         #
-        f = file(logFile, "r")
+        f = open(logFile, "r")
         data = f.read()
         f.close()
         #

@@ -42,7 +42,7 @@ class CorresPNDGenerator(object):
         if self.__corres_content:
             entryId = self.__reqObj.getValue('entryid')
             filename = os.path.join(self.__sessionPath, entryId + '_correspondence-to-depositor_P1.txt')
-            f = file(filename, 'w')
+            f = open(filename, 'w')
             f.write(self.__corres_content + '\n')
             f.close()
             return 'Generated'
@@ -52,7 +52,7 @@ class CorresPNDGenerator(object):
     def __parseForm(self):
         number = int(str(self.__reqObj.getValue('number_question')))
         count = 0
-        for i in xrange(number):
+        for i in range(number):
             title = str(self.__reqObj.getValue('question_' + str(i)))
             if not title:
                 continue

@@ -56,7 +56,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         if input_number < 6:
             return
         #
-        for i in xrange (0, input_number):
+        for i in range (0, input_number):
             wavelength = self.__reqObj.getValue("wavelength_" + str(i))
             if not wavelength:
                 continue

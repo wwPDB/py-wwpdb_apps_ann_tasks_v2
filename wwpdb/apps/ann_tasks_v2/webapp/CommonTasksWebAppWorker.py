@@ -130,9 +130,12 @@ from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsMiscChecks import NmrChemShiftsMis
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 from wwpdb.apps.ann_tasks_v2.nmr.NmrModelUtils import NmrModelUtils
 #
-from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
-from wwpdb.apps.validation.src.lvw.LVW_GetHTML import LVW_GetHTML
-from wwpdb.apps.validation.src.lvw.LVW_Mogul import LVW_Mogul
+try:
+    from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
+    from wwpdb.apps.validation.src.lvw.LVW_GetHTML import LVW_GetHTML
+    from wwpdb.apps.validation.src.lvw.LVW_Mogul import LVW_Mogul
+except ImportError:
+    pass
 #
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 

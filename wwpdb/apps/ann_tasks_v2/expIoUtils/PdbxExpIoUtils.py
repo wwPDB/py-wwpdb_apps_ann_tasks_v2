@@ -117,7 +117,10 @@ class PdbxExpFileIo(object):
                 if ii < 1:
                     cName='r'+str(idCode).lower()+'sf'
                 else:
-                    cName='r'+str(idCode).lower()+str(unichr(ii+64))+'sf'
+                    if sys.version_info[0] > 2:
+                        cName='r'+str(idCode).lower()+str(chr(ii+64))+'sf'
+                    else:
+                        cName='r'+str(idCode).lower()+str(unichr(ii+64))+'sf'
                 container.setName(cName)
             return True
         except:

@@ -60,7 +60,7 @@ class CSEditorForm(object):
 
     def __runScript(self):
         script = os.path.join(self.__sessionPath, self.__entryId + '_cs_script.csh')
-        f = file(script, 'w')
+        f = open(script, 'w')
         f.write('#!/bin/tcsh -f\n')
         f.write('#\n')
         f.write('setenv RCSBROOT   ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
@@ -80,7 +80,7 @@ class CSEditorForm(object):
         content = 'No result found!'
         filename = os.path.join(self.__sessionPath, self.__entryId + '_cs_html.txt')
         if os.access(filename, os.F_OK):
-            f = file(filename, 'r')
+            f = open(filename, 'r')
             content = f.read()
             f.close()
         #
