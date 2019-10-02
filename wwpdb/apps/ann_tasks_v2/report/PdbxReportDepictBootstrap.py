@@ -65,6 +65,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             self.__reportCategories = [
                 ('pdbx_contact_author', 'Contact authors', 'row-wise'),
                 ('pdbx_database_status', 'Status', 'column-wise'),
+                ('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),
                 ('pdbx_SG_project', 'Structural genomics', 'row-wise'),
                 ('pdbx_database_related', 'Related entries', 'row-wise'),
                 ('citation','Primary citation','column-wise'),
