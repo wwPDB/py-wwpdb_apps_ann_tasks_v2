@@ -84,7 +84,7 @@ class Validate(SessionWebDownloadUtils):
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
-            if volInputFile is None:
+            if volInputFile is None or not volInputFile:
                 volPath = pI.getEmVolumeFilePath(entryId, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
             else:
                 volPath = os.path.join(pI.getArchivePath(entryId), volInputFile)
