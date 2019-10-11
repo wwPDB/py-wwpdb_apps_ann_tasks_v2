@@ -1588,9 +1588,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
 
-        # fsc-xml file (xml)
+        # fsc file (xml)
         #
-        pth = de.copyToSession(contentType='fsc-xml', formatType='xml', version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType='fsc', formatType='xml', version="latest", partitionNumber=1)
         return True
 
     def _viewOp(self):
