@@ -692,6 +692,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         expFileName = self._reqObj.getValue("entryexpfilename")
         csFileName = self._reqObj.getValue("entrycsfilename")
         volFileName = self._reqObj.getValue("entryvolfilename")
+        authorFscName = self._reqObj.getValue("entryfscfilename")
         entryId = self._reqObj.getValue("entryid")
 
         taskArgs = self._reqObj.getValue("task-form-args")
@@ -722,7 +723,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s volInputFile %s\n" %
                             (modelFileName, expFileName, pdbxCsFileName, volFileName))
             #
-        ok = calc.runAll(entryId, modelInputFile=modelFileName, reflnInputFile=expFileName, csInputFile=pdbxCsFileName, volInputFile=volFileName, annotationContext=True)
+        ok = calc.runAll(entryId, modelInputFile=modelFileName, reflnInputFile=expFileName, csInputFile=pdbxCsFileName, volInputFile=volFileName, authorFscFile=authorFscName, annotationContext=True)
 
         if (self._verbose):
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() status %r\n" % ok)
@@ -1587,6 +1588,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
 
+        # fsc-xml file (xml)
+        #
+        pth = de.copyToSession(contentType='fsc-xml', formatType='xml', version="latest", partitionNumber=1)
         return True
 
     def _viewOp(self):
