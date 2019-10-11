@@ -89,7 +89,7 @@ class Validate(SessionWebDownloadUtils):
             else:
                 volPath = os.path.join(pI.getArchivePath(entryId), volInputFile)
             if authorFscFile is None or not authorFscFile:
-                authorFscPath = pI.getFileName(entryId, contentType="fsc-xml", formatType="xml", versionId=uploadVersionOp, partNumber='1')
+                authorFscPath = pI.getFileName(entryId, contentType="fsc", formatType="xml", versionId=uploadVersionOp, partNumber='1')
             else:
                 authorFscPath = os.path.join(pI.getArchivePath(entryId), authorFscFile)
             #
