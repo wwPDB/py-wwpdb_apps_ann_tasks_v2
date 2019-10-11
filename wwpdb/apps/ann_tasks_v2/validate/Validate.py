@@ -59,7 +59,7 @@ class Validate(SessionWebDownloadUtils):
         ret = self.runAll(entryId, modelInputFile=modelInputFile, reflnInputFile= expInputFile, updateInput=updateInput)
         return ret
 
-    def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None,
+    def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None, authorFscFile=None,
                updateInput=True, annotationContext=False, validation_mode="annotate"):
         """  Run the validation operation for all supported methods
         """
@@ -84,10 +84,14 @@ class Validate(SessionWebDownloadUtils):
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
-            if volInputFile is None:
+            if volInputFile is None or not volInputFile:
                 volPath = pI.getEmVolumeFilePath(entryId, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
             else:
                 volPath = os.path.join(pI.getArchivePath(entryId), volInputFile)
+            if authorFscFile is None or not authorFscFile:
+                authorFscPath = pI.getFileName(entryId, contentType="fsc", formatType="xml", versionId=uploadVersionOp, partNumber='1')
+            else:
+                authorFscPath = os.path.join(pI.getArchivePath(entryId), authorFscFile)
             #
             #
             fName = pI.getFileName(entryId, contentType="validation-report", formatType="pdf", versionId=uploadVersionOp, partNumber='1')
@@ -133,6 +137,9 @@ class Validate(SessionWebDownloadUtils):
 
             if os.access(volPath, os.R_OK):
                 dp.addInput(name="vol_file_path", value=volPath)
+
+            if os.access(authorFscPath, os.R_OK):
+                dp.addInput(name="fsc_file_path", value=authorFscPath)
             #
             if annotationContext:
                 dp.addInput(name='request_annotation_context', value="yes")

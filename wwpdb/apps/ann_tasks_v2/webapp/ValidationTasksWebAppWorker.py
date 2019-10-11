@@ -203,10 +203,12 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         entryFileName = identifier + "_model_P1.cif"
         entryExpFileName = identifier + "_sf_P1.cif"
         entryCsFileName = identifier + "_cs_P1.cif"
+        entryFscFileName = identifier + "_fsc-xml_P1.xml"
         #
         #  By convention we leave the volumes in archive directory rather than copying them around -
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         entryVolFilePath = pI.getEmVolumeFilePath(entryId, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
+        self._lfh.write("entryVolFilePath {}".format(entryVolFilePath))
         dd, entryVolFileName = os.path.split(entryVolFilePath)
         #
         sfOk = False
@@ -219,6 +221,11 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(entryCsFilePath, os.R_OK):
             csOk = True
         #
+        fscOk = False
+        entryFscPath = os.path.join(self._sessionPath, entryFscFileName)
+        if os.access(entryFscPath, os.R_OK):
+            fscOk = True
+
         volOk = False
         if os.access(entryVolFilePath,os.R_OK):
             volOk = True
@@ -237,9 +244,32 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         htmlList.append('<html lang="en">')
         htmlList.append('<head>')
         htmlList.append('<title>Validation Tasks Module</title>')
+
+        list = [
+            "sessionid={}".format(sessionId),
+            "entryid={}".format(entryId),
+            "entryfilename={}".format(entryFileName),
+            "wfstatus={}".format(wfStatus),
+            "standalonemode={}".format(standaloneMode)
+        ]
+        if sfOk:
+            list.append("entryexpfilename={}".format(entryExpFileName))
+        if csOk:
+            list.append("entrycsfilename={}".format(entryCsFileName))
+        if fscOk:
+            list.append("entryfscfilename={}".format(entryFscFileName))
+        if volOk:
+            list.append("entryvolfilename={}".format(entryVolFileName))
+
+        query = '&'.join(list)
+
+        htmlList.append('<meta http-equiv="REFRESH" content="0;url=/validation_tasks_v2/wf-startup-template.html?{}"></head>'.format(query))
+
+
         #
         #   What follows does not address the multi-method case --
         #
+        """
         if sfOk:
             htmlList.append('<meta http-equiv="REFRESH" content="0;url=/validation_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s"></head>' %
                             (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode))
@@ -254,6 +284,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             htmlList.append('<meta http-equiv="REFRESH" content="0;url=/validation_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&wfstatus=%s&standalonemode=%s"></head>' %
                             (sessionId, entryId, entryFileName, wfStatus, standaloneMode))
         #
+        """
         rC.setHtmlText('\n'.join(htmlList))
         return rC
 
