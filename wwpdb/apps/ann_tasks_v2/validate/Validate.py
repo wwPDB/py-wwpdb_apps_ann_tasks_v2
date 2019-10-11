@@ -59,7 +59,7 @@ class Validate(SessionWebDownloadUtils):
         ret = self.runAll(entryId, modelInputFile=modelInputFile, reflnInputFile= expInputFile, updateInput=updateInput)
         return ret
 
-    def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None, authorFscFile,
+    def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None, authorFscFile=None,
                updateInput=True, annotationContext=False, validation_mode="annotate"):
         """  Run the validation operation for all supported methods
         """
