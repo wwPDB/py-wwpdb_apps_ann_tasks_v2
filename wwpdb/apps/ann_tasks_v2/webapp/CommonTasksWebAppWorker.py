@@ -2256,6 +2256,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._makeIdListFetchResponse(entryIdList, contentType='em-volume', formatType='map', fileSource=fileSource)
         elif (operation == "fetch_cs"):
             return self._makeIdListFetchResponse(entryIdList, contentType='nmr-chemical-shifts', formatType='pdbx', fileSource=fileSource)
+        elif (operation == "fetch_mr"):
+            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-restraints', formatType='mr', fileSource=fileSource)
         elif (operation == "fetch_nef"):
             return self._makeIdListFetchResponse(entryIdList, contentType='nmr-nef', formatType='pdbx', fileSource=fileSource)
         elif (operation == "report"):
