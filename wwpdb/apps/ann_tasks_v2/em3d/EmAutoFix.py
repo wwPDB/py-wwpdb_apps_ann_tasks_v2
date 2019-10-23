@@ -13,19 +13,14 @@ __author__ = "Ezra Peisach"
 __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 
-
 import sys
 import os.path
 import os
 import json
 import logging
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-
 from mmcif.io.IoAdapterCore import IoAdapterCore
-from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import PdbxFileIo
-
 from wwpdb.io.locator.PathInfo import PathInfo
-
 
 logger = logging.getLogger()
 
@@ -37,21 +32,22 @@ class EmAutoFix(object):
         self.__siteId = siteId
         self.__sessionPath = sessionPath
         self.__cleanup = False
-        self.__pI = PathInfo(sessionPath=sessionPath, 
+        self.__pI = PathInfo(sessionPath=sessionPath,
                              verbose=self.__verbose, log=self.__lfh)
         self.__mD = {'primary map': 'em-volume',
                      'mask': 'em-mask-volume',
                      'additional map': 'em-additional-volume',
-                     'half map':'em-half-volume',
-                     'map header':'em-volume-header' }
+                     'half map': 'em-half-volume',
+                     'map header': 'em-volume-header'}
 
-    def __getEmdDbCode(self, blockobj):
+    @staticmethod
+    def __getEmdDbCode(blockobj):
         """ Return the database code for EMDB.  Returns None is 
         EMDB id not present.
         """
         try:
             catObj = blockobj.getObj('database_2')
-            vals = catObj.selectValuesWhere('database_code', 'EMDB', 
+            vals = catObj.selectValuesWhere('database_code', 'EMDB',
                                             'database_id')
             if len(vals):
                 return vals[0]
@@ -59,7 +55,6 @@ class EmAutoFix(object):
             pass
 
         return None
-
 
     def __mapfix(self, depsetid, emdbid, volin, volout, voxel):
         resultPath = os.path.join(self.__sessionPath, depsetid + "_mapfix-header-report_P1.json")
@@ -74,7 +69,7 @@ class EmAutoFix(object):
         dp.expLog(logPath)
         dp.exp(resultPath)
 
-        if (self.__cleanup):
+        if self.__cleanup:
             dp.cleanup()
 
         return resultPath
@@ -102,7 +97,7 @@ class EmAutoFix(object):
 
         # Is there an em_map category?
 
-        #block0.printIt()
+        # block0.printIt()
         emdbid = self.__getEmdDbCode(block0)
         if not emdbid:
             logger.info("No emdb id")
@@ -131,10 +126,10 @@ class EmAutoFix(object):
                 logger.error("Unknown map type %s" % map_type)
                 continue
 
-            volin = self.__pI.getFilePath(dataSetId = datasetid, contentType = ctxtype, formatType='map', 
+            volin = self.__pI.getFilePath(dataSetId=datasetid, contentType=ctxtype, formatType='map',
                                           fileSource=vollocation, partNumber=partition,
                                           versionId="latest")
-            volout = self.__pI.getFilePath(dataSetId = datasetid, contentType = ctxtype, formatType='map', 
+            volout = self.__pI.getFilePath(dataSetId=datasetid, contentType=ctxtype, formatType='map',
                                            fileSource=vollocation, partNumber=partition,
                                            versionId="next")
             logger.debug("Updating %s to %s" % (volin, volout))
@@ -148,21 +143,26 @@ class EmAutoFix(object):
                 mrep = json.load(fin)
                 labelnew = mrep['output_header_long']['label']
                 tobj.setValue(value=labelnew, attributeName='label', rowIndex=row)
+                # Update filename in em_map
+                newname = self.__pI.getFileName(dataSetId=datasetid, contentType=ctxtype, formatType='map',
+                                                fileSource=vollocation, partNumber=partition,
+                                                versionId="latest")
+                tobj.setValue(value=newname, attributeName='file', rowIndex=row)
 
             updated = True
-
 
         if updated:
             logger.info("Model file updated")
 
-            ## Write model
+            # Write model
             ret = ioobj.writeFile(outputFilePath=modelout, containerList=c0)
             logger.info("Writing file returns %s %s" % (ret, modelout))
             return True
 
         return False
 
-if __name__== '__main__':
+
+if __name__ == '__main__':
     ch = logging.StreamHandler()
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
@@ -170,8 +170,8 @@ if __name__== '__main__':
     pI = PathInfo(sessionPath='/tmp')
 
     dep = 'D_800037'
-    modellocation='archive'
-    modelin = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation)
-    modelout = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation, versionId='next')
+    modellocation = 'archive'
+    modin = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation)
+    modout = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation, versionId='next')
     ema = EmAutoFix(sessionPath='/tmp')
-    ema.autoFixMapLabels(datasetid=dep, modelin=modelin, modelout=modelout)
+    ema.autoFixMapLabels(datasetid=dep, modelin=modin, modelout=modout)
