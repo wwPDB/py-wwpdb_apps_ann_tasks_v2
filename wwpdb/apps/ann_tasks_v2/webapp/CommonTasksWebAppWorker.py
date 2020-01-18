@@ -2057,7 +2057,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
+                    # Biocuration requested no message be returned
+                    myD[cT] = self.__getMessageTextWithMarkup('')
 
         if len(aTagList) > 0:
             myD['downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(aTagList)
