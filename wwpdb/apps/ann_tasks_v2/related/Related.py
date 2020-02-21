@@ -50,7 +50,7 @@ class Related(SessionWebDownloadUtils):
             logPath = os.path.join(self.__sessionPath, entryId + "-related-updated.log")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_related.cif")
             #
-            ur = UpdateRelated()
+            ur = UpdateRelated(siteId=self.__siteId)
             updated = ur.updateRelatedEntries(inpPath, retPath, logPath)
 
             if updated:

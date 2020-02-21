@@ -19,9 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class UpdateRelated(object):
-    def __init__(self, verbose=False, log=sys.stderr):
+    def __init__(self, siteId=None, verbose=False, log=sys.stderr):
         self.__verbose = verbose
         self.__lfh = log
+        self.__siteId = siteId
         self.__debug = False
         self.__ioObj = IoAdapterCore()
 
@@ -82,7 +83,7 @@ class UpdateRelated(object):
         If depid is not present in da_internal, return None
         """
 
-        dai = DaInternalDb()
+        dai = DaInternalDb(siteId=self.__siteId)
         data = dai.getDatabase2(depid)
         if len(data) > 0:
             return data

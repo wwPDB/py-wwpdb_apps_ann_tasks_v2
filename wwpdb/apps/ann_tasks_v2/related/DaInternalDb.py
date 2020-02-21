@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class DaInternalDb(object):
-    def __init__(self):
+    def __init__(self, siteId=None):
         self.__mydb = None
+        self.__siteId = siteId
         self.__open()
         pass
 
@@ -25,7 +26,7 @@ class DaInternalDb(object):
 
     def __open(self, resource="DA_INTERNAL"):
         """Opens up DB connection"""
-        self.__mydb = MyConnectionBase()
+        self.__mydb = MyConnectionBase(siteId=self.__siteId)
         self.__mydb.setResource(resourceName=resource)
         ok = self.__mydb.openConnection()
         if not ok:
