@@ -1586,6 +1586,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
             pth = deArchive.copyToSession(contentType="nmr-chemical-shifts", formatType="pdbx", version="latest", partitionNumber=1)
         #
+        # NEF file (nmr-star)
+        #
+        pth = de.copyToSession(contentType="nmr-data-str", formatType="nmr-star", version="latest", partitionNumber=1)
+        if pth is None:
+            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
+            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="nmr-star", version="latest", partitionNumber=1)
+        #
         pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
 
         # fsc file (xml)
@@ -2260,8 +2267,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._makeIdListFetchResponse(entryIdList, contentType='nmr-chemical-shifts', formatType='pdbx', fileSource=fileSource)
         elif (operation == "fetch_mr"):
             return self._makeIdListFetchResponse(entryIdList, contentType='nmr-restraints', formatType='mr', fileSource=fileSource)
-        elif (operation == "fetch_nef"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-nef', formatType='pdbx', fileSource=fileSource)
+        elif (operation == "fetch_nmr_data"):
+            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-data-str', formatType='pdbx', fileSource=fileSource)
         elif (operation == "report"):
             return self._makeIdListModelReportResponse(entryIdList, contentType, fileSource=fileSource, useFileVersions=useFileVersions)
         #
