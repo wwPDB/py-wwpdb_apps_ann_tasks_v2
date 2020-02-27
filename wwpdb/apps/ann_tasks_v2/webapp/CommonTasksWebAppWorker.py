@@ -1588,10 +1588,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         # NEF file (nmr-star)
         #
-        pth = de.copyToSession(contentType="nmr-data-str", formatType="nmr-star", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
         if pth is None:
             deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
-            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="nmr-star", version="latest", partitionNumber=1)
+            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
         #
         pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
 
