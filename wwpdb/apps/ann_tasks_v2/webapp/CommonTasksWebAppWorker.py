@@ -709,6 +709,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         starFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star", versionId=uploadVersionOp, partNumber='1')
         pdbxCsFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        pdbxNmrDataFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
         if (not os.access(os.path.join(self._sessionPath, starFileName), os.R_OK)):
             if (os.access(os.path.join(self._sessionPath, pdbxCsFileName), os.R_OK)):
                 outFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star", versionId=uploadVersionOp, partNumber='1')
@@ -719,6 +720,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             else:
                 starFileName = None
             #
+        # nmr-data trumps CS
+        if (os.access(os.path.join(self._sessionPath, pdbxNmrDataFileName), os.R_OK)):
+            pdbxCsFileName = pdbxNmrDataFileName
+            
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s volInputFile %s\n" %
                             (modelFileName, expFileName, pdbxCsFileName, volFileName))
