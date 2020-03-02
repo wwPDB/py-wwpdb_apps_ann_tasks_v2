@@ -935,25 +935,10 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         annotatorInitials = self._reqObj.getValue('annotator-initials')
         statusD = {}
         emdbId = self._reqObj.getValue('emdb_id')
-        releaseHeader = False
         for kyPair in kyPairListEm:
             statusD[kyPair[0]] = self._reqObj.getValue(kyPair[0])
-        #
-        # Update header_release_date if it is not set and status_code = HOLD|HPUB
-        # Last update is updated everytime the header is released.
-        #
-        if (('em_current_status' in statusD) and (statusD['em_current_status'] in ['HOLD', 'HPUB'])):
-            releaseHeader = True
-            if ((statusD['em_header_release_date'] is not None) and (len(statusD['em_header_release_date']) > 1)):
-                pass
-            else:
-                statusD['em_header_release_date'] = self.__getHeaderReleaseDate()
-            # Always update last_update
-            statusD['em_last_update'] = self.__getHeaderReleaseDate()
 
-        #
         if (self._verbose):
-            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOpEm() releaseHeader %r\n" % releaseHeader)
             self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOpEm() statusD %r\n" % statusD.items())
         #
         #  Values from the current version of the model file --
@@ -966,7 +951,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         # expMethods = self._reqObj.getValue('experimental_methods')
         #
         msg = 'ok'
-        ok4 = False
         ok5 = False
         # Test if any conditions are violated
         #
@@ -1000,10 +984,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             sUD = sU.getV2(filePath)
             modTitleSupp = sUD['titleSupp']
 
+            # No title suppression in generating headers
             headerFilters = []
-            if modTitleSupp == 'Y' and releaseHeader:
-                # Release header in this code only happens for HPUB/HOLD
-                headerFilters = ['all', 'prereleasetitle']
 
             if (self._verbose):
                 self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOpEm() title suppression is %s with filters %s\n" %
@@ -1057,9 +1039,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     aTagList.append(du.getAnchorTag())
                     ok5 = True
                     #
-                    if (releaseHeader):
-                        ok4 = emhu.releaseHeader(emdbFilePath, emdbId)
-                        ok4a = emhu.releaseHeaderPdbx(emdFilePath, emdbId)
                 else:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateEmOp() NO HEADER FILE CREATED %s" % emdbFilePath)
                 #
@@ -1072,13 +1051,10 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 htmlText = self.__getFileTextWithMarkup(emdbLogPath)
                 rC.setHtmlText(htmlText)
 
-                if ok4:
-                    rC.setStatus(statusMsg="Status updated - header file released")
+                if ok5:
+                    rC.setStatus(statusMsg="Status updated - header file produced")
                 else:
-                    if ok5:
-                        rC.setStatus(statusMsg="Status updated - header file produced")
-                    else:
-                        rC.setError(errMsg="Status updated - no header file produced")
+                    rC.setError(errMsg="Status updated - no header file produced")
                 #
                 myD = {}
                 # myD['statuscode'] = statusCode
