@@ -23,10 +23,10 @@ __version__ = "V0.07"
 import sys
 import os.path
 import os
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from mmcif.io.IoAdapterCore import IoAdapterCore
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class AssemblyInput(object):
 
@@ -45,7 +45,6 @@ class AssemblyInput(object):
     def __setup(self):
         self.__placeHolderValue = "click-to-edit"
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI = ConfigInfo(self.__siteId)
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
@@ -324,13 +323,17 @@ class AssemblyInput(object):
                 os.remove(fTmp)
             #
         #
-        cmd = "cd " + self.__sessionPath + " ; RCSBROOT=" + self.__cI.get('SITE_ANNOT_TOOLS_PATH') \
-            + "; export RCSBROOT; BINPATH=${RCSBROOT}/bin; export BINPATH; ${BINPATH}/GetSymmetryOperator -space_group " \
-            + space_group + " -output " + entryId + "-symop-info.txt -log " + entryId + "-symop-info.log  > " \
-            + entryId + "-symop-info.clog 2>&1 ; "
-        #
-        os.system(cmd)
         symopFile = os.path.join(self.__sessionPath, entryId + "-symop-info.txt")
+        #
+        try:
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.addInput(name="space_group", value=space_group)
+            dp.op('annot-get-symmetry-operator')
+            dp.exp(symopFile)
+            dp.cleanup()
+        except:
+            traceback.print_exc(file=self.__lfh)
+        #
         if os.access(symopFile, os.R_OK):
             ifh = open(symopFile, 'r')
             data = ifh.read()
