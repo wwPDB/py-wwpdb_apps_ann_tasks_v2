@@ -21,10 +21,10 @@ except ImportError:
 import sys,os.path,os,traceback
 import logging
 
-from wwpdb.utils.config.ConfigInfo    import ConfigInfo
 from mmcif.io.PdbxWriter         import PdbxWriter
 from mmcif.api.PdbxContainers     import DataContainer
 from mmcif.api.DataCategory import DataCategory
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,6 @@ class CoordEditorUpdate(object):
 
     def __setup(self):
         self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI=ConfigInfo(self.__siteId)
         self.__sObj=self.__reqObj.getSessionObj()
         self.__sessionId=self.__sObj.getId()
         self.__sessionPath=self.__sObj.getPath()
@@ -111,45 +110,41 @@ class CoordEditorUpdate(object):
         f.close()
 
     def __runCheckScript(self):
-        script = os.path.join(self.__sessionPath, self.__entryId + '_check.csh')
-        f = open(script, 'w')
-        f.write('#!/bin/tcsh -f\n')
-        f.write('#\n')
-        f.write('setenv RCSBROOT   ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
-        f.write('setenv COMP_PATH  ' + self.__cI.get('SITE_CC_CVS_PATH') + '\n')
-        f.write('setenv BINPATH  ${RCSBROOT}/bin\n')
-        f.write('#\n')
-        f.write('${BINPATH}/CheckSelectNumber -index ' + self.__entryId + \
-                '_index.cif -select ' + self.__entryId + '_select.cif ' + \
-                ' -log ' + self.__entryId + '_check.log\n')
-        f.write('#\n')
-        f.close()
-        cmd = 'cd ' + self.__sessionPath + '; chmod 755 ' + self.__entryId + '_check.csh; ' \
-            + './' + self.__entryId + '_check.csh >& check_log'
-        os.system(cmd)
+        """
+        """
+        try:
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(os.path.join(self.__sessionPath, self.__entryId + "_index.cif"))
+            dp.addInput(name="select", value=os.path.join(self.__sessionPath, self.__entryId + "_select.cif"))
+            dp.op("annot-check-select-number")
+            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_check.log"))
+            dp.cleanup()
+            #
+            return self.__readLogFile('_check.log', 'Run numbering checking failed')
+        except:
+            traceback.print_exc(file=self.__lfh)
+            error = 'error:' + traceback.format_exc()
+            return error
         #
-        return self.__readLogFile('_check.log', 'Run numbering checking failed')
 
     def __runUpdateScript(self):
-        script = os.path.join(self.__sessionPath, self.__entryId + '_update.csh')
-        f = open(script, 'w')
-        f.write('#!/bin/tcsh -f\n')
-        f.write('#\n')
-        f.write('setenv RCSBROOT   ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
-        f.write('setenv COMP_PATH  ' + self.__cI.get('SITE_CC_CVS_PATH') + '\n')
-        f.write('setenv BINPATH  ${RCSBROOT}/bin\n')
-        f.write('#\n')
-        f.write('${BINPATH}/UpdateMolecule -input ' + self.__entryFile + \
-                ' -assign ' + self.__entryId + '_select.cif ' + \
-                ' -output ' + self.__entryFile + \
-                ' -log ' + self.__entryId + '_update.log\n')
-        f.write('#\n')
-        f.close()
-        cmd = 'cd ' + self.__sessionPath + '; chmod 755 ' + self.__entryId + '_update.csh; ' \
-            + './' + self.__entryId + '_update.csh >& update_log'
-        os.system(cmd)
+        """
+        """
+        try:
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(os.path.join(self.__sessionPath, self.__entryFile))
+            dp.addInput(name="assign", value=os.path.join(self.__sessionPath, self.__entryId + "_select.cif"))
+            dp.op("annot-update-molecule")
+            dp.exp(os.path.join(self.__sessionPath, self.__entryFile))
+            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_update.log"))
+            dp.cleanup()
+            #
+            return self.__readLogFile('_update.log', 'Update failed!')
+        except:
+            traceback.print_exc(file=self.__lfh)
+            error = 'error:' + traceback.format_exc()
+            return error
         #
-        return self.__readLogFile('_update.log', 'Update failed!')
 
     def __readLogFile(self, extension, default_message):
         filename = os.path.join(self.__sessionPath, self.__entryId + extension)

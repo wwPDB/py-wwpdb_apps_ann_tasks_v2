@@ -15,9 +15,9 @@ __version__   = "V0.07"
 
 import sys,os.path,os,traceback
 
-from wwpdb.utils.config.ConfigInfo                   import ConfigInfo
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
-from wwpdb.io.file.mmCIFUtil                    import mmCIFUtil
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class CorresPNDTemplate(object):
     """
@@ -49,7 +49,6 @@ class CorresPNDTemplate(object):
         """
         """
         self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI=ConfigInfo(self.__siteId)
         self.__sObj=self.__reqObj.getSessionObj()
         self.__sessionId=self.__sObj.getId()
         self.__sessionPath=self.__sObj.getPath()
@@ -75,61 +74,35 @@ class CorresPNDTemplate(object):
         except:
             traceback.print_exc(file=self.__lfh)
             return 'Generating correspondence template failed'
-
-    def __getFileName(self, path, root, ext):
-        """Create unique file name.
-        """
-        count = 1
-        while True:
-            filename = root + '_' + str(count) + '.' + ext
-            fullname = os.path.join(path, filename)
-            if not os.access(fullname, os.F_OK):
-                return filename
-            #
-            count += 1
-                #
-        return root + '_1.' + ext
-
-    def __RunScript(self, path, script, log):
-        """Run script command
-        """
-        cmd = 'cd ' + path + '; chmod 755 ' + script \
-            + '; ./' + script + ' >& ' + log
-        os.system(cmd)
+        #
 
     def __runGetCorresInfo(self):
         """
         """
-        scriptfile = self.__getFileName(self.__sessionPath, 'corres', 'csh')
-        resultfile = self.__getFileName(self.__sessionPath, 'corres', 'cif')
-        logfile    = self.__getFileName(self.__sessionPath, 'corres', 'log')
-        clogfile   = self.__getFileName(self.__sessionPath, 'corres_command', 'log')
-        #
-        script = os.path.join(self.__sessionPath, scriptfile)
-        f = open(script, 'w')
-        f.write('#!/bin/tcsh -f\n')
-        f.write('#\n')
-        f.write('setenv RCSBROOT ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
-        f.write('setenv COMP_PATH ' + self.__cI.get('SITE_CC_CVS_PATH') + '\n')
-        f.write('setenv BINPATH ${RCSBROOT}/bin\n')
-        f.write('#\n')
-        f.write('${BINPATH}/GetCorresInfo -input ' + self.__entryFile + ' -output ' + \
-                resultfile + ' -log ' + logfile + '\n')
-        f.write('#\n')
-        f.close()
-        #
-        self.__RunScript(self.__sessionPath, scriptfile, clogfile)
-        #
-        logfilename = os.path.join(self.__sessionPath, logfile)
-        f = open(logfilename, 'r')
-        data = f.read()
-        f.close()
-        #
-        error = ''
-        if len(data) > 0 and data.find('Finished!') == -1:
-            error = '<pre>\n' + data + '\n</pre>\n'
-        #
-        return error,resultfile
+        try:
+            resultfile = os.path.join(self.__sessionPath, 'corres_1.cif')
+            logfilename = os.path.join(self.__sessionPath, 'corres_1.log')
+            #
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(os.path.join(self.__sessionPath, self.__entryFile))
+            dp.op('annot-get-corres-info');
+            dp.exp(resultfile)
+            dp.expLog(logfilename)
+            dp.cleanup()
+            #
+            f = open(logfilename, 'r')
+            data = f.read()
+            f.close()
+            #
+            error = ''
+            if len(data) > 0 and data.find('Finished!') == -1:
+                error = '<pre>\n' + data + '\n</pre>\n'
+            #
+            return error,'corres_1.cif'
+        except:
+            traceback.print_exc(file=self.__lfh)
+            error = 'error:' + traceback.format_exc()
+            return error,''
 
     def __getCorrespondenceTempltInfo(self):
         """

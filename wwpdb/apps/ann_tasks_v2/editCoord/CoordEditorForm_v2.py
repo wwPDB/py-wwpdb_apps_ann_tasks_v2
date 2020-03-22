@@ -20,7 +20,7 @@ except ImportError:
 
 import json,os,shutil,sys,traceback
 
-from wwpdb.utils.config.ConfigInfo    import ConfigInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class CoordEditorForm(object):
     """
@@ -36,7 +36,6 @@ class CoordEditorForm(object):
 
     def __setup(self):
         self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI=ConfigInfo(self.__siteId)
         self.__sObj=self.__reqObj.getSessionObj()
         self.__sessionId=self.__sObj.getId()
         self.__sessionPath=self.__sObj.getPath()
@@ -130,10 +129,6 @@ class CoordEditorForm(object):
     def __runScript(self):
         """ Run DepictMolecule_Json program
         """
-        setting = " RCSBROOT=" + self.__cI.get("SITE_ANNOT_TOOLS_PATH") + "; export RCSBROOT; " \
-                + " COMP_PATH=" + self.__cI.get("SITE_CC_CVS_PATH") + "; export COMP_PATH; " \
-                + " BINPATH=${RCSBROOT}/bin; export BINPATH; ${BINPATH}/DepictMolecule_Json "
-        #
         fileList = []
         for ext in ( "_chainids.txt", "_index.cif", "_summary.log", "_command.log"): 
             fileName = self.__entryId + ext
@@ -147,11 +142,20 @@ class CoordEditorForm(object):
         if not os.access(os.path.join(self.__sessionPath, self.__entryFile), os.F_OK):
             return
         #
-        cmd = "cd " + self.__sessionPath + " ; " + setting + " -input " + self.__entryFile + " -output " \
-            + os.path.join(self.__jsonPath, self.__entryId + ".json") + " -output_2 " + fileList[0] \
-            + " -output_3 " + fileList[1] + " -log " + fileList[2] + " > " + fileList[3] + " 2>&1 ; " 
+        try:
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(os.path.join(self.__sessionPath, self.__entryFile))
+            dp.op('annot-depict-molecule-json')
+            #
+            jsonPath = os.path.join(self.__jsonPath, self.__entryId + ".json")
+            textPath = os.path.join(self.__sessionPath, self.__entryId + "_chainids.txt")
+            indxPath = os.path.join(self.__sessionPath, self.__entryId + "_index.cif")
+            dp.expList(dstPathList=[jsonPath,textPath,indxPath])
+            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_summary.log"))
+            dp.cleanup()
+        except:
+            traceback.print_exc(file=self.__lfh)
         #
-        os.system(cmd)
 
     def __geterateChainJson(self, mol_idx, chainID):
         """ Read entryId.json file and re-write chain.json file

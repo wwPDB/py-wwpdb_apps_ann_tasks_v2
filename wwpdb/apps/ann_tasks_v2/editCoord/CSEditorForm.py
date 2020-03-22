@@ -15,7 +15,7 @@ __version__   = "V0.07"
 
 import sys,os.path,os,traceback
 
-from wwpdb.utils.config.ConfigInfo    import ConfigInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class CSEditorForm(object):
     """
@@ -31,7 +31,6 @@ class CSEditorForm(object):
 
     def __setup(self):
         self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI=ConfigInfo(self.__siteId)
         self.__sObj=self.__reqObj.getSessionObj()
         self.__sessionId=self.__sObj.getId()
         self.__sessionPath=self.__sObj.getPath()
@@ -59,22 +58,18 @@ class CSEditorForm(object):
         return myD
 
     def __runScript(self):
-        script = os.path.join(self.__sessionPath, self.__entryId + '_cs_script.csh')
-        f = open(script, 'w')
-        f.write('#!/bin/tcsh -f\n')
-        f.write('#\n')
-        f.write('setenv RCSBROOT   ' + self.__cI.get('SITE_ANNOT_TOOLS_PATH') + '\n')
-        f.write('setenv COMP_PATH  ' + self.__cI.get('SITE_CC_CVS_PATH') + '\n')
-        f.write('setenv BINPATH  ${RCSBROOT}/bin\n')
-        f.write('#\n')
-        f.write('${BINPATH}/depict_chemical_shift -input ' + self.__entryFile + \
-                ' -output ' + self.__entryId + '_cs_html.txt ' + \
-                ' -log ' + self.__entryId + '_cs_summary.log\n')
-        f.write('#\n')
-        f.close()
-        cmd = 'cd ' + self.__sessionPath + '; chmod 755 ' + self.__entryId + '_cs_script.csh; ' \
-            + ' ./' + self.__entryId + '_cs_script.csh >& cs_summary_log'
-        os.system(cmd)
+        """
+        """
+        try:
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(os.path.join(self.__sessionPath, self.__entryFile))
+            dp.op("annot-depict-chemical-shift")
+            dp.exp(os.path.join(self.__sessionPath, self.__entryId + "_cs_html.txt"))
+            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_cs_summary.log"))
+            dp.cleanup()
+        except:
+            traceback.print_exc(file=self.__lfh)
+        #
 
     def __getHtmlcontent(self):
         content = 'No result found!'
