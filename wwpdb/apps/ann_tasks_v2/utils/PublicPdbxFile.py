@@ -18,8 +18,8 @@ __version__   = "V0.07"
 
 import sys,os.path,os,traceback
 
-from wwpdb.utils.config.ConfigInfo    import ConfigInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class PublicPdbxFile(SessionWebDownloadUtils):
     """ The PublicPdbxFile class encapsulates conversion internal pdbx cif to public pdbx cif file.
@@ -33,7 +33,6 @@ class PublicPdbxFile(SessionWebDownloadUtils):
         
     def __setup(self):
         self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI=ConfigInfo(self.__siteId)
         self.__sObj=self.__reqObj.getSessionObj()
         self.__sessionId=self.__sObj.getId()
         self.__sessionPath=self.__sObj.getPath()
@@ -47,26 +46,17 @@ class PublicPdbxFile(SessionWebDownloadUtils):
             logPath=os.path.join(self.__sessionPath,entryId+"-public_cif.log")
             retPath=os.path.join(self.__sessionPath,entryId+"_model-review_P1.cif")
             #
-            script = os.path.join(self.__sessionPath, entryId + '_pub_pdbx.csh')
-            f = open(script, 'w')
-            f.write('#!/bin/tcsh -f\n')
-            f.write('#\n')
-            f.write('setenv DICPATH ' + self.__cI.get('SITE_PDBX_DICT_PATH') + '\n')
-            f.write('setenv BINPATH ' + self.__cI.get('SITE_PACKAGES_PATH') + '/dict/bin\n')
-            f.write('#\n')
-            f.write('set dict = "'   + self.__cI.get('SITE_PDBX_DICT_NAME')    + '.sdb"\n')
-            f.write('set dictV4 = "' + self.__cI.get('SITE_PDBX_V4_DICT_NAME') + '.sdb"\n')        
-            f.write('set exchprog = "cifexch2"\n')
-            f.write('#\n')
-            f.write('${BINPATH}/${exchprog} -dicSdb ${DICPATH}/${dict}  -pdbxDicSdb ${DICPATH}/${dictV4}  -reorder -strip -op in ' + \
-                    '-pdbids -input ' + inpFile + ' -output ' + entryId + '_model-review_P1.cif\n') 
-            f.write('#\n')
-            f.close()
-            cmd = 'cd ' + self.__sessionPath + '; chmod 755 ' + entryId + '_pub_pdbx.csh; ' \
-                + './' + entryId + '_pub_pdbx.csh >& pub_pdbx_log'
-            os.system(cmd)
-            self.addDownloadPath(retPath)
-            self.addDownloadPath(logPath)            
+            for filePath in ( logPath, retPath):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
+            #
+            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+            dp.imp(inpPath)
+            dp.op("annot-cif-to-public-pdbx")
+            dp.exp(retPath);
+            dp.expLog(logPath)
+            dp.cleanup()
             #
             return True
         except:
