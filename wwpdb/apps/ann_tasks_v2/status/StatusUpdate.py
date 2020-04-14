@@ -366,6 +366,12 @@ class StatusUpdate(object):
                         dcObj.appendAttribute('status_code_mr')
                     dcObj.setValue(statusCode, attributeName='status_code_mr', rowIndex=0)
 
+                    # For nmr-data - only set if recvd
+                    have_nmr_data = dcObj.getValueOrDefault(attributeName='recvd_nmr_data', rowIndex=0, defaultValue='').upper()
+                    if have_nmr_data == "Y":
+                        dcObj.setValue(statusCode, attributeName='status_code_nmr_data', rowIndex=0)
+                    
+
                 if dcObj.getAttributeIndex('author_approval_type') < 0:
                     dcObj.appendAttribute('author_approval_type')
 
