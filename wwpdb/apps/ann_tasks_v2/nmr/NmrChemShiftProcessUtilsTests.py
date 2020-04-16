@@ -27,7 +27,7 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stderr
         self.__verbose = True
-        self.__entryId = "D_8000210570"
+        self.__entryId = "D_1000102134"
         #
         self.__getSession()
         self.__getFiles()
@@ -55,8 +55,13 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         self.__inputCsFile = pI.getFilePath(self.__entryId, contentType="nmr-chemical-shifts", formatType="pdbx", fileSource="session", versionId="next")
         shutil.copyfile(archiveCsFile, self.__inputCsFile)
         #
+        archiveNefFile = pI.getFilePath(self.__entryId, contentType="nmr-data-str", formatType="pdbx", fileSource="archive", versionId="latest")
+        self.__inputNefFile = pI.getFilePath(self.__entryId, contentType="nmr-data-str", formatType="pdbx", fileSource="session", versionId="next")
+        shutil.copyfile(archiveNefFile, self.__inputNefFile)
+        #
         self.__outputModelFile = pI.getFilePath(self.__entryId, contentType="model", formatType="pdbx", fileSource="session", versionId="next")
         self.__outputCsFile = pI.getFilePath(self.__entryId, contentType="nmr-chemical-shifts", formatType="pdbx", fileSource="session", versionId="next")
+        self.__outputNefFile = pI.getFilePath(self.__entryId, contentType="nmr-data-str", formatType="pdbx", fileSource="session", versionId="next")
         self.__outputReportFile = pI.getFilePath(self.__entryId, contentType="nmr-shift-error-report", formatType="json", fileSource="session", versionId="next")
         self.__validationReportFile = pI.getFilePath(self.__entryId, contentType="validation-report", formatType="pdf", fileSource="session", versionId="next")
         self.__validationDataFile = pI.getFilePath(self.__entryId, contentType="validation-data", formatType="xml", fileSource="session", versionId="next")
@@ -84,13 +89,16 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
             util.setWorkingDirPath(dirPath=self.__sessionPath)
             util.setInputModelFileName(fileName=self.__inputModelFile)
             util.setInputCsFileName(fileName=self.__inputCsFile)
+            util.setInputNefFileName(fileName=self.__inputNefFile)
             util.setOutputModelFileName(fileName=self.__outputModelFile)
             util.setOutputCsFileName(fileName=self.__outputCsFile)
+            util.setOutputNefFileName(fileName=self.__outputNefFile)
             util.setOutputReportFileName(fileName=self.__outputReportFile)
             util.setOutputValidationFileList(dstPathList=[ self.__validationReportFile, self.__validationDataFile, self.__fullReportFile, \
                                                            self.__sliderPngFile, self.__sliderSvgFile ])
             #
             util.run()
+            util.runNefProcess()
         except:
             traceback.print_exc(file=self.__lfh)
             self.fail()

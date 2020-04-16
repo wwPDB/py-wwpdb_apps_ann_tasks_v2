@@ -357,7 +357,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         entryFileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
         expFileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
         csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
-
+        nefFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         #
         filelist = []
         filelist.append([entryFileName, "model", "pdbx"])
@@ -386,6 +386,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         if os.access(os.path.join(self._sessionPath, csFileName), os.F_OK):
             filelist.append([csFileName, "nmr-chemical-shifts", "pdbx"])
+        #
+        if os.access(os.path.join(self._sessionPath, nefFileName), os.F_OK):
+            filelist.append([nefFileName, "nmr-data-str", "pdbx"])
         #
         # ----------
         # Generate PDB file
@@ -437,7 +440,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if fileSource not in ['archive', 'wf-archive']:
             dEAr = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, fileSource='archive', verbose=self._verbose, log=self._lfh)
             for list in filelist:
-                if list[1] in ["structure-factors", "nmr-chemical-shifts"]:
+                if list[1] in ["structure-factors", "nmr-chemical-shifts", "nmr-data-str"]:
                     pdbxPath = os.path.join(self._sessionPath, list[0])
                     ok = dEAr.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
                     if (self._verbose):
