@@ -79,8 +79,12 @@ class Validate(SessionWebDownloadUtils):
                 sfPath = os.path.join(self.__sessionPath, reflnInputFile)
 
             if csInputFile is None:
-                csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                csFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
                 csPath = os.path.join(self.__sessionPath, csFileName)
+                if not os.access(csPath, os.R_OK):
+                    # Fallback on cs file
+                    csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                    csPath = os.path.join(self.__sessionPath, csFileName)
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #

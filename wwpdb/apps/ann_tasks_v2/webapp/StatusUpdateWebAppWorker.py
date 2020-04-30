@@ -40,6 +40,7 @@ import os
 import sys
 import traceback
 import shutil
+import logging
 import datetime
 from dateutil.relativedelta import *
 #
@@ -61,14 +62,8 @@ from wwpdb.utils.session.WebRequest import ResponseContent
 #
 from wwpdb.apps.wf_engine.engine.WFEapplications import killAllWF
 
-import logging
-# Create logger
-logger = logging.getLogger()
-ch = logging.StreamHandler()
-formatter = logging.Formatter('[%(levelname)s] [%(module)s.%(funcName)s] %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 

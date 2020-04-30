@@ -359,12 +359,23 @@ class StatusUpdate(object):
                     dcObj.setValue(statusCode, attributeName='status_code_sf', rowIndex=0)
 
                 if expMethods is not None and self.__inMethod('NMR', expMethods):
-                    if dcObj.getAttributeIndex('status_code_cs') < 0:
-                        dcObj.appendAttribute('status_code_cs')
-                    dcObj.setValue(statusCode, attributeName='status_code_cs', rowIndex=0)
-                    if dcObj.getAttributeIndex('status_code_mr') < 0:
-                        dcObj.appendAttribute('status_code_mr')
-                    dcObj.setValue(statusCode, attributeName='status_code_mr', rowIndex=0)
+                    have_cs_data = dcObj.getValueOrDefault(attributeName='recvd_chemical_shifts', rowIndex=0, defaultValue='').upper()
+                    if have_cs_data == "Y":
+                        if dcObj.getAttributeIndex('status_code_cs') < 0:
+                            dcObj.appendAttribute('status_code_cs')
+                        dcObj.setValue(statusCode, attributeName='status_code_cs', rowIndex=0)
+
+                    have_mr_data = dcObj.getValueOrDefault(attributeName='recvd_nmr_constraints', rowIndex=0, defaultValue='').upper()
+                    if have_mr_data == "Y":
+                        if dcObj.getAttributeIndex('status_code_mr') < 0:
+                            dcObj.appendAttribute('status_code_mr')
+                        dcObj.setValue(statusCode, attributeName='status_code_mr', rowIndex=0)
+
+                    # For nmr-data - only set if recvd
+                    have_nmr_data = dcObj.getValueOrDefault(attributeName='recvd_nmr_data', rowIndex=0, defaultValue='').upper()
+                    if have_nmr_data == "Y":
+                        dcObj.setValue(statusCode, attributeName='status_code_nmr_data', rowIndex=0)
+                    
 
                 if dcObj.getAttributeIndex('author_approval_type') < 0:
                     dcObj.appendAttribute('author_approval_type')

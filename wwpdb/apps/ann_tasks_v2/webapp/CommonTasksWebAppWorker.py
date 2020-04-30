@@ -709,6 +709,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         starFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star", versionId=uploadVersionOp, partNumber='1')
         pdbxCsFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        pdbxNmrDataFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
         if (not os.access(os.path.join(self._sessionPath, starFileName), os.R_OK)):
             if (os.access(os.path.join(self._sessionPath, pdbxCsFileName), os.R_OK)):
                 outFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star", versionId=uploadVersionOp, partNumber='1')
@@ -719,6 +720,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             else:
                 starFileName = None
             #
+        # nmr-data trumps CS
+        if (os.access(os.path.join(self._sessionPath, pdbxNmrDataFileName), os.R_OK)):
+            pdbxCsFileName = pdbxNmrDataFileName
+            
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s volInputFile %s\n" %
                             (modelFileName, expFileName, pdbxCsFileName, volFileName))
@@ -1333,7 +1338,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                           '#nmr-cs-upload-check-form', '#nmr-cs-atom-name-check-form', '#nmr-rep-model-update-form',
                           '#nmr-cs-update-archive-form', '#nmr-cs-update-form', '#nmr-cs-processing-form', '#nmr-cs-edit-form',
                           '#tls-range-correction-form', '#mtz-mmcif-conversion-form', '#mtz-mmcif-semi-auto-conversion-form',
-                          '#sf-mmcif-free-r-correction-form' ]
+                          '#sf-mmcif-free-r-correction-form', '#database-related-correction-form']
             tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             for key in formIdList:
                 val = uds.get(key)
@@ -1585,6 +1590,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if pth is None:
             deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
             pth = deArchive.copyToSession(contentType="nmr-chemical-shifts", formatType="pdbx", version="latest", partitionNumber=1)
+        #
+        # NEF file (nmr-star)
+        #
+        pth = de.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
+        if pth is None:
+            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
+            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
         #
         pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
 
@@ -2260,8 +2272,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._makeIdListFetchResponse(entryIdList, contentType='nmr-chemical-shifts', formatType='pdbx', fileSource=fileSource)
         elif (operation == "fetch_mr"):
             return self._makeIdListFetchResponse(entryIdList, contentType='nmr-restraints', formatType='mr', fileSource=fileSource)
-        elif (operation == "fetch_nef"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-nef', formatType='pdbx', fileSource=fileSource)
+        elif (operation == "fetch_nmr_data"):
+            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-data-str', formatType='pdbx', fileSource=fileSource)
         elif (operation == "report"):
             return self._makeIdListModelReportResponse(entryIdList, contentType, fileSource=fileSource, useFileVersions=useFileVersions)
         #

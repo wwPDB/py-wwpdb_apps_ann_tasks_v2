@@ -30,12 +30,14 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 import json,os,sys,traceback
+import logging
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.expIoUtils.MtzTommCIF import MtzTommCIF
 from wwpdb.apps.ann_tasks_v2.expIoUtils.ReSetFreeRinSFmmCIF import ReSetFreeRinSFmmCIF
+from wwpdb.apps.ann_tasks_v2.related.Related import Related
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
@@ -45,15 +47,8 @@ from wwpdb.utils.session.WebRequest import ResponseContent
 from wwpdb.io.file.DataExchange import DataExchange
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
-import logging
-# Create logger
-logger = logging.getLogger()
-ch = logging.StreamHandler()
-formatter = logging.Formatter('[%(levelname)s] [%(module)s.%(funcName)s] %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-logger.setLevel(logging.DEBUG)
 
+logger = logging.getLogger(__name__)
 
 class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
 
@@ -104,6 +99,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/ann_tasks_v2/tlsrangecorrection': '_tlsRangeCorrectionOp',
                            '/service/ann_tasks_v2/mtz_mmcif_conversion': '_mtzCifConversionOp',
                            '/service/ann_tasks_v2/correcting_sf_free_r_set': '_sfFreeRCorrectionOp',
+                           '/service/ann_tasks_v2/correcting_database_releated': '_relatedCorrectionOp',
                            '/service/ann_tasks_v2/reassignaltidscalc': '_reassignAltIdsCalcOp',
                            '/service/ann_tasks_v2/bisofullcalc': '_bisoFullCalcOp',
                            '/service/ann_tasks_v2/linkcalc': '_linkCalcOp',
@@ -139,6 +135,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/ann_tasks_v2/manualcseditorupdate': '_updateCSEditorOp',
                            '/service/ann_tasks_v2/checkreports': '_fetchAndReportIdOps',
                            '/service/ann_tasks_v2/update_reflection_file': '_updateRefelectionFileOp',
+
                            '/service/ann_tasks_v2/list_em_maps': '_listEmMapsOp',
                            '/service/ann_tasks_v2/edit_em_map_header': '_editEmMapHeaderOp',
                            '/service/ann_tasks_v2/edit_em_map_header_responder': '_editEmMapHeaderResponderOp',
@@ -360,7 +357,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         entryFileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
         expFileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
         csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
-
+        nefFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         #
         filelist = []
         filelist.append([entryFileName, "model", "pdbx"])
@@ -389,6 +386,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         if os.access(os.path.join(self._sessionPath, csFileName), os.F_OK):
             filelist.append([csFileName, "nmr-chemical-shifts", "pdbx"])
+        #
+        if os.access(os.path.join(self._sessionPath, nefFileName), os.F_OK):
+            filelist.append([nefFileName, "nmr-data-str", "pdbx"])
         #
         # ----------
         # Generate PDB file
@@ -440,7 +440,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if fileSource not in ['archive', 'wf-archive']:
             dEAr = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, fileSource='archive', verbose=self._verbose, log=self._lfh)
             for list in filelist:
-                if list[1] in ["structure-factors", "nmr-chemical-shifts"]:
+                if list[1] in ["structure-factors", "nmr-chemical-shifts", "nmr-data-str"]:
                     pdbxPath = os.path.join(self._sessionPath, list[0])
                     ok = dEAr.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
                     if (self._verbose):
@@ -572,6 +572,31 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         tss.assign(name="Correcting free R set form", formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryExpFileName=expFileName)
+        rC = self._makeTaskResponse(tssObj=tss)
+        #
+        return rC
+
+    def _relatedCorrectionOp(self):
+        """ Correcting pdbx_database_related OneDep Refereces
+        """
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._relatedCorrectionOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        entryId = self._reqObj.getValue("entryid")
+        fileName = self._reqObj.getValue("entryfilename")
+        taskFormId = self._reqObj.getValue("taskformid")
+        #
+        calc = Related(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok = calc.run(entryId, fileName, updateInput=True)
+        #
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._reltaedCorrectionOp() status %r\n" % ok)
+        #
+        tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
+        #
+        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        tss.assign(name="Correcting Related form", formId=taskFormId, args="", completionFlag=ok, tagList=tagL, entryId=entryId)
         rC = self._makeTaskResponse(tssObj=tss)
         #
         return rC

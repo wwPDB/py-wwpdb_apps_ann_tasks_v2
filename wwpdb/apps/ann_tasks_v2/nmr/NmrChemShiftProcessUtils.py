@@ -36,8 +36,10 @@ class NmrChemShiftProcessUtils(object):
         self.__workingDirPath = "."
         self.__inModelFilePath = ""
         self.__inCsFilePath = ""
+        self.__inNefFilePath = ""
         self.__outModelFilePath = ""
         self.__outCsFilePath = ""
+        self.__outNefFilePath = ""
         self.__outReportFilePath = ""
         self.__validationResultPath = []
 
@@ -83,6 +85,11 @@ class NmrChemShiftProcessUtils(object):
         """
         self.__inCsFilePath = fileName
 
+    def setInputNefFileName(self, fileName=""):
+        """ Set input nef file name
+        """
+        self.__inNefFilePath = fileName
+
     def setOutputModelFileName(self, fileName=""):
         """ Set output model file name
         """
@@ -92,6 +99,11 @@ class NmrChemShiftProcessUtils(object):
         """ Set output chemical shift file name
         """
         self.__outCsFilePath = fileName
+
+    def setOutputNefFileName(self, fileName=""):
+        """ Set output nef file name
+        """
+        self.__outNefFilePath = fileName
 
     def setOutputReportFileName(self, fileName=""):
         """ Set output chemical shift atom name report file name
@@ -111,6 +123,11 @@ class NmrChemShiftProcessUtils(object):
         self.__updateCsFileAndRunNomenclatureCheck()
         self.__runNmrValidationMiscellaneousCheck()
         self.__outputReportFile()
+
+    def runNefProcess(self):
+        """ Run ref file checking & updating process
+        """
+        self.__updateNefFileAndRunNomenclatureCheck()
 
     def __moveBestRepresentativeModel(self):
         """ Run the selection of representative model update from _pdbx_nmr_representative.conformer_id
@@ -187,6 +204,57 @@ class NmrChemShiftProcessUtils(object):
             if logMessage:
                 self.__insertSystemLogMessage(logMessage)
             #
+            dp.cleanup()
+        except:
+            traceback.print_exc(file=self.__lfh)
+        #
+
+    def __updateNefFileAndRunNomenclatureCheck(self):
+        """  Update chemical shift atom naming relative to any changes in the coordinate model. 
+             This operation acts on chemical shift files that are in PDBx format and have been 
+             preprocessed with to contain original atom nomenclature details.
+        """
+        try:
+            if not self.__inNefFilePath:
+                self.__insertSystemLogMessage("Input nef file was not provided.")
+                return
+            #
+            if not os.access(self.__inNefFilePath, os.R_OK):
+                self.__insertSystemLogMessage("Nef file '" + self.__inNefFilePath + "' does not exist.")
+                return
+            #
+            xyzFilePath = ""
+            if self.__inModelFilePath and os.access(self.__inModelFilePath, os.R_OK):
+                xyzFilePath = self.__inModelFilePath
+            else:
+                return
+            #
+            if self.__outModelFilePath and os.access(self.__outModelFilePath, os.R_OK):
+                xyzFilePath = self.__outModelFilePath
+            #
+            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self.__checkReportFilePath = os.path.join(self.__workingDirPath, "nef-update-checking-" \
+                                       + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif")
+            #
+            dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=True)
+            #
+            dp.imp(self.__inNefFilePath)
+            # current session model path -
+            dp.addInput(name="coordinate_file_path",value=xyzFilePath)
+            dp.op("annot-nef-update-with-check")
+            #
+            dp.exp(self.__outNefFilePath)
+            #
+# Need to know the exact requirements
+#           logPath = os.path.join(self.__workingDirPath, "nef-update-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log")
+#           dp.expLog(logPath)
+#           ok,logMessage = self.__processLogFile("RcsbDpUtility.op='annot-nef-update'", logPath)
+#           if ok:
+#               dp.expList(dstPathList=[self.__outNefFilePath, self.__checkReportFilePath])
+#           #
+#           if logMessage:
+#               self.__insertSystemLogMessage(logMessage)
+#           #
             dp.cleanup()
         except:
             traceback.print_exc(file=self.__lfh)
