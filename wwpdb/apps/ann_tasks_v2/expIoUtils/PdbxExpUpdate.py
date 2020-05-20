@@ -99,9 +99,9 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         """
         return self.__wavelengthInfo
 
-    def doUpdate(self,entryId,modelInputFile=None,expInputFile=None,expOutputFile=None):
+    def doUpdate(self,entryId,modelInputFile=None,expInputFile=None,expOutputFile=None,skipNotChanged=False):
         """ Update selected items in reflection data file using the current contents of the model file.
-
+            Will always output new SF file if possible unless skipNotNeeded is set
         """
         startTime=time.time()        
         if self.__verbose:
@@ -157,12 +157,13 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             sfIo = PdbxExpFileIo(verbose=self.__verbose,log=self.__lfh)
             containerList=sfIo.getContainerList(inpExpFilePath)
             if len(containerList) < 1:
-                self.__warningMsg.append("Empty structural factor file.")
+                self.__warningMsg.append("Empty structure factor file.")
                 return returnFlag
             #
             if self.__verbose:
                 self.__lfh.write("+PdbxExpUpdate.doUpdate() In file %s found data %d sets\n" % (inpExpFilePath,len(containerList)))
             #
+            anyUpdates = False
             containerNameList = []
             for container in containerList:
                 if self.__verbose:
@@ -319,6 +320,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                     self.__warningMsg.append("Update 'diffrn_radiation_wavelength' category failed for '" + curContainerName + "' data block.")
                     returnFlag = False
                     break
+                anyUpdates = True
                 #
             #
             self.__wavelengthInfo["datablock"] = containerNameList
@@ -326,7 +328,8 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             #
             # ----------------------   write output file and add separator comments ------------------------
             #
-            if (not self.__diffFlag) and returnFlag:
+            # Logic at end: If skipNotChanged False - always write. If skipNotChanged and anyUpdate is false, skip
+            if (not self.__diffFlag) and returnFlag and not (skipNotChanged and not anyUpdates):
                 if (self.__verbose):
                     self.__lfh.write("+PdbxExpUpdate.doUpdate() writing container list to %r\n" % (outExpFilePath))
                 #
