@@ -21,12 +21,14 @@ import traceback
 import time
 import os
 import os.path
+import platform
 import logging
 
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
+from mmcif.api.PdbxContainers                   import *
+from mmcif.api.DataCategory                     import DataCategory
 
-import platform
-import os
+
 HERE = os.path.abspath(os.path.dirname(__file__))
 TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
@@ -324,6 +326,32 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                                                                                      time.localtime()),
                                                                        endTime - startTime))
 
+    def testBlockNames(self):
+        """ Test update of block names """
+
+        # Create 100 containers
+        cl = []
+        for i in range(100):
+            container = DataContainer(name=str(i))
+            dc=DataCategory('diffrn_radiation_wavelength')
+            dc.appendAttribute('id')
+            dc.appendAttribute('wavelength')
+            dc.append(['1', '1.1'])
+            container.append(dc)
+
+            cl.append(container)
+
+        pio = PdbxExpFileIo()
+        stat = pio.updateContainerNames("1abc", cl)
+        self.assertTrue(stat, "Failed to update names")
+
+        self.assertEqual(cl[0].getName(), "r1abcsf")
+        self.assertEqual(cl[1].getName(), "r1abcAsf")
+        self.assertEqual(cl[50].getName(), "r1abcXAsf")
+        self.assertEqual(cl[53].getName(), "r1abcABsf")
+            
+        
+
 
 def suiteUpdateExpItemsTests():
     suiteSelect = unittest.TestSuite()
@@ -348,6 +376,11 @@ def suiteRegexTests():
     suiteSelect.addTest(PdbxExpIoUtilsTests("testInsertComments"))
     return suiteSelect
 
+def suiteNameTests():
+    suiteSelect = unittest.TestSuite()
+    suiteSelect.addTest(PdbxExpIoUtilsTests("testBlockNames"))
+    return suiteSelect
+
 
 if __name__ == '__main__':
 
@@ -362,4 +395,7 @@ if __name__ == '__main__':
         unittest.TextTestRunner(verbosity=2).run(mySuite)
 
     mySuite = suiteUpdateExpItemsTests()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)
+
+    mySuite = suiteNameTests()
     unittest.TextTestRunner(verbosity=2).run(mySuite)
