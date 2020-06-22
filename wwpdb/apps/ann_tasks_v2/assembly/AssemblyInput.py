@@ -124,7 +124,7 @@ class AssemblyInput(object):
             return assemGen
         #
         polychainIDList = []
-        polyEntityList=modelFile.getEntityPolyList()
+        polyEntityList=modelFile.getPolymerEntityList()
         if len(polyEntityList) > 0:
             for eId in polyEntityList:
                 polychainIDList.extend(modelFile.getPdbChainIdList(eId))
@@ -136,13 +136,16 @@ class AssemblyInput(object):
         chnAsymIdMap = {}
         allAsymIdList = []
         try:
-            attributeList = [ 'asym_id', 'pdb_strand_id' ]
-            for category in ( 'pdbx_poly_seq_scheme', 'pdbx_nonpoly_scheme' ):
+            for category in ( 'pdbx_poly_seq_scheme', 'pdbx_branch_scheme', 'pdbx_nonpoly_scheme' ):
                 if not container.exists(category):
                     if category == 'pdbx_poly_seq_scheme':
                         break
                     #
                     continue
+                #
+                attributeList = [ 'asym_id', 'pdb_strand_id' ]
+                if category == 'pdbx_branch_scheme':
+                    attributeList = [ 'asym_id', 'pdb_asym_id' ]
                 #
                 catObj = container.getObj(category)
                 colNames = list(catObj.getAttributeList())
@@ -151,6 +154,10 @@ class AssemblyInput(object):
                     rD = {}
                     row = catObj.getRow(iRow)
                     for col in attributeList:
+                        col_out = col
+                        if col == 'pdb_asym_id':
+                            col_out = 'pdb_strand_id'
+                        #
                         if col in colNames:
                             val = str(row[colNames.index(col)])
                             if val is None:
@@ -158,9 +165,9 @@ class AssemblyInput(object):
                             elif ((val == '.') or (val == '?')):
                                 val = ''
                             #
-                            rD[col] = val
+                            rD[col_out] = val
                         else:
-                            rD[col] = ''
+                            rD[col_out] = ''
                         #
                     #
                     if (not 'pdb_strand_id' in rD) or (not rD['pdb_strand_id']) or (not 'asym_id' in rD) or (not rD['asym_id']):
@@ -246,7 +253,7 @@ class AssemblyInput(object):
         #
         c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(fN)
         sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
-        polyEntityList=sdf.getEntityPolyList()
+        polyEntityList=sdf.getPolymerEntityList()
         if len(polyEntityList) > 0:
             oL = []
             oL.append('<table class="table table-bordered table-striped">')
@@ -590,7 +597,7 @@ class AssemblyInput(object):
             for inst in instL:
                 instanceIdList.append(inst)
 
-        sorted(instanceIdList)
+        instanceIdList.sort()
         #
         provenanceList = ['author_defined_assembly', 'software_defined_assembly', 'author_and_software_defined_assembly']
 

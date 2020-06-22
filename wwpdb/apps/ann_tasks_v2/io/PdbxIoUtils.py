@@ -114,52 +114,39 @@ class ModelFileIo(object):
         else:
             return default
 
-    def getPolymerEntityList(self, type=None):
-       """Returns a list of polymer entity id's  of the input 'type'
-          type is an entity type (all, polymer, non-polymer,  any)  or
-              one of the polymer entity types.
+    def getPolymerEntityList(self):
+       """Returns a list of polymer entity id's  of 'type=polymer' or 'type=branched') 
        """
        try:
-           if type in ['any', 'all', 'polymer']:
-               tType = 'polymer'
-               catObj = self.__currentContainer.getObj('entity')
-               eList = catObj.selectValuesWhere('id', tType, 'type')
-               return eList
-           elif type in SequenceReferenceData._polymerEntityTypes:
-               catObj = self.__currentContainer.getObj('entity_poly')
-               eList = catObj.selectValuesWhere('entity_id', type, 'type')
-           else:
-               return []
+           catObj = self.__currentContainer.getObj('entity')
+           myList = ['id', 'type']
+           retList = self.__getAttributeDictList(catObj=catObj, attributeList=myList)
+           #
+           eList = []
+           for rD in retList:
+               if ('id' not in rD) or (not rD['id']) or ('type' not in rD) or (not rD['type']):
+                   continue
+               #
+               if (rD['type'] == 'polymer') or (rD['type'] == 'branched'):
+                   eList.append(rD['id'])
+               #
+           #
+           return eList
        except:
            if self.__verbose:
-               self.__lfh.write("+PdbxIoUtils.getPolymerEntityList() WARNING - Likely missing entity or entity_poly data categories\n")
-
+               self.__lfh.write("+PdbxIoUtils.getPolymerEntityList() WARNING - Likely missing entity data category.\n")
+           #
+       #
        return []
 
     def getPdbChainIdList(self, entityId):
-        catObj = self.__currentContainer.getObj('entity_poly')
-        if catObj.hasAttribute('pdbx_strand_id'):
-            vals = catObj.selectValuesWhere('pdbx_strand_id', entityId, 'entity_id')
-        elif catObj.hasAttribute('ndb_chain_id'):
-            vals = catObj.selectValuesWhere('ndb_chain_id', entityId, 'entity_id')
-        else:
-            vals = []
-        st = self.__firstOrDefault(vals, '')
-
-        tList = []
-        if st is not None and len(st) > 0:
-            if ((len(st) > 1) and (st.count(',') > 0)):
-                tList = st.split(',')
-            elif ((len(st) > 1) and (st.count(' ') > 0)):
-                tList = st.split()
-            else:
-                tList = st.split(',')
-        rList = []
-        for ch in tList:
-            if len(ch) == 0 or ch in ['.', '?']:
-                continue
-            rList.append(str(ch).strip())
-        return rList
+        if len(self.__polymerEntityChainDict) == 0:
+            self.__buildPolymerEntityChainDict()
+        #
+        if entityId in self.__polymerEntityChainDict:
+            return self.__polymerEntityChainDict[entityId]
+        #
+        return []
 
     def getEntityDescription(self, entityId):
         """
@@ -169,8 +156,6 @@ class ModelFileIo(object):
             catObj = self.__currentContainer.getObj('entity')
             if catObj.hasAttribute('pdbx_description'):
                 vals = catObj.selectValuesWhere('pdbx_description', entityId, 'id')
-            elif catObj.hasAttribute('ndb_chain_id'):
-                vals = catObj.selectValuesWhere('ndb_description', entityId, 'id')
             else:
                 vals = []
             return self.__firstOrDefault(vals, '')
@@ -195,22 +180,65 @@ class ModelFileIo(object):
     def getPolymerEntityChainDict(self):
         if len(self.__polymerEntityChainDict) == 0:
             self.__buildPolymerEntityChainDict()
+        #
         return self.__polymerEntityChainDict
 
     def __buildPolymerEntityChainDict(self):
         """ Build entity chain mapping information --  Chain details must be provided
         """
         self.__polymerEntityChainDict = {}
-        pEntityList = self.getPolymerEntityList('all')
-        for eId in pEntityList:
-            tL = self.getPdbChainIdList(eId)
-            if len(tL) > 0:
-                self.__polymerEntityChainDict[eId] = tL
+        self.__buildBranchEntityChainDict()
+        #
+        if (not self.__currentContainer.exists('entity_poly')):
+            return
+        #
+        catObj = self.__currentContainer.getObj('entity_poly')
+        myList = ['entity_id', 'pdbx_strand_id']
+        retList = self.__getAttributeDictList(catObj=catObj, attributeList=myList)
+        #
+        for rD in retList:
+            if ('entity_id' not in rD) or (not rD['entity_id']) or ('pdbx_strand_id' not in rD) or (not rD['pdbx_strand_id']):
+                continue
+            #
+            rList = []
+            for ch in rD['pdbx_strand_id'].split(','):
+                if len(ch) == 0 or ch in ['.', '?']:
+                    continue
+                rList.append(str(ch).strip())
+            #
+            if rList:
+                self.__polymerEntityChainDict[rD['entity_id']] = rList
+            #
         #
         self.__chainPolymerEntityDict = {}
         for eId, cList in self.__polymerEntityChainDict.items():
             for cId in cList:
                 self.__chainPolymerEntityDict[cId] = eId
+            #
+        #
+
+    def __buildBranchEntityChainDict(self):
+        """ Build branch entity chain mapping information from pdbx_branch_scheme category
+        """
+        if (not self.__currentContainer.exists('pdbx_branch_scheme')):
+            return
+        #
+        catObj = self.__currentContainer.getObj('pdbx_branch_scheme')
+        myList = ['entity_id', 'pdb_asym_id']
+        retList = self.__getAttributeDictList(catObj=catObj, attributeList=myList)
+        #
+        for rD in retList:
+            if ('entity_id' not in rD) or (not rD['entity_id']) or ('pdb_asym_id' not in rD) or (not rD['pdb_asym_id']):
+                continue
+            #
+            if rD['entity_id'] in self.__polymerEntityChainDict:
+                if rD['pdb_asym_id'] not in self.__polymerEntityChainDict[rD['entity_id']]:
+                    self.__polymerEntityChainDict[rD['entity_id']].append(rD['pdb_asym_id'])
+                #
+            else:
+                self.__polymerEntityChainDict[rD['entity_id']] = [ rD['pdb_asym_id'] ]
+            #
+        #
 
     def getAssemblyDetails(self):
         """
