@@ -10,6 +10,7 @@
 # 16-Sep-2015   Supporting all exp methods --
 # 14-July-2016 jdw add validation_mode="annotate" as an optional argument
 # 18-Dec-2016  ep Remove obsolete RunAlt and Run...
+# 30-Jun-2020  zk added validation-report-images output
 ##
 """
 Manage invoking validation processing -
@@ -113,6 +114,9 @@ class Validate(SessionWebDownloadUtils):
             fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="svg", versionId=uploadVersionOp, partNumber='1')
             resultSvgPath = os.path.join(self.__sessionPath, fName)
 
+            fName = pI.getFileName(entryId, contentType="validation-report-images", formatType="tar", versionId=uploadVersionOp, partNumber='1')
+            resultImageTarPath = os.path.join(self.__sessionPath, fName)
+
             fName = pI.getFileName(entryId, contentType="validation-report-2fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
             result2FoPath = os.path.join(self.__sessionPath, fName)
 
@@ -154,13 +158,14 @@ class Validate(SessionWebDownloadUtils):
                 dp.addInput(name="validate_arguments", value=self.__validateArgs)
             dp.op("annot-wwpdb-validate-all-sf")
             dp.expLog(logPath)
-            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultFoPath, result2FoPath])
+            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultImageTarPath, resultFoPath, result2FoPath])
 
             self.addDownloadPath(resultPdfPath)
             self.addDownloadPath(resultXmlPath)
             self.addDownloadPath(resultFullPdfPath)
             self.addDownloadPath(resultPngPath)
             self.addDownloadPath(resultSvgPath)
+            self.addDownloadPath(resultImageTarPath)
             self.addDownloadPath(resultFoPath)
             self.addDownloadPath(result2FoPath)
             self.addDownloadPath(logPath)
