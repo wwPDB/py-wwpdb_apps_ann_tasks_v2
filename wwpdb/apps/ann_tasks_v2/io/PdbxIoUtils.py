@@ -95,6 +95,7 @@ class ModelFileIo(object):
         self.__lfh = log
         #
         self.__polymerEntityChainDict = {}
+        self.__branchChainIdList = []
         self.__chainPolymerEntityDict = {}
         self.__buildPolymerEntityChainDict()
 
@@ -181,12 +182,16 @@ class ModelFileIo(object):
         if len(self.__polymerEntityChainDict) == 0:
             self.__buildPolymerEntityChainDict()
         #
-        return self.__polymerEntityChainDict
+        return self.__polymerEntityChainDict,self.__branchChainIdList
+
+    def getBranchChainIdList(self):
+        return self.__branchChainIdList
 
     def __buildPolymerEntityChainDict(self):
         """ Build entity chain mapping information --  Chain details must be provided
         """
         self.__polymerEntityChainDict = {}
+        self.__branchChainIdList = []
         self.__buildBranchEntityChainDict()
         #
         if (not self.__currentContainer.exists('entity_poly')):
@@ -230,6 +235,9 @@ class ModelFileIo(object):
         for rD in retList:
             if ('entity_id' not in rD) or (not rD['entity_id']) or ('pdb_asym_id' not in rD) or (not rD['pdb_asym_id']):
                 continue
+            #
+            if rD['pdb_asym_id'] not in self.__branchChainIdList:
+                self.__branchChainIdList.append(rD['pdb_asym_id'])
             #
             if rD['entity_id'] in self.__polymerEntityChainDict:
                 if rD['pdb_asym_id'] not in self.__polymerEntityChainDict[rD['entity_id']]:

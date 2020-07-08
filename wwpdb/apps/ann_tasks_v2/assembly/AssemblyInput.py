@@ -26,6 +26,7 @@ import os
 from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from mmcif.io.IoAdapterCore import IoAdapterCore
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class AssemblyInput(object):
@@ -65,7 +66,7 @@ class AssemblyInput(object):
         fN = os.path.join(self.__sessionPath, entryFileName)
         c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(fN)
         sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
-        ed = sdf.getPolymerEntityChainDict()
+        ed,bList = sdf.getPolymerEntityChainDict()
         if self.__debug:
             for eId, iList in ed.items():
                 self.__lfh.write("+AssemblyInput.__fetchMolecularDetails() entity %s  instance list = %r\n" % (eId, iList))
@@ -103,7 +104,7 @@ class AssemblyInput(object):
         assemOper = sdf.getDepositorStructOperList()
         assemEvidence = sdf.getDepositorAssemblyEvidence()
         assemClassification = sdf.getDepositorAssemblyClassification()
-        ed = sdf.getPolymerEntityChainDict()
+        ed,branchInstList = sdf.getPolymerEntityChainDict()
 
         if self.__verbose:
             self.__lfh.write("+AssemblyInput.__fetchAssemblyDepositorDetails()        %r\n" % assemL)
@@ -116,7 +117,7 @@ class AssemblyInput(object):
                 for eId, iList in ed.items():
                     self.__lfh.write("+AssemblyInput.__fetchMolecularDetails() entity %s  instance list = %r\n" % (eId, iList))
 
-        return assemL, assemRcsbL, ed, assemGen, assemOper, assemEvidence, assemClassification
+        return assemL, assemRcsbL, ed, assemGen, assemOper, assemEvidence, assemClassification, branchInstList
 
     def __getPdbxStructAssemblyGenDepositorInfo(self, modelFile, container):
         assemGen = modelFile.getDepositorAssemblyGen()
@@ -239,7 +240,7 @@ class AssemblyInput(object):
     def makeAssemblyDetailsTable(self, entryFilePath=None):
         return self.__fetchAssemblyDetails(entryFilePath=entryFilePath)
 
-    def makeEntityInfoTable(self, entryFileName=None):
+    def makeEntityInfoTable(self, entryId="1ABC", entryFileName=None):
         """ Return entity ids, names & related PDB chain ids
         """
         not_found_msg = '<br />\nNo polymer entity information found.'
@@ -270,6 +271,22 @@ class AssemblyInput(object):
                 oL.append('</tr>')
             #
             oL.append('</table>')
+            #
+            branchChainIdList = sdf.getBranchChainIdList()
+            if branchChainIdList:
+                branchInfoPath = os.path.join(self.__sessionPath, entryId + "-branch-info.cif")
+                if not os.access(branchInfoPath, os.R_OK):
+                    try:
+                        dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
+                        dp.imp(fN)
+                        dp.op("get-branch-polymer-info")
+                        dp.exp(branchInfoPath)
+                        dp.cleanup()
+                    except:
+                        traceback.print_exc(file=self.__lfh)
+                    #
+                #
+            #
             return '\n'.join(oL)
         else:
             return not_found_msg
@@ -406,7 +423,7 @@ class AssemblyInput(object):
         if (self.__verbose):
             self.__lfh.write("+AssemblyInput.makeDepositorAssemblyDetailsTable() updated description saved in extraD %r\n" % extraD.items())
         assemL, assemRcsbL, eD, assemGen, assemOper, assemEvidence, \
-            assemClassification = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
+            assemClassification, branchInstList = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
 
         #
         if ((extraD is not None) and (len(extraD) > 0)):
@@ -430,7 +447,8 @@ class AssemblyInput(object):
         for eId, instL in eD.items():
             for inst in instL:
                 instanceIdList.append(inst)
-
+            #
+        #
         sorted(instanceIdList)
         if (len(instanceIdList) > 0):
             iC = 'Instance List (%d):' % len(instanceIdList)
@@ -546,6 +564,7 @@ class AssemblyInput(object):
                 <tr><td style="width:20%%" >Update depositor provided assembly details</td><td> %s </td></tr>
             </table>
             <br />
+            %s
             <table class="table table-bordered table-striped width100">
             <tr>
                <th class="width10">Assembly<br /> Id</th>
@@ -578,7 +597,7 @@ class AssemblyInput(object):
 
         # eD = self.__fetchMolecularDetails(entryFileName=entryFileName)
         assemL, assemRcsbL, eD, assemGen, assemOper, assemEvidence, \
-            assemClassification = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
+            assemClassification, branchInstList = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
         #
         #
         tS = ''
@@ -588,23 +607,79 @@ class AssemblyInput(object):
             rowD = assemRcsbL[0]
             if 'id' in rowD and 'details' in rowD:
                 tS = rowD['details']
-
+            #
+        #
         tHtml = "<textarea style='width:100%%; height:100%%;' rows='4' name='details_1'>%s</textarea>" % tS
-
+        #
+        branch2LinearMap = {}
+        linear2BranchMap = {}
+        linearInstList = []
+        branchInfoPath = os.path.join(self.__sessionPath, entryId + "-branch-info.cif")
+        if os.access(branchInfoPath, os.R_OK):
+            cifObj = mmCIFUtil(filePath=branchInfoPath)
+            status = cifObj.GetSingleValue("summary", "status")
+            if status == "yes":
+                infoList = cifObj.GetValue("branch_polymer_info")
+                for infoD in infoList:
+                    if ("branch_polymer_chain_id" not in infoD) or (not infoD["branch_polymer_chain_id"]) or \
+                       ("linear_polymer_chain_id" not in infoD) or (not infoD["linear_polymer_chain_id"]) or \
+                       ("type" not in infoD) or (not infoD["type"]):
+                        continue
+                    #
+                    if infoD["linear_polymer_chain_id"] not in linearInstList:
+                        linearInstList.append(infoD["linear_polymer_chain_id"])
+                    #
+                    branch2LinearMap[infoD["branch_polymer_chain_id"]] = infoD["linear_polymer_chain_id"]
+                    if infoD["linear_polymer_chain_id"] in linear2BranchMap:
+                        linear2BranchMap[infoD["linear_polymer_chain_id"]].append( ( infoD["branch_polymer_chain_id"], infoD["type"] ) )
+                    else:
+                        linear2BranchMap[infoD["linear_polymer_chain_id"]] = [ ( infoD["branch_polymer_chain_id"], infoD["type"] ) ]
+                    #
+                #
+            #
+        #
+        branchInfoText = ""
+        for inst in linearInstList:
+            if inst not in linear2BranchMap:
+                continue
+            #
+            branchInfoText += "<tr><td>Polymer chain '" + inst + "' is associated with branch polymer(s): "
+            first = True
+            for branchTup in linear2BranchMap[inst]:
+                if not first:
+                    branchInfoText += ", "
+                #
+                branchInfoText += branchTup[0]
+                if branchTup[1] == "linked":
+                    branchInfoText += " (linked)"
+                #
+                first = False
+            #
+            branchInfoText += "</td></tr>\n"
+        #
+        branchInfoTabletext = ""
+        if branchInfoText:
+            branchInfoTabletext = '<table class="table table-borderless width100">\n' + branchInfoText + "</table><br />"
         #
         instanceIdList = []
         for eId, instL in eD.items():
             for inst in instL:
+                if inst in branch2LinearMap:
+                    continue
+                #
                 instanceIdList.append(inst)
-
+            #
+        #
         instanceIdList.sort()
         #
         provenanceList = ['author_defined_assembly', 'software_defined_assembly', 'author_and_software_defined_assembly']
 
         defautSymOp = '1_555'
+        checkInstTemplate = ' %s <input name="a_%d_inst_%s" type="checkbox" checked="checked"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
+        chainInstTemplate = ' %s <input name="a_%d_inst_%s" type="checkbox"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
         #
         oL = []
-        oL.append(top_form_template % (entryId, self.__sessionId, tHtml))
+        oL.append(top_form_template % (entryId, self.__sessionId, tHtml, branchInfoTabletext))
         defaultValue = self.__placeHolderValue
         nRows = 0
         numAssem = len(fD)
@@ -623,10 +698,12 @@ class AssemblyInput(object):
                         oL.append('<td><span  id="%s"   class="ief greyedout">%s</span></td>' % (ky, defaultValue))
                     else:
                         oL.append('<td><span  id="%s"   class="ief">%s</span></td>' % (ky, d[fTup[0]]))
-
+                    #
+                #
                 inD = {}
                 for op in d['op_list']:
                     inD[op[0]] = op
+                #
                 oL.append('<td class="textleft">')
                 for instanceId in instanceIdList:
                     if instanceId in inD:
@@ -634,7 +711,27 @@ class AssemblyInput(object):
                         oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, inD[instanceId][1]))
                     else:
                         oL.append(' %s <input name="a_%d_inst_%s" type="checkbox"></input>' % (instanceId, assemId, instanceId))
-                        oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, '1_555'))
+                        oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, defautSymOp))
+                    #
+                    if instanceId in linear2BranchMap:
+                        includeBranchList = []
+                        for branchTup in linear2BranchMap[instanceId]:
+                            instId = branchTup[0]
+                            if instId in inD:
+                                includeBranchList.append(checkInstTemplate % (instId, assemId, instId, assemId, instId, inD[instId][1]))
+                            else:
+                                includeBranchList.append(chainInstTemplate % (instId, assemId, instId, assemId, instId, defautSymOp))
+                            #
+                        #
+                        if includeBranchList:
+                            includeBranchList[0] = "( " + includeBranchList[0]
+                            includeBranchList[-1] = includeBranchList[-1] + " )"
+                            for branchText in includeBranchList:
+                                oL.append(branchText + " <br/>")
+                            #
+                        #
+                    #
+                #
                 oL.append('</td>')
                 oL.append('</tr>')
             else:
@@ -651,7 +748,23 @@ class AssemblyInput(object):
                 oL.append('<td class="textleft">')
                 for instanceId in instanceIdList:
                     oL.append(' %s <input name="a_%d_inst_%s" type="checkbox"></input>' % (instanceId, assemId, instanceId))
-                    oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, '1_555'))
+                    oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, defautSymOp))
+                    #
+                    if instanceId in linear2BranchMap:
+                        includeBranchList = []
+                        for branchTup in linear2BranchMap[instanceId]:
+                            instId = branchTup[0]
+                            includeBranchList.append(chainInstTemplate % (instId, assemId, instId, assemId, instId, defautSymOp))
+                        #
+                        if includeBranchList:
+                            includeBranchList[0] = "( " + includeBranchList[0]
+                            includeBranchList[-1] = includeBranchList[-1] + " )"
+                            for branchText in includeBranchList:
+                                oL.append(branchText + " <br/>")
+                            #
+                        #
+                    #
+                #
                 oL.append('</td>')
                 oL.append('</tr>')
             nRows += 1

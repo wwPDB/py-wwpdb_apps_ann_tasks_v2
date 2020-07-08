@@ -48,6 +48,7 @@ from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import PdbxFileIo, ModelFileIo
 from mmcif.api.PdbxContainers import *
 from mmcif.api.DataCategory import DataCategory
 from mmcif.io.IoAdapterCore import IoAdapterCore
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 
 
 class AssemblySelect(object):
@@ -232,6 +233,26 @@ class AssemblySelect(object):
                 t.setValue('1', 'id', 0)
                 t.setValue(extraD['details'], 'details', 0)
                 curContainer.append(t)
+            #
+            branchInfoPath = os.path.join(self.__sessionPath, entryId + "-branch-info.cif")
+            if os.access(branchInfoPath, os.R_OK):
+                cifObj = mmCIFUtil(filePath=branchInfoPath)
+                branchInfoList = cifObj.GetValue("branch_polymer_info")
+                if len(branchInfoList) > 0:
+                    t = DataCategory('branch_polymer_info')
+                    t.appendAttribute('branch_polymer_chain_id')
+                    t.appendAttribute('linear_polymer_chain_id')
+                    t.appendAttribute('type')
+                    #
+                    for ii, branchInfoD in enumerate(branchInfoList, start=0):
+                        for item in ( 'branch_polymer_chain_id', 'linear_polymer_chain_id', 'type' ):
+                            if item in branchInfoD:
+                                t.setValue(str(branchInfoD[item]), item, ii)
+                            #
+                        #
+                    #
+                    curContainer.append(t)
+                #
             #
             myContainerList = []
             myContainerList.append(curContainer)

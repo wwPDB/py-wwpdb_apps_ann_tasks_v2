@@ -450,10 +450,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     def _loadEntityInfoOp(self):
         self._getSession(useContext=True)
+        entryId = self._reqObj.getValue("entryid")
         entryFileName = self._reqObj.getValue("entryfilename")
         adi = AssemblyInput(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         cD = {}
-        cD ['htmlcontent'] = adi.makeEntityInfoTable(entryFileName=entryFileName)
+        cD ['htmlcontent'] = adi.makeEntityInfoTable(entryId=entryId, entryFileName=entryFileName)
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         rC.addDictionaryItems(cD=cD)
