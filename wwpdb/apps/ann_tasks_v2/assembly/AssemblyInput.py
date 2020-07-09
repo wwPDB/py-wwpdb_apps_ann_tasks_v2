@@ -662,8 +662,10 @@ class AssemblyInput(object):
             branchInfoTabletext = '<table class="table table-borderless width100">\n' + branchInfoText + "</table><br />"
         #
         instanceIdList = []
+        allInstanceIdList = []
         for eId, instL in eD.items():
             for inst in instL:
+                allInstanceIdList.append(inst)
                 if inst in branch2LinearMap:
                     continue
                 #
@@ -769,7 +771,7 @@ class AssemblyInput(object):
                 oL.append('</tr>')
             nRows += 1
         oL.append('<input type="hidden"  name="formlength" value="%d" />' % nRows)
-        oL.append('<input type="hidden"  name="instanceidlist" value="%s" />' % ','.join(instanceIdList))
+        oL.append('<input type="hidden"  name="instanceidlist" value="%s" />' % ','.join(allInstanceIdList))
         oL.append('</table>')
         oL.append(bottom_form_template)
         return '\n'.join(oL)
