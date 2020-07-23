@@ -745,8 +745,6 @@ class AssemblySelect(object):
             pL.append('</select>')
             viewopt = ''
             if uid != 0:
-                serviceUrl = "/service/ann_tasks_v2/assemblyview?assemblyid=%s" % (uid)
-                ht = '<a class="assem_viewable" href="%s">Jmol</a>' % serviceUrl
                 #
                 #  <entryId>_assembly-model-xyz_P<assemId>.cif
                 # <a href='javascript:loadFileJsmol("myApp1","#jmol-dialog-1","/files/1cbs.cif","cpk")'> Load 1cbs cpk </a>
@@ -757,18 +755,16 @@ class AssemblySelect(object):
                 if os.access(fullPath, os.R_OK):
                     assemblyFilePath = os.path.join(self.__rltvSessionPath, self.__entryId + "_assembly-model-xyz_P" + str(uid) + '.cif')
                     jsurl = 'javascript:loadFileJsmol("myApp1","#jsmol-dialog-1","%s","cpk")' % assemblyFilePath
-                    htjs = "<br /><a href='%s'>Jsmol</a>" % (jsurl)
-                    viewopt = ht + htjs
+                    htjs = "<a href='%s'>Jsmol</a>" % (jsurl)
+                    viewopt = htjs
             else:
-                serviceUrl = "/service/ann_tasks_v2/assemblyview?assemblyid=%s" % (uid)
-                ht = '<a class="assem_viewable" href="%s">Jmol</a>' % serviceUrl
                 #
                 fullPath = os.path.join(self.__sessionPath, self.__entryFileName)
                 if os.access(fullPath, os.R_OK):
                     assemblyFilePath = os.path.join(self.__rltvSessionPath, self.__entryFileName)
                     jsurl = 'javascript:loadFileJsmol("myApp1","#jsmol-dialog-1","%s","cpk")' % assemblyFilePath
-                    htjs = "<br /><a href='%s'>Jsmol</a>" % (jsurl)
-                    viewopt = ht + htjs
+                    htjs = "<a href='%s'>Jsmol</a>" % (jsurl)
+                    viewopt = htjs
 
             #
             #
@@ -904,12 +900,10 @@ class AssemblySelect(object):
             rD = {}
             fullPath = os.path.join(self.__sessionPath, entryId + "_assembly-model_P" + str(k) + '.cif.V1')
             if os.access(fullPath, os.R_OK):
-                serviceUrl = "/service/ann_tasks_v2/genassemblyview?assemblyid=%s" % (k)
-                ht = '<a class="assem_viewable" href="%s">Jmol</a>' % serviceUrl
                 assemblyFilePath = os.path.join(self.__rltvSessionPath, self.__entryId + "_assembly-model_P" + str(k) + '.cif.V1')
                 jsurl = 'javascript:loadFileJsmol("myApp1","#jsmol-dialog-1","%s","secstruct1")' % assemblyFilePath
-                htjs = "<br /><a href='%s'>Jsmol</a>" % (jsurl)
-                viewop = ht + htjs
+                htjs = "<a href='%s'>Jsmol</a>" % (jsurl)
+                viewop =htjs
                 rD['id'] = k
                 rD['viewop'] = viewop
                 rD['details'] = tD[k]['details']
