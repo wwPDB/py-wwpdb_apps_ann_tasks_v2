@@ -89,6 +89,7 @@ from wwpdb.apps.ann_tasks_v2.check.Check import Check
 from wwpdb.apps.ann_tasks_v2.check.GeometryCalc import GeometryCalc
 from wwpdb.apps.ann_tasks_v2.check.GeometryCheck import GeometryCheck
 from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
+from wwpdb.apps.ann_tasks_v2.check.EmdXmlCheck import EmdXmlCheck
 from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
 from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
 from wwpdb.apps.ann_tasks_v2.mapcalc.MapCalc import MapCalc
@@ -1405,6 +1406,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 (dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("dccfiles", fList)
+            #
+            fpattern = self._sessionPath + "/" + entryId + "_emd-xml-header-report_*"
+            pthList = []
+            pthList = glob.glob(fpattern)
+            #
+            fList = []
+            for pth in pthList:
+                # Only list if size is not zero
+                df = DataFile(fPath=pth)
+                if df.srcFileSize() > 0:
+                    (dir, fileName) = os.path.split(pth)
+                    fList.append(fileName)
+            rC.set("emdxmlreportfiles", fList)
+
 
             #
             fpattern = self._sessionPath + "/" + entryId + "_site-anal_P1.cif"
@@ -1965,7 +1980,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         myD = {}
         for ky in ['model', 'dcc-report', 'geometry-check-report', 'misc-check-report', 'format-check-report',
-                   'dict-check-report', 'dict-check-report-r4', 'dict-check-report-next', 'special-position-report', 'downloads']:
+                   'dict-check-report', 'dict-check-report-r4', 'dict-check-report-next', 'special-position-report', 
+                   'emd-xml-header-report', 'downloads']:
             myD[ky] = None
         myD['entry-info'] = {'pdb_id': '', 'struct_title': '', 'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
         #
@@ -2073,6 +2089,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     # myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
                     # Biocuration requested no message be returned
                     myD[cT] = self.__getMessageTextWithMarkup('')
+            elif cT == 'emd-xml-header-report':
+                # EMD XML header generation report
+                ok = du.fetchId(entryId, contentType='emd-xml-header-report', formatType='txt', fileSource=fileSource, instance=instance)
+                if (ok):
+                    downloadPath = du.getDownloadPath()
+                    aTagList.append(du.getAnchorTag())
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                else:
+                    myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
+
 
         if len(aTagList) > 0:
             myD['downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(aTagList)
@@ -2096,6 +2122,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         'special-position-report'     :  (['txt'], 'special-position-report'),
         'dcc-report'                  :  (['pdbx','txt'], 'dcc-report'),
         'geometry-check-report'       :  (['pdbx'],'geometry-check-report'),
+        'emd-xml-header-report'       :  (['txt'], 'emd-xml-header-report'),
 
         """
         #
@@ -2192,6 +2219,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
 
+            if ('check-emd-xml' in operationList):
+                chk = EmdXmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                try:
+                    chk.run(entryId=entryId, modelInputFile=modelFilePath)
+                except Exception as e:
+                    logger.error("Error running EmdXmlCheck %s", e)
+                hasDiags = chk.getReportSize() > 0
+                rptPath = chk.getReportPath()
+                if hasDiags:
+                    duL.copyToDownload(rptPath)
+                    aTagList.append(duL.getAnchorTag())
+                else:
+                    duL.removeFromDownload(rptPath)
+
             if ('check-sf' in operationList):
                 ok = duL.fetchId(entryId, contentType='structure-factors', formatType='pdbx', fileSource=fileSource, versionId=versionId)
                 expFilePath = duL.getDownloadPath()
@@ -2284,7 +2325,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._listFilesResponse(entryIdList[0], fileSource='deposit')
         elif (operation == "files-instance"):
             return self._listFilesResponse(entryIdList[0], fileSource='wf-instance')
-        elif (operation in ['check-all', 'cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc', 'check-geometry', 'check-special-position', 'check-sf']):
+        elif (operation in ['check-all', 'cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc', 'check-geometry', 'check-special-position', 'check-sf', 'check-emd-xml']):
             #
             templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "consolidated_section_template.html")
             self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() templateFilePath %s\n" % templateFilePath)
@@ -2304,12 +2345,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         opCtD = {'checkv5': 'dict-check-report', 'checkv4': 'dict-check-report-r4', 'checkNext' : 'dict-check-report-next', 
                  'check-misc': 'misc-check-report', 
                  'check-format': 'format-check-report', 'check-geometry': 'geometry-check-report', 'check-sf': 'dcc-report',
-                 'check-special-position': 'special-position-report', 'cif2pdb': 'model-pdb'}
+                 'check-special-position': 'special-position-report', 'cif2pdb': 'model-pdb',
+                 'check-emd-xml': 'emd-xml-header-report'}
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat('json')
         if operation in ['check-all']:
-            opList = ['cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc', 'check-geometry', 'check-special-position', 'check-sf']
+            opList = ['cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc', 'check-geometry', 'check-special-position', 'check-sf', 'check-emd-xml']
             aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource, useFileVersions=useFileVersions)
             cTList = ['model']
             cTList.extend(sorted(opCtD.values()))

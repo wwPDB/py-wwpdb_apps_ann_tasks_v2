@@ -150,6 +150,14 @@ class SessionDownloadUtils(object):
         else:
             return False
 
+    def removeFromDownload(self, filePath):
+        """Removes a previously setuop download file"""
+        (pth, targetFileName) = os.path.split(filePath)
+        downloadFilePath = os.path.join(self.__downloadDirPath, targetFileName)
+        if os.path.exists(downloadFilePath):
+            os.unlink(downloadFilePath)
+        
+
     def copyToDownload(self, filePath):
         self.__fetchFile(filePath)
 

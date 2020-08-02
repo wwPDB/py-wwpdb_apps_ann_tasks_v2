@@ -281,7 +281,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
         if ((fileSource is None) or (len(fileSource) < 1) or (fileSource in ['session', 'session-download'])):
             fileSource = 'session-download'
             # Make reports in session directory --
-            opList = ['checkv5', 'check-format', 'check-misc', 'check-geometry', 'check-sf', 'cif2pdb', 'check-special-position']
+            opList = ['checkv5', 'check-format', 'check-misc', 'check-geometry', 'check-sf', 'cif2pdb', 'check-special-position', 'check-emd-xml']
             aTagList = self._makeCheckReports([idCode], operationList=opList)
         #
         #
@@ -297,6 +297,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             'format-check-report',
             'dict-check-report',
             'model-pdb',
+            'emd-xml-header-report',
             'downloads']
         reportD = self._renderCheckReports(idCode, fileSource=fileSource, instance=instance, contentTypeList=cTL)
         #
