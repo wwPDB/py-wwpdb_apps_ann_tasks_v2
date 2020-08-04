@@ -85,7 +85,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
 
             # Test if em_admin present in model
             ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
-            dIn = ioObj.readFile(inputFilePath=modelInputPath, selectList=['em_admin'])
+            dIn = ioObj.readFile(inputFilePath=modelInputFile, selectList=['em_admin'])
             if not dIn or len(dIn) == 0:
                 return True
 
