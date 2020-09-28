@@ -63,31 +63,35 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ]
         elif self.__st.getStyleId() in ['PDBX_REPORT_V1'] :
             self.__reportCategories = [
-                ('pdbx_contact_author', 'Contact authors', 'row-wise'),
-                ('pdbx_database_status', 'Status', 'column-wise'),
-                ('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),
+                ('entity', 'Entity description', 'row-wise'),
+                ('entity_poly', 'Polymers', 'row-wise'),
+                ('entity_src_gen', 'Source', 'row-wise'),
+                ('entity_src_nat', 'Source', 'row-wise'),
+                ('struct_ref', 'Sequence', 'row-wise'),
+                ('pdbx_entity_nonpoly', 'non-polymers', 'row-wise'),
+                ('pdbx_entity_instance_feature', 'Ligand of Interest', 'row-wise'),
+                ('struct_keywords', 'Keywords', 'row-wise'),
+                ('struct_biol', 'Author Assembly Details', 'row-wise'),
+
+                #('pdbx_database_status', 'Status', 'column-wise'),
+                #('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),
                 ('pdbx_SG_project', 'Structural genomics', 'row-wise'),
                 ('pdbx_database_related', 'Related entries', 'row-wise'),
-                ('citation','Primary citation','column-wise'),
-                ('entity','Entity description','row-wise'),
-                ('struct_ref','Sequence','row-wise'),
-                ('entity_src_gen', 'Source','row-wise'),
-                ('entity_src_nat', 'Source','row-wise'),
-                ('struct_keywords', 'Keywords', 'row-wise'),
-                ('struct_biol','Author Assembly Details','row-wise'),
-                ('symmetry', 'Symmetry', 'row-wise'),                  
-                ('cell', 'Cell constants', 'row-wise'),                  
-                ('exptl_crystal_grow', 'Crystallization details', 'row-wise'),  
-                ('diffrn_source','Data collection (source details)','row-wise'),
-                ('diffrn_detector','Data collection (detector details)','row-wise'),
-                ('reflns', 'Reflection statistics','row-wise'),
-                ('reflns_shell','Reflection shell statistics','row-wise'),
-                ('refine','Refinement','column-wise'),
-                ('refine_ls_restr','Refinement restraints','row-wise'),
-                ('refine_ls_shell','Refinement shell statistics','row-wise'),
-                ('software','Software','row-wise'),
-                ('pdbx_entity_instance_feature','Ligand of Interest','row-wise'),
-                ('pdbx_binding_assay','Binding Assay','row-wise')
+                ('pdbx_contact_author', 'Contact authors', 'row-wise'),
+                #('citation','Primary citation','column-wise'),
+
+                #('symmetry', 'Symmetry', 'row-wise'),
+                #('cell', 'Cell constants', 'row-wise'),
+                #('exptl_crystal_grow', 'Crystallization details', 'row-wise'),
+                #('diffrn_source','Data collection (source details)','row-wise'),
+                #('diffrn_detector','Data collection (detector details)','row-wise'),
+                #('reflns', 'Reflection statistics','row-wise'),
+                #('reflns_shell','Reflection shell statistics','row-wise'),
+                #('refine','Refinement','column-wise'),
+                # ('refine_ls_restr','Refinement restraints','row-wise'),
+                # ('refine_ls_shell','Refinement shell statistics','row-wise'),
+                # ('software','Software','row-wise'),
+                #('pdbx_binding_assay','Binding Assay','row-wise')
 
             ]
 
