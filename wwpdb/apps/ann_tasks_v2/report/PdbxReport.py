@@ -20,7 +20,8 @@ import shutil
 import sys
 import traceback
 
-from mmcif_utils.pdbx.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
+# from mmcif_utils.pdbx.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
+from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
 # from mmcif_utils.style.PdbxXrayExpReportCategoryStyle          import PdbxXrayExpReportCategoryStyle
 #from mmcif_utils.style.PdbxReportCategoryStyle import PdbxReportCategoryStyle
