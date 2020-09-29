@@ -98,11 +98,11 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         elif self.__st.getStyleId() in ['PDBX_DCC_REPORT_V1'] :
             self.__reportCategories = [
                 ('pdbx_density','Summary statistics','column-wise'),
-                ('pdbx_rscc_mapman_overall','Density correlation summary','column-wise'),
-                ('pdbx_dcc_software','Software used by DCC','row-wise'),
-                ('pdbx_dcc_sf','Counting statistics of SF file','row-wise'),
-                ('pdbx_density_corr','Density correlation','row-wise'),
-                ('pdbx_rscc_mapman', 'Real-space density statistics by residue','row-wise')
+                #('pdbx_rscc_mapman_overall','Density correlation summary','column-wise'),
+                #('pdbx_dcc_software','Software used by DCC','row-wise'),
+                #('pdbx_dcc_sf','Counting statistics of SF file','row-wise'),
+                #('pdbx_density_corr','Density correlation','row-wise'),
+                #('pdbx_rscc_mapman', 'Real-space density statistics by residue','row-wise')
             ]
         elif self.__st.getStyleId() in ['PDBX_GEOMETRY_REPORT_V1'] :
             self.__reportCategories = [

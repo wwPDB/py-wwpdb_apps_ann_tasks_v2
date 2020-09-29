@@ -46,90 +46,89 @@ try:
 except ImportError:
     import pickle as pickle
 
-import operator, os
-import sys
-import time
-import types
-import string
-import traceback
-import ntpath
-import shutil
 import glob
 import json
 # from json import loads, dumps
 import logging
-
+import ntpath
+import operator
+import os
+import shutil
+import string
+import sys
+import time
+import traceback
+import types
 from time import localtime, strftime, sleep
-from wwpdb.utils.session.WebAppWorkerBase import WebAppWorkerBase
 
-from wwpdb.utils.session.WebRequest import ResponseContent, InputRequest
-from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
-from wwpdb.io.file.DataFile import DataFile
 from wwpdb.io.file.DataExchange import DataExchange
-from wwpdb.utils.detach.DetachUtils import DetachUtils
-from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
-from wwpdb.utils.session.UtilDataStore import UtilDataStore
+from wwpdb.io.file.DataFile import DataFile
 from wwpdb.io.locator.PathInfo import PathInfo
-
-from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
-
-from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
-from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
-
-from wwpdb.apps.ann_tasks_v2.view3d.ModelViewer3D import ModelViewer3D
-from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
-from wwpdb.apps.ann_tasks_v2.assembly.AssemblyInput import AssemblyInput
-#
-from wwpdb.apps.ann_tasks_v2.site.Site import Site
-from wwpdb.apps.ann_tasks_v2.secstruct.SecondaryStructure import SecondaryStructure
-from wwpdb.apps.ann_tasks_v2.link.Link import Link
-from wwpdb.apps.ann_tasks_v2.solvent.Solvent import Solvent
-from wwpdb.apps.ann_tasks_v2.nafeatures.NAFeatures import NAFeatures
-from wwpdb.apps.ann_tasks_v2.check.Check import Check
-from wwpdb.apps.ann_tasks_v2.check.GeometryCalc import GeometryCalc
-from wwpdb.apps.ann_tasks_v2.check.GeometryCheck import GeometryCheck
-from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
-from wwpdb.apps.ann_tasks_v2.check.EmdXmlCheck import EmdXmlCheck
-from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
-from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
-from wwpdb.apps.ann_tasks_v2.mapcalc.MapCalc import MapCalc
-from wwpdb.apps.ann_tasks_v2.mapcalc.NpCcMapCalc import NpCcMapCalc
-from wwpdb.apps.ann_tasks_v2.mapcalc.MapDisplay import MapDisplay
-from wwpdb.apps.ann_tasks_v2.mapcalc.DccCalc import DccCalc
-from wwpdb.apps.ann_tasks_v2.mapcalc.DccRefineCalc import DccRefineCalc
-from wwpdb.apps.ann_tasks_v2.mapcalc.SpecialPositionCalc import SpecialPositionCalc
-from wwpdb.apps.ann_tasks_v2.mapcalc.SpecialPositionUpdate import SpecialPositionUpdate
-from wwpdb.apps.ann_tasks_v2.mapcalc.ReassignAltIdsCalc import ReassignAltIdsCalc
-from wwpdb.apps.ann_tasks_v2.mapcalc.BisoFullCalc import BisoFullCalc
-#
-#
-from wwpdb.apps.ann_tasks_v2.transformCoord.TransformCoord import TransformCoord
-from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
-from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
-#
-from wwpdb.apps.ann_tasks_v2.utils.TerminalAtoms import TerminalAtoms
-from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
-from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
+from wwpdb.utils.detach.DetachUtils import DetachUtils
+from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
+from wwpdb.utils.session.FileUtils import FileUtils
+from wwpdb.utils.session.UtilDataStore import UtilDataStore
+from wwpdb.utils.session.WebAppWorkerBase import WebAppWorkerBase
+from wwpdb.utils.session.WebRequest import ResponseContent, InputRequest
+from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
 #
 from wwpdb.utils.wf.dbapi.WfTracking import WfTracking
+
+from wwpdb.apps.ann_tasks_v2.assembly.AssemblyInput import AssemblyInput
+from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
+from wwpdb.apps.ann_tasks_v2.check.Check import Check
+from wwpdb.apps.ann_tasks_v2.check.EmdXmlCheck import EmdXmlCheck
+from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
+from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
+from wwpdb.apps.ann_tasks_v2.check.GeometryCalc import GeometryCalc
+from wwpdb.apps.ann_tasks_v2.check.GeometryCheck import GeometryCheck
 #
 from wwpdb.apps.ann_tasks_v2.correspnd.CorresPNDGenerator import CorresPNDGenerator
 from wwpdb.apps.ann_tasks_v2.correspnd.CorresPNDTemplate import CorresPNDTemplate
+from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorForm import CSEditorForm
+from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorUpdate import CSEditorUpdate
 #
 from wwpdb.apps.ann_tasks_v2.editCoord.CoordEditorForm_v2 import CoordEditorForm
 from wwpdb.apps.ann_tasks_v2.editCoord.CoordEditorUpdate import CoordEditorUpdate
-from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorForm import CSEditorForm
-from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorUpdate import CSEditorUpdate
-from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpUpdate import PdbxExpUpdate
-from wwpdb.apps.ann_tasks_v2.em3d.EmUtils import EmUtils
 from wwpdb.apps.ann_tasks_v2.em3d.EmEditUtils import EmEditUtils
 from wwpdb.apps.ann_tasks_v2.em3d.EmModelUtils import EmModelUtils
-from wwpdb.utils.session.FileUtils import FileUtils
+from wwpdb.apps.ann_tasks_v2.em3d.EmUtils import EmUtils
+from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpUpdate import PdbxExpUpdate
+from wwpdb.apps.ann_tasks_v2.link.Link import Link
+from wwpdb.apps.ann_tasks_v2.mapcalc.BisoFullCalc import BisoFullCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.DccCalc import DccCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.DccRefineCalc import DccRefineCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.MapCalc import MapCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.MapDisplay import MapDisplay
+from wwpdb.apps.ann_tasks_v2.mapcalc.NpCcMapCalc import NpCcMapCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.ReassignAltIdsCalc import ReassignAltIdsCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.SpecialPositionCalc import SpecialPositionCalc
+from wwpdb.apps.ann_tasks_v2.mapcalc.SpecialPositionUpdate import SpecialPositionUpdate
+from wwpdb.apps.ann_tasks_v2.nafeatures.NAFeatures import NAFeatures
+from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
+from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsMiscChecks import NmrChemShiftsMiscChecks
 #
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsUtils import NmrChemShiftsUtils
-from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftsMiscChecks import NmrChemShiftsMiscChecks
-from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 from wwpdb.apps.ann_tasks_v2.nmr.NmrModelUtils import NmrModelUtils
+from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
+from wwpdb.apps.ann_tasks_v2.secstruct.SecondaryStructure import SecondaryStructure
+#
+from wwpdb.apps.ann_tasks_v2.site.Site import Site
+from wwpdb.apps.ann_tasks_v2.solvent.Solvent import Solvent
+#
+#
+from wwpdb.apps.ann_tasks_v2.transformCoord.TransformCoord import TransformCoord
+from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
+from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
+from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
+from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
+from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
+from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
+#
+from wwpdb.apps.ann_tasks_v2.utils.TerminalAtoms import TerminalAtoms
+from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
+from wwpdb.apps.ann_tasks_v2.view3d.ModelViewer3D import ModelViewer3D
+
 #
 try:
     from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
@@ -141,6 +140,7 @@ except ImportError:
 from mmcif_utils.pdbx.PdbxIo import PdbxEntryInfoIo
 
 logger = logging.getLogger(__name__)
+
 
 class CommonTasksWebAppWorker(WebAppWorkerBase):
 
@@ -287,7 +287,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if (self.__debug):
                 # self._lfh.write("+CommonTasksWebAppWorker._assemblyCalcOp() report %r\n" % cL)
                 self._lfh.write("+CommonTasksWebAppWorker._assemblyCalcOp() report %r\n" % oL)
-        #
+            #
             rC.setHtmlText("Assembly calculation completed")
             self._saveSessionParameter(param="assemanalcomplete", value=True, prefix=entryId)
             # rC.set("rowdata",rowList)
@@ -297,7 +297,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 rC.setHtmlText("No assemblies predicted")
                 self._saveSessionParameter(param="assemanalcomplete", value=True, prefix=entryId)
             else:
-                #rC.setError(errMsg="Assembly calculation failed")
+                # rC.setError(errMsg="Assembly calculation failed")
                 rC.setHtmlText("Assembly calculation failed")
                 self._saveSessionParameter(param="assemanalcomplete", value=False, prefix=entryId)
         return rC
@@ -336,7 +336,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if (self.__debug):
                 self._lfh.write("+CommonTasksWebAppWorker._assemblyRestartOp() rowlist       %r\n" % oL)
                 self._lfh.write("+CommonTasksWebAppWorker._assemblyRestartOp() select string %r\n" % selectString)
-        #
+            #
             rC.setHtmlText("Assembly calculation completed")
             rC.set("tablecontent", '\n'.join(oL))
             # rC.set("rowdata",rowList)
@@ -455,7 +455,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         entryFileName = self._reqObj.getValue("entryfilename")
         adi = AssemblyInput(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         cD = {}
-        cD ['htmlcontent'] = adi.makeEntityInfoTable(entryId=entryId, entryFileName=entryFileName)
+        cD['htmlcontent'] = adi.makeEntityInfoTable(entryId=entryId, entryFileName=entryFileName)
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         rC.addDictionaryItems(cD=cD)
@@ -467,7 +467,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         entryFileName = self._reqObj.getValue("entryfilename")
         adi = AssemblyInput(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         cD = {}
-        cD ['htmlcontent'] = adi.makeSymopInfoTable(entryId=entryId, entryFileName=entryFileName)
+        cD['htmlcontent'] = adi.makeSymopInfoTable(entryId=entryId, entryFileName=entryFileName)
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         rC.addDictionaryItems(cD=cD)
@@ -565,7 +565,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Link', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Link', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId,
+                   entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -595,7 +596,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Dictionary check', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Dictionary check', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
         if ok:
             rS = calc.getReportSize()
             if rS > 0:
@@ -633,7 +635,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Extra checks', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Extra checks', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
         if ok:
             rS = calc.getReportSize()
             if rS > 0:
@@ -672,7 +675,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         tss.setTaskStatusText(calc.getWarningMessage())
-        tss.assign(name='Reflection file update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Reflection file update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         if ok:
             wvInfo = calc.getWavelengthInfo()
@@ -709,14 +713,18 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() USING runAll VERSION on site %s\n" % self._siteId)
             #
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        starFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star", versionId=uploadVersionOp, partNumber='1')
-        pdbxCsFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
-        pdbxNmrDataFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        starFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star",
+                                      versionId=uploadVersionOp, partNumber='1')
+        pdbxCsFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx",
+                                        versionId=uploadVersionOp, partNumber='1')
+        pdbxNmrDataFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx",
+                                             versionId=uploadVersionOp, partNumber='1')
         if (not os.access(os.path.join(self._sessionPath, starFileName), os.R_OK)):
             if (os.access(os.path.join(self._sessionPath, pdbxCsFileName), os.R_OK)):
-                outFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star", versionId=uploadVersionOp, partNumber='1')
+                outFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="nmr-star",
+                                             versionId=uploadVersionOp, partNumber='1')
                 ok = self.__uploadConversion(entryId, pdbxCsFileName, 'nmr-chemical-shifts', 'pdbx', 'pdbx2nmrstar',
-                                                 outFileName, 'nmr-chemical-shifts', 'nmr-star', timeOut=0)
+                                             outFileName, 'nmr-chemical-shifts', 'nmr-star', timeOut=0)
                 if not ok:
                     starFileName = None
             else:
@@ -725,12 +733,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # nmr-data trumps CS
         if (os.access(os.path.join(self._sessionPath, pdbxNmrDataFileName), os.R_OK)):
             pdbxCsFileName = pdbxNmrDataFileName
-            
+
         if self._verbose:
-            self._lfh.write("+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s volInputFile %s\n" %
-                            (modelFileName, expFileName, pdbxCsFileName, volFileName))
+            self._lfh.write(
+                "+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s volInputFile %s\n" %
+                (modelFileName, expFileName, pdbxCsFileName, volFileName))
             #
-        ok = calc.runAll(entryId, modelInputFile=modelFileName, reflnInputFile=expFileName, csInputFile=pdbxCsFileName, volInputFile=volFileName, authorFscFile=authorFscName, annotationContext=True)
+        ok = calc.runAll(entryId, modelInputFile=modelFileName, reflnInputFile=expFileName, csInputFile=pdbxCsFileName,
+                         volInputFile=volFileName, authorFscFile=authorFscName, annotationContext=True)
 
         if (self._verbose):
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() status %r\n" % ok)
@@ -738,7 +748,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Validation report', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Validation report', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -767,7 +778,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Map', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Map', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId,
+                   entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -795,7 +807,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Non-polymer CC Map', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Non-polymer CC Map', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -824,7 +837,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Special position', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Special position', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -853,9 +867,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Special position update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Special position update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         # Need to improve warning message display on front end...
-        #if ok:
+        # if ok:
         #    updated = calc.modelUpdated()
         #    if not updated:
         #        tss.setTaskWarningFlag(True)
@@ -888,7 +903,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='DCC refinement', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='DCC refinement', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -921,7 +937,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='DCC', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='DCC', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId,
+                   entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -951,7 +968,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Isotropic B-value replacement', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Isotropic B-value replacement', formId=taskFormId, args=taskArgs, completionFlag=ok,
+                   tagList=tagL, entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -980,7 +998,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Alt Id reassignment', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=modelFileName)
+        tss.assign(name='Alt Id reassignment', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=modelFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -1009,7 +1028,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Site', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Site', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId,
+                   entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
         return rC
 
@@ -1036,7 +1056,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='NA features', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='NA features', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -1070,7 +1091,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Secondary structure', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Secondary structure', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
 
         tss.setTaskWarningFlag(True)
         tss.setAuxilaryFileName(topFileName)
@@ -1117,7 +1139,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
-        tss.assign(name='Transform coordinates', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Transform coordinates', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -1160,7 +1183,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
-        tss.assign(name='Merge replacement coordinates', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Merge replacement coordinates', formId=taskFormId, args=taskArgs, completionFlag=ok,
+                   tagList=tagL, entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -1189,7 +1213,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Solvent', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Solvent', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId,
+                   entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -1217,10 +1242,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Terminal atom replacement', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Terminal atom replacement', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
+
     #
 
     def _geometryValidationCalcOp(self):
@@ -1246,14 +1273,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Geometry validation', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Geometry validation', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                   entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
 
     def _setSessionInfoWf(self, entryId, entryFileName):
         if (self._verbose):
-            self._lfh.write("\n\n+CommonTasksWebAppWorker._setSessionInfoWf() entryId %s entryFileName %s\n" % (entryId, entryFileName))
+            self._lfh.write("\n\n+CommonTasksWebAppWorker._setSessionInfoWf() entryId %s entryFileName %s\n" % (
+            entryId, entryFileName))
 
         #
         # uds=UtilDataStore(reqObj=self._reqObj,prefix=entryId, verbose=self._verbose, log=self._lfh)
@@ -1291,14 +1320,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             uploadFileFormId = self._reqObj.getValue("uploadfileformid")
 
             if (self._verbose):
-                self._lfh.write("+CommonTasksWebAppWorker._getSessionInfoOp() using entryId %s and entryFileName %s\n" % (entryId, fileName))
+                self._lfh.write(
+                    "+CommonTasksWebAppWorker._getSessionInfoOp() using entryId %s and entryFileName %s\n" % (
+                    entryId, fileName))
 
             rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             rC.setReturnFormat("json")
 
             if uploadFileFormId:
-                uploadFileFormIdMap = { "#tls-range-correction-form": [ "model-upload", [ "pdb", "pdbx" ] ], \
-                                        "#mtz-mmcif-conversion-form": [ "structure-factors-upload", [ "mtz" ] ] }
+                uploadFileFormIdMap = {"#tls-range-correction-form": ["model-upload", ["pdb", "pdbx"]], \
+                                       "#mtz-mmcif-conversion-form": ["structure-factors-upload", ["mtz"]]}
                 #
                 uploadFileFormIdList = uploadFileFormId.split(",")
                 pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
@@ -1331,15 +1362,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 val = uds.get(key)
                 rC.set(key, val)
 
-            formIdList = ['#solvent-task-form', '#link-task-form', '#secstruct-task-form', '#nafeature-task-form', '#site-task-form',
-                          '#extracheck-task-form', '#valreport-task-form', '#npcc-mapcalc-task-form', '#mapcalc-task-form', 
-                          '#dcc-calc-task-form', '#dcc-refine-calc-task-form', '#trans-coord-task-form', 
+            formIdList = ['#solvent-task-form', '#link-task-form', '#secstruct-task-form', '#nafeature-task-form',
+                          '#site-task-form',
+                          '#extracheck-task-form', '#valreport-task-form', '#npcc-mapcalc-task-form',
+                          '#mapcalc-task-form',
+                          '#dcc-calc-task-form', '#dcc-refine-calc-task-form', '#trans-coord-task-form',
                           '#special-position-task-form', '#special-position-update-task-form', '#biso-full-task-form',
                           '#terminal-atoms-task-form', '#merge-xyz-task-form', '#geom-valid-task-form',
                           '#dict-check-task-form', '#reassign-altids-task-form', '#reflection-file-update-task-form',
                           '#nmr-cs-upload-check-form', '#nmr-cs-atom-name-check-form', '#nmr-rep-model-update-form',
-                          '#nmr-cs-update-archive-form', '#nmr-cs-update-form', '#nmr-cs-processing-form', '#nmr-cs-edit-form',
-                          '#tls-range-correction-form', '#mtz-mmcif-conversion-form', '#mtz-mmcif-semi-auto-conversion-form',
+                          '#nmr-cs-update-archive-form', '#nmr-cs-update-form', '#nmr-cs-processing-form',
+                          '#nmr-cs-edit-form',
+                          '#tls-range-correction-form', '#mtz-mmcif-conversion-form',
+                          '#mtz-mmcif-semi-auto-conversion-form',
                           '#sf-mmcif-free-r-correction-form', '#database-related-correction-form']
             tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             for key in formIdList:
@@ -1419,7 +1454,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     (dir, fileName) = os.path.split(pth)
                     fList.append(fileName)
             rC.set("emdxmlreportfiles", fList)
-
 
             #
             fpattern = self._sessionPath + "/" + entryId + "_site-anal_P1.cif"
@@ -1546,7 +1580,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         """  Import annotation data files from the input workflow storage into this annotation session
         """
         #
-        de = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource, verbose=self._verbose, log=self._lfh)
+        de = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource,
+                          verbose=self._verbose, log=self._lfh)
         #
         # model file -
         #
@@ -1563,7 +1598,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # assembly model files
         #
         for ii in range(1, 50):
-            pth = de.copyToSession(contentType="assembly-model-xyz", formatType="pdbx", version="latest", partitionNumber=ii)
+            pth = de.copyToSession(contentType="assembly-model-xyz", formatType="pdbx", version="latest",
+                                   partitionNumber=ii)
             if pth is None:
                 break
         #
@@ -1572,11 +1608,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # Validation files
         #
         pth = de.copyToSession(contentType="validation-report", formatType="pdf", version="latest", partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-full", formatType="pdf", version="latest", partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-slider", formatType="svg", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-full", formatType="pdf", version="latest",
+                               partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-slider", formatType="svg", version="latest",
+                               partitionNumber=1)
         pth = de.copyToSession(contentType="validation-data", formatType="xml", version="latest", partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-2fo-map-coef", formatType="pdbx", version="latest", partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-fo-map-coef", formatType="pdbx", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-2fo-map-coef", formatType="pdbx", version="latest",
+                               partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-fo-map-coef", formatType="pdbx", version="latest",
+                               partitionNumber=1)
         #
         # dictionary check file
         #
@@ -1597,24 +1637,32 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         pth = de.copyToSession(contentType="structure-factors", formatType="pdbx", version="latest", partitionNumber=1)
         #
         if pth is None:
-            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource="archive", verbose=self._verbose, log=self._lfh)
-            pth = deArchive.copyToSession(contentType="structure-factors", formatType="pdbx", version="latest", partitionNumber=1)
+            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf,
+                                     fileSource="archive", verbose=self._verbose, log=self._lfh)
+            pth = deArchive.copyToSession(contentType="structure-factors", formatType="pdbx", version="latest",
+                                          partitionNumber=1)
 
         # CS file (PDBx)
         #
-        pth = de.copyToSession(contentType="nmr-chemical-shifts", formatType="pdbx", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="nmr-chemical-shifts", formatType="pdbx", version="latest",
+                               partitionNumber=1)
         if pth is None:
-            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
-            pth = deArchive.copyToSession(contentType="nmr-chemical-shifts", formatType="pdbx", version="latest", partitionNumber=1)
+            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None,
+                                     fileSource="archive", verbose=self._verbose, log=self._lfh)
+            pth = deArchive.copyToSession(contentType="nmr-chemical-shifts", formatType="pdbx", version="latest",
+                                          partitionNumber=1)
         #
         # NEF file (nmr-star)
         #
         pth = de.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
         if pth is None:
-            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
-            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
+            deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None,
+                                     fileSource="archive", verbose=self._verbose, log=self._lfh)
+            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest",
+                                          partitionNumber=1)
         #
-        pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest",
+                               partitionNumber=1)
 
         # fsc file (xml)
         #
@@ -1671,13 +1719,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if loiUtil.readLOIMap():
                     loiMap = loiUtil.getLOIMap()
                     if loiMap:
-                        mogulUtil = LVW_Mogul(siteId=self._siteId, rundir=rundir, LOIMap=loiMap, verbose=self._verbose, log=self._lfh)
+                        mogulUtil = LVW_Mogul(siteId=self._siteId, rundir=rundir, LOIMap=loiMap, verbose=self._verbose,
+                                              log=self._lfh)
                         mogulUtil.readMogulResult()
                         loiMap = mogulUtil.getLOIMap()
                         #
                         topHtmlPath = os.path.join("/sessions", str(self._sessionId), "LVW_" + entryId.upper())
-                        htmlUtil = LVW_GetHTML(siteId=self._siteId, rundir=rundir, topHtmlPath=topHtmlPath, LOIMap=loiMap, \
-                                       verbose=self._verbose, log=self._lfh)
+                        htmlUtil = LVW_GetHTML(siteId=self._siteId, rundir=rundir, topHtmlPath=topHtmlPath,
+                                               LOIMap=loiMap, \
+                                               verbose=self._verbose, log=self._lfh)
                         htmlUtil.setLigandOfInterestingList(loiUtil.getLOIList())
                         content = htmlUtil.getHtmlText()
                     #
@@ -1768,16 +1818,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         tagL = []
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        fileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId="none", partNumber="1")
+        fileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId="none",
+                                  partNumber="1")
         filePath = os.path.join(self._sessionPath, fileName)
         if os.access(filePath, os.R_OK):
-            tagL.append('<a class="" href="/sessions/' + self._sessionId + '/' + fileName + '" target="_blank">' + fileName + '</a>')
+            tagL.append(
+                '<a class="" href="/sessions/' + self._sessionId + '/' + fileName + '" target="_blank">' + fileName + '</a>')
         #
         csEditorFormOp = CSEditorForm(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         myD = csEditorFormOp.get()
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Launch chemical shift editor", formId=taskFormId, args="", completionFlag=True, tagList=tagL, entryId=entryId)
+        tss.assign(name="Launch chemical shift editor", formId=taskFormId, args="", completionFlag=True, tagList=tagL,
+                   entryId=entryId)
         rC = self._makeTaskResponse(tssObj=tss)
         for key, value in myD.items():
             rC.set(key, value)
@@ -1901,7 +1954,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         fileSource = str(self._reqObj.getValue("filesource")).lower()
         #
         if (self._verbose):
-            self._lfh.write("+%s.%s() - filesource is %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource))
+            self._lfh.write(
+                "+%s.%s() - filesource is %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource))
         #
         # add wf_archive to fix PDBe wfm issue -- jdw 2011-06-30
         #
@@ -1939,18 +1993,23 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                                              classId=classId,
                                              status=p_status)
             if (self._verbose):
-                self._lfh.write("+%s.%s() -TRACKING status updated to '%s' for session %s \n" % (self.__class__.__name__,
-                                                                                                 sys._getframe().f_code.co_name, p_status, sessionId))
+                self._lfh.write(
+                    "+%s.%s() -TRACKING status updated to '%s' for session %s \n" % (self.__class__.__name__,
+                                                                                     sys._getframe().f_code.co_name,
+                                                                                     p_status, sessionId))
         except:
             bSuccess = False
             if (self._verbose):
-                self._lfh.write("+%s.%s() - TRACKING status, update to '%s' failed for session %s \n" % (self.__class__.__name__,
-                                                                                                         sys._getframe().f_code.co_name, p_status, sessionId))
+                self._lfh.write(
+                    "+%s.%s() - TRACKING status, update to '%s' failed for session %s \n" % (self.__class__.__name__,
+                                                                                             sys._getframe().f_code.co_name,
+                                                                                             p_status, sessionId))
             traceback.print_exc(file=self._lfh)
         #
         return bSuccess
 
-    def _renderCheckReports(self, entryId, fileSource='archive', instance=None, contentTypeList=[], useModelFileVersion=True):
+    def _renderCheckReports(self, entryId, fileSource='archive', instance=None, contentTypeList=[],
+                            useModelFileVersion=True):
         """  Prepare HTML rendered reports for existing check report content for input Id code and fileSource.
 
              Rendered content is returned in a dictionary with the following content keys plus a tag list
@@ -1979,11 +2038,22 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         layout = 'multiaccordion'
         #
         myD = {}
-        for ky in ['model', 'dcc-report', 'geometry-check-report', 'misc-check-report', 'format-check-report',
-                   'dict-check-report', 'dict-check-report-r4', 'dict-check-report-next', 'special-position-report', 
-                   'emd-xml-header-report', 'downloads']:
+        for ky in [
+            'model',
+            'dcc-report',
+            'geometry-check-report',
+            'misc-check-report',
+            'format-check-report',
+            'dict-check-report',
+            'dict-check-report-r4',
+            'dict-check-report-next',
+            'special-position-report',
+            'emd-xml-header-report',
+            'downloads'
+        ]:
             myD[ky] = None
-        myD['entry-info'] = {'pdb_id': '', 'struct_title': '', 'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
+        myD['entry-info'] = {'pdb_id': '', 'struct_title': '', 'my_entry_id': entryId, 'useversion': '1',
+                             'usesaved': 'yes'}
         #
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         aTagList = []
@@ -1998,18 +2068,22 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     versionId = 'latest'
                 else:
                     versionId = 'none'
-                ok = du.fetchId(entryId, contentType='model', formatType='pdbx', fileSource=fileSource, instance=instance, versionId=versionId)
+                ok = du.fetchId(entryId, contentType='model', formatType='pdbx', fileSource=fileSource,
+                                instance=instance, versionId=versionId)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = '\n'.join(pR.makeTabularReport(filePath=downloadPath, contentType='model', idCode=entryId, layout=layout))
+                    myD[cT] = '\n'.join(
+                        pR.makeTabularReport(filePath=downloadPath, contentType='model', idCode=entryId, layout=layout))
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup('No model data file.')
-                myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(), 'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
+                myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
+                                     'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
                 self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
 
             elif cT == 'model-pdb':
-                ok = du.fetchId(entryId, contentType='model', formatType='pdb', fileSource=fileSource, instance=instance, versionId='none')
+                ok = du.fetchId(entryId, contentType='model', formatType='pdb', fileSource=fileSource,
+                                instance=instance, versionId='none')
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
@@ -2017,70 +2091,89 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
             elif cT == 'dcc-report':
                 # DCC report
-                ok = du.fetchId(entryId, contentType='dcc-report', formatType='pdbx', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='dcc-report', formatType='pdbx', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = '\n'.join(pR.makeTabularReport(filePath=downloadPath, contentType='dcc-report', idCode=entryId, layout=layout))
+                    myD[cT] = '\n'.join(
+                        pR.makeTabularReport(filePath=downloadPath, contentType='dcc-report', idCode=entryId,
+                                             layout=layout))
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No X-ray experimental data check report.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No X-ray experimental data check report.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'geometry-check-report':
                 # Geometry report
-                ok = du.fetchId(entryId, contentType='geometry-check-report', formatType='pdbx', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='geometry-check-report', formatType='pdbx', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = '\n'.join(pR.makeTabularReport(filePath=downloadPath, contentType='geometry-check-report', idCode=entryId, layout=layout))
+                    myD[cT] = '\n'.join(
+                        pR.makeTabularReport(filePath=downloadPath, contentType='geometry-check-report', idCode=entryId,
+                                             layout=layout))
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No geometry issues.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No geometry issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'misc-check-report':
                 # Misc check report
-                ok = du.fetchId(entryId, contentType='misc-check-report', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='misc-check-report', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No miscellaneous issues.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No miscellaneous issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'format-check-report':
                 # Format check report
-                ok = du.fetchId(entryId, contentType='format-check-report', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='format-check-report', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No format check issues.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No format check issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'dict-check-report':
                 # Dictionary check report
-                ok = du.fetchId(entryId, contentType='dict-check-report', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='dict-check-report', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'dict-check-report-r4':
                 # Dictionary check report
-                ok = du.fetchId(entryId, contentType='dict-check-report-r4', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='dict-check-report-r4', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'dict-check-report-next':
                 # Dictionary check report
-                ok = du.fetchId(entryId, contentType='dict-check-report-next', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='dict-check-report-next', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    # myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'special-position-report':
                 #
-                ok = du.fetchId(entryId, contentType='special-position-report', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='special-position-report', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
@@ -2091,17 +2184,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'emd-xml-header-report':
                 # EMD XML header generation report
-                ok = du.fetchId(entryId, contentType='emd-xml-header-report', formatType='txt', fileSource=fileSource, instance=instance)
+                ok = du.fetchId(entryId, contentType='emd-xml-header-report', formatType='txt', fileSource=fileSource,
+                                instance=instance)
                 if (ok):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
-                    myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
-
+                    # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
 
         if len(aTagList) > 0:
-            myD['downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(aTagList)
+            myD['downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(
+                aTagList)
         myD['identifier'] = entryId
         myD['aTagList'] = aTagList
         #
@@ -2182,7 +2277,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
 
-
             if ('check-format' in operationList):
                 chk = FormatCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 chk.run(entryId=entryId, inpPath=modelFilePath)
@@ -2234,7 +2328,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     duL.removeFromDownload(rptPath)
 
             if ('check-sf' in operationList):
-                ok = duL.fetchId(entryId, contentType='structure-factors', formatType='pdbx', fileSource=fileSource, versionId=versionId)
+                ok = duL.fetchId(entryId, contentType='structure-factors', formatType='pdbx', fileSource=fileSource,
+                                 versionId=versionId)
                 expFilePath = duL.getDownloadPath()
                 chk = DccCalc(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 ok = chk.run(entryId=entryId, modelInputPath=modelFilePath, expInputPath=expFilePath)
@@ -2296,28 +2391,36 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         fileSource = self._reqObj.getValue('filesource')
 
-        if fileSource in['archive', 'wf-archive', 'wf-instance']:
+        if fileSource in ['archive', 'wf-archive', 'wf-instance']:
             useFileVersions = True
         else:
             useFileVersions = False
 
         if (self._verbose):
-            self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() content %s fetch id(s) %r\n" % (contentType, entryIdList))
+            self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() content %s fetch id(s) %r\n" % (
+            contentType, entryIdList))
         #
         if (operation == "fetch_entry"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='model', formatType='pdbx', fileSource=fileSource)
+            return self._makeIdListFetchResponse(entryIdList, contentType='model', formatType='pdbx',
+                                                 fileSource=fileSource)
         elif (operation == "fetch_sf"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='structure-factors', formatType='pdbx', fileSource=fileSource)
+            return self._makeIdListFetchResponse(entryIdList, contentType='structure-factors', formatType='pdbx',
+                                                 fileSource=fileSource)
         elif (operation == "fetch_map"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='em-volume', formatType='map', fileSource=fileSource)
+            return self._makeIdListFetchResponse(entryIdList, contentType='em-volume', formatType='map',
+                                                 fileSource=fileSource)
         elif (operation == "fetch_cs"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-chemical-shifts', formatType='pdbx', fileSource=fileSource)
+            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-chemical-shifts', formatType='pdbx',
+                                                 fileSource=fileSource)
         elif (operation == "fetch_mr"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-restraints', formatType='mr', fileSource=fileSource)
+            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-restraints', formatType='mr',
+                                                 fileSource=fileSource)
         elif (operation == "fetch_nmr_data"):
-            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-data-str', formatType='pdbx', fileSource=fileSource)
+            return self._makeIdListFetchResponse(entryIdList, contentType='nmr-data-str', formatType='pdbx',
+                                                 fileSource=fileSource)
         elif (operation == "report"):
-            return self._makeIdListModelReportResponse(entryIdList, contentType, fileSource=fileSource, useFileVersions=useFileVersions)
+            return self._makeIdListModelReportResponse(entryIdList, contentType, fileSource=fileSource,
+                                                       useFileVersions=useFileVersions)
         #
         elif (operation == "files-archive"):
             return self._listFilesResponse(entryIdList[0], fileSource='archive')
@@ -2325,47 +2428,68 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._listFilesResponse(entryIdList[0], fileSource='deposit')
         elif (operation == "files-instance"):
             return self._listFilesResponse(entryIdList[0], fileSource='wf-instance')
-        elif (operation in ['check-all', 'cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc', 'check-geometry', 'check-special-position', 'check-sf', 'check-emd-xml']):
+        elif (operation in ['check-all', 'cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc',
+                            'check-geometry', 'check-special-position', 'check-sf', 'check-emd-xml']):
             #
             templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "consolidated_section_template.html")
             self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() templateFilePath %s\n" % templateFilePath)
 
             webIncludePath = os.path.join(self._reqObj.getValue("TopPath"), "htdocs")
             return self._generateCheckReportsJson(
-                entryIdList[0], operation, fileSource=fileSource, templateFilePath=templateFilePath, webIncludePath=webIncludePath, useFileVersions=useFileVersions)
+                entryIdList[0], operation, fileSource=fileSource, templateFilePath=templateFilePath,
+                webIncludePath=webIncludePath, useFileVersions=useFileVersions)
         else:
             pass
 
-    def _generateCheckReportsJson(self, entryId, operation, fileSource='wf-archive', templateFilePath=None, webIncludePath=None, useFileVersions=True):
+    def _generateCheckReportsJson(self, entryId, operation, fileSource='wf-archive', templateFilePath=None,
+                                  webIncludePath=None, useFileVersions=True):
         """  Generate
         """
         #
         # opCtD - this dictionary maps input check request operation names to project report content types -
         #
-        opCtD = {'checkv5': 'dict-check-report', 'checkv4': 'dict-check-report-r4', 'checkNext' : 'dict-check-report-next', 
-                 'check-misc': 'misc-check-report', 
-                 'check-format': 'format-check-report', 'check-geometry': 'geometry-check-report', 'check-sf': 'dcc-report',
-                 'check-special-position': 'special-position-report', 'cif2pdb': 'model-pdb',
+        opCtD = {'checkv5': 'dict-check-report',
+                 # 'checkv4': 'dict-check-report-r4',
+                 'checkNext': 'dict-check-report-next',
+                 'check-misc': 'misc-check-report',
+                 'check-format': 'format-check-report',
+                 # 'check-geometry': 'geometry-check-report',
+                 'check-sf': 'dcc-report',
+                 'check-special-position': 'special-position-report',
+                 'cif2pdb': 'model-pdb',
                  'check-emd-xml': 'emd-xml-header-report'}
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat('json')
         if operation in ['check-all']:
-            opList = ['cif2pdb', 'checkv5', 'checkNext', 'check-format', 'check-misc', 'check-geometry', 'check-special-position', 'check-sf', 'check-emd-xml']
-            aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource, useFileVersions=useFileVersions)
+            opList = ['cif2pdb',
+                      'checkv5',
+                      'checkNext',
+                      'check-format',
+                      'check-misc',
+                      # 'check-geometry',
+                      'check-special-position',
+                      'check-sf',
+                      'check-emd-xml']
+            aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource,
+                                              useFileVersions=useFileVersions)
             cTList = ['model']
             cTList.extend(sorted(opCtD.values()))
             if (self._verbose):
                 self._lfh.write("+ReviewDataWebAppWorker._reviewDataInlineIdOps() content type list %r\n" % cTList)
-            myD = self._renderCheckReports(entryId, fileSource='session-download', instance=None, contentTypeList=cTList, useModelFileVersion=useFileVersions)
-            rC.setHtmlTextFromTemplate(templateFilePath=templateFilePath, webIncludePath=webIncludePath, parameterDict=myD, insertContext=True)
+            myD = self._renderCheckReports(entryId, fileSource='session-download', instance=None,
+                                           contentTypeList=cTList, useModelFileVersion=useFileVersions)
+            rC.setHtmlTextFromTemplate(templateFilePath=templateFilePath, webIncludePath=webIncludePath,
+                                       parameterDict=myD, insertContext=True)
             rC.setStatus(statusMsg="Check reports completed")
         else:
             opList = [operation]
-            aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource, useFileVersions=useFileVersions)
+            aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource,
+                                              useFileVersions=useFileVersions)
             #
             cT = opCtD[operation]
-            myD = self._renderCheckReports(entryId, fileSource='session-download', instance=None, contentTypeList=[cT], useModelFileVersion=useFileVersions)
+            myD = self._renderCheckReports(entryId, fileSource='session-download', instance=None, contentTypeList=[cT],
+                                           useModelFileVersion=useFileVersions)
 
             html = myD[cT]
             if len(aTagList) > 0:
@@ -2407,7 +2531,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         return rC
 
-    def _makeIdListModelReportResponse(self, entryIdList, contentType='model', formatType='pdbx', fileSource='archive', useFileVersions=True):
+    def _makeIdListModelReportResponse(self, entryIdList, contentType='model', formatType='pdbx', fileSource='archive',
+                                       useFileVersions=True):
         """  Prepare JSON response for a report request for the input Id code list.
         """
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -2420,7 +2545,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         htmlList = []
 
         for entryId in entryIdList:
-            myD = self._renderCheckReports(entryId, fileSource=fileSource, instance=None, contentTypeList=[contentType], useModelFileVersion=useFileVersions)
+            myD = self._renderCheckReports(entryId, fileSource=fileSource, instance=None, contentTypeList=[contentType],
+                                           useModelFileVersion=useFileVersions)
             htmlList.append(myD[contentType])
             aTagList.extend(myD['aTagList'])
 
@@ -2433,6 +2559,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             # do nothing
 
         return rC
+
     ##
     ##
 
@@ -2486,8 +2613,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         useSaved = self._reqObj.getValue("usesaved")
 
         if (self._verbose):
-            self._lfh.write("+CommonTasksWebAppWorker._entryInfoOp() entryId %r myEntryId %r fileName %r useFileVersion %r useSaved %r\n" %
-                            (entryId, myEntryId, fileName, useFileVersion, useSaved))
+            self._lfh.write(
+                "+CommonTasksWebAppWorker._entryInfoOp() entryId %r myEntryId %r fileName %r useFileVersion %r useSaved %r\n" %
+                (entryId, myEntryId, fileName, useFileVersion, useSaved))
         #
         # use any existing session data values as appropriate
         #
@@ -2534,7 +2662,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             self._saveSessionParameter(pvD=myD, prefix=self._udsPrefix)
         #
         comb_id = ''
-        for key in ( 'pdb_id', 'emdb_id', 'bmrb_id', 'my_entryid' ):
+        for key in ('pdb_id', 'emdb_id', 'bmrb_id', 'my_entryid'):
             if (not key in myD) or (not myD[key]):
                 continue
             #
@@ -2608,14 +2736,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         emu = EmUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         for ctup in ctupL:
             title = "Edit " + fileSource + " " + ctup[1]
-            nMap, htmlText = emu.renderEmMapFileList(entryId, contentType=ctup[0], fileSource=fileSource, colTextHtml=title)
+            nMap, htmlText = emu.renderEmMapFileList(entryId, contentType=ctup[0], fileSource=fileSource,
+                                                     colTextHtml=title)
             if nMap > 0:
                 myD[ctup[2]] = htmlText
         #
         # Make a separate table EM related content types for download -
         #
         fu = FileUtils(entryId, reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        nFiles, htmlList = fu.renderFileList(fileSource=fileSource, rDList=['3DEM Files'], titleSuffix=" for Download ", displayImageFlag=True)
+        nFiles, htmlList = fu.renderFileList(fileSource=fileSource, rDList=['3DEM Files'], titleSuffix=" for Download ",
+                                             displayImageFlag=True)
         if nFiles > 0:
             myD['em_download_files'] = '\n'.join(htmlList)
         #
@@ -2678,17 +2808,21 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mD = emx.getDepositorMapDetails(mapType, partitionNo)
 
                 if (self._verbose):
-                    self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, mD.items()))
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker._editEmMapHeaderOp() type %r partitionNo %r modelD %r\n" % (
+                        mapType, partitionNo, mD.items()))
             except:
                 if (self._verbose):
-                    self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderOp() failing model file %r\n" % modelFilePath)
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker._editEmMapHeaderOp() failing model file %r\n" % modelFilePath)
                     traceback.print_exc(file=self._lfh)
             #
             if emdbId is not None and len(emdbId) > 1:
                 mD['emdb_id'] = emdbId
             #
             if ok:
-                ok1, htmlText = emed.renderMapHeaderEditForm(entryId, mapHeaderFilePath, mapFileName, modelD=mD, mapType=mapType, partition=partitionNo)
+                ok1, htmlText = emed.renderMapHeaderEditForm(entryId, mapHeaderFilePath, mapFileName, modelD=mD,
+                                                             mapType=mapType, partition=partitionNo)
                 if ok1 and len(htmlText) > 0:
                     myD['map_header_html'] = htmlText
                 if doFigure:
@@ -2760,11 +2894,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 mapType = self._reqObj.getValue('maptype')
                 partitionNo = self._reqObj.getValue('partition')
                 if (self._verbose):
-                    self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, modelD.items()))
-                emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (
+                        mapType, partitionNo, modelD.items()))
+                emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo,
+                                          outModelFilePath=modelFilePath)
             except:
                 if (self._verbose):
-                    self._lfh.write("+CommonTasksWebAppWorker._editEmMapResponderOp() failing model file %r\n" % modelFilePath)
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker._editEmMapResponderOp() failing model file %r\n" % modelFilePath)
                     traceback.print_exc(file=self._lfh)
 
             #
@@ -2872,7 +3010,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         indexPath = os.path.join(self._sessionPath, "np-cc-maps", "np-cc-maps-index.cif")
         if os.access(indexPath, os.R_OK):
             mapIdx = mpd.readLocalMapIndex(indexPath)
-            htmlList.extend(mpd.renderLocalMapTable(rowDL=mapIdx, title='Table of local electron density maps for non-polymer chemical components'))
+            htmlList.extend(mpd.renderLocalMapTable(rowDL=mapIdx,
+                                                    title='Table of local electron density maps for non-polymer chemical components'))
             if (self.__debug):
                 self._lfh.write("+CommonTasksWebAppWorker._mapDisplayOp() html list %r\n" % htmlList)
                 self._lfh.write("+CommonTasksWebAppWorker._mapDisplayOp() data object %r\n" % myD.items())
@@ -2880,7 +3019,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         indexPath = os.path.join(self._sessionPath, "np-cc-omit-maps", "np-cc-omit-maps-index.cif")
         if os.access(indexPath, os.R_OK):
             mapIdx = mpd.readLocalMapIndex(indexPath)
-            htmlList.extend(mpd.renderLocalMapTable(rowDL=mapIdx, title='Table of local electron density omit maps for non-polymer chemical components', subdir='np-cc-omit-maps'))
+            htmlList.extend(mpd.renderLocalMapTable(rowDL=mapIdx,
+                                                    title='Table of local electron density omit maps for non-polymer chemical components',
+                                                    subdir='np-cc-omit-maps'))
             if (self.__debug):
                 self._lfh.write("+CommonTasksWebAppWorker._mapDisplayOp() html list %r\n" % htmlList)
                 self._lfh.write("+CommonTasksWebAppWorker._mapDisplayOp() data object %r\n" % myD.items())
@@ -2940,7 +3081,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 fD = {}
             #
             if (self._verbose):
-                self._lfh.write("+CommonTasksWebAppWorker._uploadMultipleFilesOp() cs_auth_file_upload with fD %r\n" % fD.items())
+                self._lfh.write(
+                    "+CommonTasksWebAppWorker._uploadMultipleFilesOp() cs_auth_file_upload with fD %r\n" % fD.items())
 
             csAuthFileName = wuu.getUploadFileName(fileTag='file')
             #
@@ -2963,10 +3105,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         formatType = 'nmr-star'
                 except:
                     pass
-                tPath = pI.getAuthChemcialShiftsFilePath(entryId, formatType=formatType, partNumber='next', fileSource="session", versionId="latest")
+                tPath = pI.getAuthChemcialShiftsFilePath(entryId, formatType=formatType, partNumber='next',
+                                                         fileSource="session", versionId="latest")
 
                 if (self._verbose):
-                    self._lfh.write("+CommonTasksWebAppWorker._uploadMultipleFilesOp() csAuthFileName %s session path is %s\n" % (csAuthFileName, tPath))
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker._uploadMultipleFilesOp() csAuthFileName %s session path is %s\n" % (
+                        csAuthFileName, tPath))
 
                 dN, fN = os.path.split(tPath)
                 csFileName = wuu.copyToSession(fileTag='file', sessionFileName=fN, uncompress=True)
@@ -2995,7 +3140,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         if len(fD) > 0:
             if (self._verbose):
-                self._lfh.write("+CommonTasksWebAppWorker._nmrCsUploadCheckOp() for id %s recovered CS files %r\n" % (entryId, fD.items()))
+                self._lfh.write("+CommonTasksWebAppWorker._nmrCsUploadCheckOp() for id %s recovered CS files %r\n" % (
+                entryId, fD.items()))
             #
             authFilePathList = []
             authNameList = []
@@ -3018,13 +3164,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
             #
-            tss.assign(name='CS Upload Check', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId)
+            tss.assign(name='CS Upload Check', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                       entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
         else:
             if (self._verbose):
-                self._lfh.write("+CommonTasksWebAppWorker._nmrCsUploadCheckOp() for id %s no files recovered\n" % entryId)
+                self._lfh.write(
+                    "+CommonTasksWebAppWorker._nmrCsUploadCheckOp() for id %s no files recovered\n" % entryId)
             tss.setTaskErrorFlag(True)
-            tss.assign(name='CS Upload File Combination and Check', formId=taskFormId, args=taskArgs, completionFlag=False, tagList=[], entryId=entryId)
+            tss.assign(name='CS Upload File Combination and Check', formId=taskFormId, args=taskArgs,
+                       completionFlag=False, tagList=[], entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -3042,14 +3191,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         taskFormId = self._reqObj.getValue("taskformid")
         #
         if (self._verbose):
-            self._lfh.write("+CommonTasksWebAppWorker._nmrCsAtomNameCheckOp() for id %s model file %s\n" % (entryId, entryFileName))
+            self._lfh.write(
+                "+CommonTasksWebAppWorker._nmrCsAtomNameCheckOp() for id %s model file %s\n" % (entryId, entryFileName))
 
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         # xyzFilePath=pI.getModelPdbxFilePath(dataSetId=entryId,fileSource='session-download',versionId='latest')
         xyzFilePath = os.path.join(self._sessionPath, entryFileName)
-        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none", mileStone=None)
-        csOutFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none", mileStone=None)
+        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none",
+                                                     mileStone=None)
+        csOutFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none",
+                                                     mileStone=None)
 
         if (os.access(csInpFilePath, os.R_OK) and os.access(xyzFilePath, os.R_OK)):
             calc = NmrChemShiftsUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -3058,13 +3210,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 self._lfh.write("+CommonTasksWebAppWorker._nmrCsAtomNameCheckOp() status %r\n" % ok)
             #
             tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
-            tss.assign(name='CS Atom Name Check', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId)
+            tss.assign(name='CS Atom Name Check', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                       entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
         else:
             if (self._verbose):
-                self._lfh.write("+CommonTasksWebAppWorker._nmrCsAtomNameCheckOp() for id %s no files recovered\n" % entryId)
+                self._lfh.write(
+                    "+CommonTasksWebAppWorker._nmrCsAtomNameCheckOp() for id %s no files recovered\n" % entryId)
             tss.setTaskErrorFlag(True)
-            tss.assign(name='CS Atom Name Check', formId=taskFormId, args=taskArgs, completionFlag=False, tagList=[], entryId=entryId)
+            tss.assign(name='CS Atom Name Check', formId=taskFormId, args=taskArgs, completionFlag=False, tagList=[],
+                       entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -3082,14 +3237,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         taskFormId = self._reqObj.getValue("taskformid")
         #
         if (self._verbose):
-            self._lfh.write("+CommonTasksWebAppWorker._nmrCsUpdateOp() for id %s model file %s\n" % (entryId, entryFileName))
+            self._lfh.write(
+                "+CommonTasksWebAppWorker._nmrCsUpdateOp() for id %s model file %s\n" % (entryId, entryFileName))
 
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
 
         xyzFilePath = os.path.join(self._sessionPath, entryFileName)
-        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none", mileStone=None)
-        csOutFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none", mileStone=None)
+        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none",
+                                                     mileStone=None)
+        csOutFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none",
+                                                     mileStone=None)
 
         if (os.access(csInpFilePath, os.R_OK) and os.access(xyzFilePath, os.R_OK)):
             calc = NmrChemShiftsUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -3098,13 +3256,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 self._lfh.write("+CommonTasksWebAppWorker._nmrCsUpdateOp() status %r\n" % ok)
             #
             tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
-            tss.assign(name='CS Update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId)
+            tss.assign(name='CS Update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL,
+                       entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
         else:
             if (self._verbose):
                 self._lfh.write("+CommonTasksWebAppWorker._nmrCsUpdateOp() for id %s missing input files\n" % entryId)
             tss.setTaskErrorFlag(True)
-            tss.assign(name='CS Update', formId=taskFormId, args=taskArgs, completionFlag=False, tagList=[], entryId=entryId)
+            tss.assign(name='CS Update', formId=taskFormId, args=taskArgs, completionFlag=False, tagList=[],
+                       entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -3132,7 +3292,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Representative model update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Representative model update', formId=taskFormId, args=taskArgs, completionFlag=ok,
+                   tagList=tagL, entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -3150,13 +3311,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         taskFormId = self._reqObj.getValue("taskformid")
         #
         if (self._verbose):
-            self._lfh.write("+CommonTasksWebAppWorker._nmrCsMiscCheckOp() for id %s model file %s\n" % (entryId, entryFileName))
+            self._lfh.write(
+                "+CommonTasksWebAppWorker._nmrCsMiscCheckOp() for id %s model file %s\n" % (entryId, entryFileName))
 
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         # xyzFilePath=pI.getModelPdbxFilePath(dataSetId=entryId,fileSource='session-download',versionId='latest')
         xyzFilePath = os.path.join(self._sessionPath, entryFileName)
-        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none", mileStone=None)
+        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none",
+                                                     mileStone=None)
 
         if (os.access(csInpFilePath, os.R_OK) and os.access(xyzFilePath, os.R_OK)):
             calc = NmrChemShiftsMiscChecks(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -3165,13 +3328,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 self._lfh.write("+CommonTasksWebAppWorker._nmrCsMiscCheckOp() status %r\n" % ok)
             #
             tagL = calc.getAnchorTagList(label=None, target='_blank', cssClass='')
-            tss.assign(name='CS Miscellaneous Checks', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId)
+            tss.assign(name='CS Miscellaneous Checks', formId=taskFormId, args=taskArgs, completionFlag=ok,
+                       tagList=tagL, entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
         else:
             if (self._verbose):
                 self._lfh.write("+CommonTasksWebAppWorker._nmrCsMiscCheckOp() for id %s no files recovered\n" % entryId)
             tss.setTaskErrorFlag(True)
-            tss.assign(name='CS Miscellaneous Checks', formId=taskFormId, args=taskArgs, completionFlag=False, tagList=[], entryId=entryId)
+            tss.assign(name='CS Miscellaneous Checks', formId=taskFormId, args=taskArgs, completionFlag=False,
+                       tagList=[], entryId=entryId)
             rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -3189,10 +3354,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         taskArgs = self._reqObj.getValue("task-form-args")
         taskFormId = self._reqObj.getValue("taskformid")
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none", mileStone=None)
-        csOutFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="archive", versionId="next", mileStone=None)
+        csInpFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="session", versionId="none",
+                                                     mileStone=None)
+        csOutFilePath = pI.getChemcialShiftsFilePath(entryId, formatType='pdbx', fileSource="archive", versionId="next",
+                                                     mileStone=None)
         #
-        self._lfh.write("+CommonTasksWebAppWorker._nmrCsArhiveUpdateOp() copying %s to %s\n" % (csInpFilePath, csOutFilePath))
+        self._lfh.write(
+            "+CommonTasksWebAppWorker._nmrCsArhiveUpdateOp() copying %s to %s\n" % (csInpFilePath, csOutFilePath))
         #
         try:
             shutil.copyfile(csInpFilePath, csOutFilePath)
@@ -3200,7 +3368,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         except:
             ok = False
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name='Archive CS file update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=[], entryId=entryId, entryFileName=fileName)
+        tss.assign(name='Archive CS file update', formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=[],
+                   entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -3256,8 +3425,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return rC
         inpContentType, inpFormatType, cnvOp, outContentType, outFormatType, timeOut = fileTypeTup
         if (self._verbose):
-            self._lfh.write("+CommonTasksWebApp.py._uploadFileOp() inpContentType %s inpFormatType %s cnvOp %s outContentType %s outFormatType %s \n" %
-                            (inpContentType, inpFormatType, cnvOp, outContentType, outFormatType))
+            self._lfh.write(
+                "+CommonTasksWebApp.py._uploadFileOp() inpContentType %s inpFormatType %s cnvOp %s outContentType %s outFormatType %s \n" %
+                (inpContentType, inpFormatType, cnvOp, outContentType, outFormatType))
         #
         #
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
@@ -3273,13 +3443,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if fSource not in ['WF_INSTANCE', 'WF_ARCHIVE']:
             entryId = defaultIdCode
 
-        inpFileName = pI.getFileName(entryId, contentType=inpContentType, formatType=inpFormatType, versionId=uploadVersionOp, partNumber='1')
+        inpFileName = pI.getFileName(entryId, contentType=inpContentType, formatType=inpFormatType,
+                                     versionId=uploadVersionOp, partNumber='1')
         wuu.renameSessionFile(uploadFileName, inpFileName)
-        outFileName = pI.getFileName(entryId, contentType=outContentType, formatType=outFormatType, versionId=uploadVersionOp, partNumber='1')
+        outFileName = pI.getFileName(entryId, contentType=outContentType, formatType=outFormatType,
+                                     versionId=uploadVersionOp, partNumber='1')
 
         ok = True
         if (cnvOp is not None and len(cnvOp) > 0):
-            ok = self.__uploadConversion(entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName, outContentType, outFormatType, timeOut)
+            ok = self.__uploadConversion(entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName,
+                                         outContentType, outFormatType, timeOut)
         else:
             # support simple renaming content types and format types on input --
             wuu.renameSessionFile(inpFileName, outFileName)
@@ -3298,7 +3471,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if inpFileName == outFileName:
                     rC.setHtmlText("Uploaded file %s renamed to standard file name %s" % (uploadFileName, outFileName))
                 else:
-                    rC.setHtmlText("Uploaded file %s renamed to standard file name %s and converted to %s" % (uploadFileName, inpFileName, outFileName))
+                    rC.setHtmlText("Uploaded file %s renamed to standard file name %s and converted to %s" % (
+                    uploadFileName, inpFileName, outFileName))
             else:
                 rC.setHtmlText("%s successfully uploaded!" % outFileName)
         else:
@@ -3334,16 +3508,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return rC
 
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        fileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        fileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp,
+                                  partNumber='1')
         rC.set('entryfilename', fileName)
         #
 
-        fileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        fileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx",
+                                  versionId=uploadVersionOp, partNumber='1')
         filePath = os.path.join(self._sessionPath, fileName)
         if os.access(filePath, os.R_OK):
             rC.set('entryexpfilename', fileName)
 
-        fileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        fileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx",
+                                  versionId=uploadVersionOp, partNumber='1')
         filePath = os.path.join(self._sessionPath, fileName)
         if os.access(filePath, os.R_OK):
             rC.set('entrycsfilename', fileName)
@@ -3373,13 +3550,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     ##
     ##
-    def __uploadConversion(self, entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName, outContentType, outFormatType, timeOut=0):
+    def __uploadConversion(self, entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName,
+                           outContentType, outFormatType, timeOut=0):
         """  Worker method supporting the conversion operations for uploaded in current session ...
 
         """
         if (self._verbose):
-            self._lfh.write("+CommonTasksWebApp.py._uploadConversionOp() entryId %s inpFileName %s inpContentType %s inpFormatType %s cnvOp %s\n" %
-                            (entryId, inpFileName, inpContentType, inpFormatType, cnvOp))
+            self._lfh.write(
+                "+CommonTasksWebApp.py._uploadConversionOp() entryId %s inpFileName %s inpContentType %s inpFormatType %s cnvOp %s\n" %
+                (entryId, inpFileName, inpContentType, inpFormatType, cnvOp))
         ok = True
         if inpContentType == 'model':
             filePath = os.path.join(self._sessionPath, inpFileName)
@@ -3409,8 +3588,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 diagsFilePath = os.path.join(self._sessionPath, entryId + "-sf-diags.log")
                 dumpFilePath = os.path.join(self._sessionPath, entryId + "-sf-dump.log")
                 logFilePath = os.path.join(self._sessionPath, entryId + "-sf-convert.log")
-                self._lfh.write("+CommonTasksWebApp.py._uploadFileOp() calling mtz2Pdbx() with %s %s\n" % (inpFilePath, outFilePath))
-                ok = dfa.mtz2Pdbx(inpFilePath, outFilePath, pdbxFilePath=None, logFilePath=logFilePath, diagsFilePath=diagsFilePath,
+                self._lfh.write("+CommonTasksWebApp.py._uploadFileOp() calling mtz2Pdbx() with %s %s\n" % (
+                inpFilePath, outFilePath))
+                ok = dfa.mtz2Pdbx(inpFilePath, outFilePath, pdbxFilePath=None, logFilePath=logFilePath,
+                                  diagsFilePath=diagsFilePath,
                                   dumpFilePath=dumpFilePath, timeout=timeOut)
                 if ok:
                     df = DataFile(fPath=outFilePath)
@@ -3443,37 +3624,39 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         """
         fileTimeList = []
         for fileFormat in content_format_type[1]:
-            latestFile = pathIofo.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=content_format_type[0], formatType=fileFormat, \
+            latestFile = pathIofo.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=content_format_type[0],
+                                              formatType=fileFormat, \
                                               fileSource="archive", versionId="latest", partNumber="1")
             #   
             if (not latestFile) or (not os.access(latestFile, os.F_OK)):
                 continue
             #   
             statinfo = os.stat(latestFile)
-            head,tail = ntpath.split(latestFile)
-            fileTimeList.append( [ tail, latestFile, statinfo.st_mtime ] ) 
+            head, tail = ntpath.split(latestFile)
+            fileTimeList.append([tail, latestFile, statinfo.st_mtime])
             #   
             vList = tail.split(".V")
             if len(vList) != 2:
                 continue
             #   
             for i in range(1, int(vList[1])):
-                previousFile = pathIofo.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=content_format_type[0], formatType=fileFormat, \
+                previousFile = pathIofo.getFilePath(dataSetId=entryId, wfInstanceId=None,
+                                                    contentType=content_format_type[0], formatType=fileFormat, \
                                                     versionId=str(i), partNumber="1")
                 #   
                 if (not previousFile) or (not os.access(previousFile, os.F_OK)):
                     continue
                 #   
                 statinfo1 = os.stat(previousFile)
-                head,tail = ntpath.split(previousFile)
-                fileTimeList.append( [ tail, previousFile, statinfo1.st_mtime ] ) 
-            #
+                head, tail = ntpath.split(previousFile)
+                fileTimeList.append([tail, previousFile, statinfo1.st_mtime])
+                #
         #
         if len(fileTimeList) > 1:
             fileTimeList.sort(key=operator.itemgetter(2), reverse=True)
         #
         fileList = []
         for fileTimeTuple in fileTimeList:
-            fileList.append( [ fileTimeTuple[0], fileTimeTuple[1] ] )
+            fileList.append([fileTimeTuple[0], fileTimeTuple[1]])
         #
         return fileList
