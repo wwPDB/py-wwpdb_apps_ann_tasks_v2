@@ -63,6 +63,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ]
         elif self.__st.getStyleId() in ['PDBX_REPORT_V1'] :
             self.__reportCategories = [
+                ('exptl', 'Experimental', 'row-wise'),
                 ('entity', 'Entity description', 'row-wise'),
                 ('entity_poly', 'Polymers', 'row-wise'),
                 ('entity_src_gen', 'Source', 'row-wise'),
