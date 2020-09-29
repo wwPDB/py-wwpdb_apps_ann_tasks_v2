@@ -123,7 +123,8 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ('pdbx_entity_nonpoly', 'table'),
         ('atom_site', 'table'),
         ('pdbx_entity_instance_feature', 'table'),
-        ('pdbx_binding_assay', 'table')
+        ('pdbx_binding_assay', 'table'),
+        ('pdbx_chem_comp_depositor_info', 'table'),
     ]
     _cDict = {
         'audit_contact_author': [
@@ -284,13 +285,13 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ],
         'pdbx_entity_instance_feature': [
             ('_pdbx_entity_instance_feature.ordinal', '%s', 'str', ''),
+            ('_pdbx_entity_instance_feature.comp_id', '%s', 'str', ''),
+            ('_pdbx_entity_instance_feature.auth_comp_id', '%s', 'str', ''),
+            ('_pdbx_entity_instance_feature.feature_type', '%s', 'str', ''),
             ('_pdbx_entity_instance_feature.asym_id', '%s', 'str', ''),
             ('_pdbx_entity_instance_feature.auth_asym_id', '%s', 'str', ''),
-            ('_pdbx_entity_instance_feature.auth_comp_id', '%s', 'str', ''),
             ('_pdbx_entity_instance_feature.auth_seq_num', '%s', 'str', ''),
-            ('_pdbx_entity_instance_feature.comp_id', '%s', 'str', ''),
             ('_pdbx_entity_instance_feature.details', '%s', 'str', ''),
-            ('_pdbx_entity_instance_feature.feature_type', '%s', 'str', ''),
             ('_pdbx_entity_instance_feature.seq_num', '%s', 'str', '')
         ],
         'struct_ref': [
@@ -587,7 +588,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_refine_ls_shell.redundancy_reflns_obs', '%s', 'str', ''),
             ('_refine_ls_shell.pdbx_refine_id', '%s', 'str', '')
         ],
-        'atom_sites': [
+        'atom_sites_footnote': [
             ('_atom_sites_footnote.id', '%s', 'str', ''),
             ('_atom_sites_footnote.text', '%s', 'str', '')
         ],
@@ -1320,15 +1321,28 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_em_entity_assembly_naturalsource.tissue', '%s', 'str', ''),
         ],
         'em_entity_assembly_recombinant': [
-            ('em_entity_assembly_recombinant.id', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.entity_assembly_id', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.ncbi_tax_id', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.source', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.organism', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.strain', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.cell', '%s', 'str', ''),
-            ('em_entity_assembly_recombinant.plasmid', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.id', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.entity_assembly_id', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.ncbi_tax_id', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.source', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.organism', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.strain', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.cell', '%s', 'str', ''),
+            ('_em_entity_assembly_recombinant.plasmid', '%s', 'str', ''),
         ],
+        'pdbx_chem_comp_depositor_info':
+            [
+                ('_pdbx_chem_comp_depositor_info.ordinal', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.comp_id', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.alt_comp_id', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.name', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.formula', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.type', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.descriptor', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.descriptor_type', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.in_dictionary_flag', '%s', 'str', ''),
+                ('_pdbx_chem_comp_depositor_info.details', '%s', 'str', ''),
+            ]
     }
 
     _excludeList = []
