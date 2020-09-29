@@ -1330,19 +1330,17 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_em_entity_assembly_recombinant.cell', '%s', 'str', ''),
             ('_em_entity_assembly_recombinant.plasmid', '%s', 'str', ''),
         ],
-        'pdbx_chem_comp_depositor_info':
-            [
-                ('_pdbx_chem_comp_depositor_info.ordinal', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.comp_id', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.alt_comp_id', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.name', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.formula', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.type', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.descriptor', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.descriptor_type', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.in_dictionary_flag', '%s', 'str', ''),
-                ('_pdbx_chem_comp_depositor_info.details', '%s', 'str', ''),
-            ]
+        'pdbx_chem_comp_depositor_info': [
+            ('_pdbx_chem_comp_depositor_info.ordinal', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.comp_id', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.alt_comp_id', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.name', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.formula', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.descriptor', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.descriptor_type', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.in_dictionary_flag', '%s', 'str', ''),
+            ('_pdbx_chem_comp_depositor_info.details', '%s', 'str', ''),
+        ]
     }
 
     _excludeList = []
