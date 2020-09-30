@@ -81,13 +81,17 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('pdbx_chem_comp_depositor_info', 'Depositor ligand info', 'row-wise'),
                 ('struct_keywords', 'Keywords', 'row-wise'),
                 ('pdbx_struct_assembly', 'Assembly Details', 'row-wise'),
-                ('struct_biol', 'Author Assembly Details', 'row-wise'),
+                ('pdbx_struct_assembly_depositor_info', 'Author Assembly Details', 'row-wise'),
+                ('pdbx_struct_assembly_auth_evidence', 'Author Assembly Evidence', 'row-wise'),
                 #('pdbx_database_status', 'Status', 'column-wise'),
                 #('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),
                 ('pdbx_SG_project', 'Structural genomics', 'row-wise'),
                 ('pdbx_database_related', 'Related entries', 'row-wise'),
                 ('pdbx_contact_author', 'Contact authors', 'row-wise'),
                 #('citation','Primary citation','column-wise'),
+                ('pdbx_validate_close_contact', 'Close contacts', 'row-wise'),
+                ('pdbx_validate_symm_contact', 'Close symmetry contacts', 'row-wise'),
+                ('struct_conn', 'Links', 'row-wise'),
 
                 #('symmetry', 'Symmetry', 'row-wise'),
                 #('cell', 'Cell constants', 'row-wise'),
@@ -110,7 +114,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 #('pdbx_rscc_mapman_overall','Density correlation summary','column-wise'),
                 #('pdbx_dcc_software','Software used by DCC','row-wise'),
                 #('pdbx_dcc_sf','Counting statistics of SF file','row-wise'),
-                #('pdbx_density_corr','Density correlation','row-wise'),
+                ('pdbx_density_corr','Density correlation','row-wise'),
                 #('pdbx_rscc_mapman', 'Real-space density statistics by residue','row-wise')
             ]
         elif self.__st.getStyleId() in ['PDBX_GEOMETRY_REPORT_V1'] :

@@ -120,11 +120,15 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ('pdbx_coordinate_model', 'table'),
         ('pdbx_validate_rmsd_angle', 'table'),
         ('pdbx_validate_torsion', 'table'),
+        ('pdbx_validate_close_contact', 'table'),
+        ('pdbx_validate_symm_contact', 'table'),
         ('pdbx_entity_nonpoly', 'table'),
         ('atom_site', 'table'),
         ('pdbx_entity_instance_feature', 'table'),
         ('pdbx_binding_assay', 'table'),
         ('pdbx_chem_comp_depositor_info', 'table'),
+        ('pdbx_struct_assembly_auth_evidence', 'table'),
+        ('pdbx_struct_assembly_depositor_info', 'table'),
     ]
     _cDict = {
         'audit_contact_author': [
@@ -1252,6 +1256,42 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_pdbx_validate_torsion.phi', '%s', 'str', ''),
             ('_pdbx_validate_torsion.psi', '%s', 'str', '')
         ],
+        'pdbx_validate_close_contact': [
+            ('_pdbx_validate_close_contact.id', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.PDB_model_num', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_atom_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_asym_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_comp_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_seq_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.PDB_ins_code_1', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.label_alt_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_atom_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_asym_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_comp_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.auth_seq_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.PDB_ins_code_2', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.label_alt_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_close_contact.dist', '%s', 'str', '')
+        ],
+        'pdbx_validate_symm_contact': [
+            ('_pdbx_validate_symm_contact.id', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.PDB_model_num', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_atom_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_asym_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_comp_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_seq_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.PDB_ins_code_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.label_alt_id_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.site_symmetry_1', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_atom_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_asym_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_comp_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.auth_seq_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.PDB_ins_code_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.label_alt_id_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.site_symmetry_2', '%s', 'str', ''),
+            ('_pdbx_validate_symm_contact.dist', '%s', 'str', '')
+        ],
         'pdbx_entity_nonpoly': [
             ('_pdbx_entity_nonpoly.entity_id', '%s', 'str', ''),
             ('_pdbx_entity_nonpoly.name', '%s', 'str', ''),
@@ -1340,7 +1380,19 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_pdbx_chem_comp_depositor_info.descriptor_type', '%s', 'str', ''),
             ('_pdbx_chem_comp_depositor_info.in_dictionary_flag', '%s', 'str', ''),
             ('_pdbx_chem_comp_depositor_info.details', '%s', 'str', ''),
-        ]
+        ],
+        'pdbx_struct_assembly_auth_evidence': [
+            ('_pdbx_struct_assembly_auth_evidence.id', '%s', 'str', ''),
+            ('_pdbx_struct_assembly_auth_evidence.assembly_id', '%s', 'str', ''),
+            ('_pdbx_struct_assembly_auth_evidence.experimental_support', '%s', 'str', ''),
+            ('_pdbx_struct_assembly_auth_evidence.details', '%s', 'str', ''),
+        ],
+        'pdbx_struct_assembly_depositor_info': [
+            ('_pdbx_struct_assembly_depositor_info.id', '%s', 'str', ''),
+            ('_pdbx_struct_assembly_depositor_info.details', '%s', 'str', ''),
+
+        ],
+
     }
 
     _excludeList = []
