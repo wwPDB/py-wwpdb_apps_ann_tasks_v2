@@ -69,6 +69,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('database_PDB_caveat', 'Caveat', 'row-wise'),
                 ('entity', 'Entity description', 'row-wise'),
                 ('entity_poly', 'Polymers', 'row-wise'),
+                ('pdbx_entity_branch_descriptor', 'Carbohydrate polymers', 'row-wise')
                 ('entity_src_gen', 'Engineered Source', 'row-wise'),
                 ('entity_src_nat', 'Natural Source', 'row-wise'),
                 ('pdbx_entity_src_syn', 'Synthetic Source', 'row-wise'),
