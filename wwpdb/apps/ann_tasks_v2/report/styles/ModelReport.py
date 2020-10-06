@@ -130,6 +130,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ('pdbx_struct_assembly_auth_evidence', 'table'),
         ('pdbx_struct_assembly_depositor_info', 'table'),
         ('pdbx_entity_branch_descriptor', 'table'),
+        ('pdbx_entity_branch', 'table'),
     ]
     _cDict = {
         'audit_contact_author': [
@@ -1395,6 +1396,10 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         'pdbx_entity_branch_descriptor': [
             ('_pdbx_entity_branch_descriptor.entity_id', '%s', 'str', ''),
             ('_pdbx_entity_branch_descriptor.descriptor', '%s', 'str', ''),
+        ],
+        'pdbx_entity_branch': [
+            ('_pdbx_entity_branch.entity_id', '%s', 'str', ''),
+            ('_pdbx_entity_branch.type', '%s', 'str', ''),
         ],
 
     }
