@@ -77,6 +77,8 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('em_entity_assembly_naturalsource', 'EM Natural Source', 'row-wise'),
                 ('em_entity_assembly_recombinant', 'EM recombinant Source', 'row-wise'),
                 ('struct_ref', 'Sequence', 'row-wise'),
+                ('struct_ref_seq', 'Sequence alignment details', 'row-wise'),
+                ('pdbx_struct_ref_seq_depositor_info', 'depositors cross reference', 'row-wise'),
                 ('pdbx_entity_nonpoly', 'non-polymers', 'row-wise'),
                 ('pdbx_entity_instance_feature', 'Ligand of Interest', 'row-wise'),
                 ('pdbx_chem_comp_depositor_info', 'Depositor ligand info', 'row-wise'),
