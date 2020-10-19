@@ -11,42 +11,48 @@ Generate public pdbx cif file.
 
 """
 __docformat__ = "restructuredtext en"
-__author__    = "Zukang Feng"
-__email__     = "zfeng@rcsb.rutgers.edu"
-__license__   = "Creative Commons Attribution 3.0 Unported"
-__version__   = "V0.07"
+__author__ = "Zukang Feng"
+__email__ = "zfeng@rcsb.rutgers.edu"
+__license__ = "Creative Commons Attribution 3.0 Unported"
+__version__ = "V0.07"
 
-import sys,os.path,os,traceback
+import os
+import os.path
+import sys
+import traceback
+
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 
 class PublicPdbxFile(SessionWebDownloadUtils):
     """ The PublicPdbxFile class encapsulates conversion internal pdbx cif to public pdbx cif file.
     """
-    def __init__(self,reqObj=None,verbose=False,log=sys.stderr):
-        super(PublicPdbxFile,self).__init__(reqObj=reqObj,verbose=verbose,log=log)
-        self.__verbose=verbose
-        self.__lfh=log
-        self.__reqObj=reqObj
+
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
+        super(PublicPdbxFile, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
+        self.__verbose = verbose
+        self.__lfh = log
+        self.__reqObj = reqObj
         self.__setup()
-        
+
     def __setup(self):
-        self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__sObj=self.__reqObj.getSessionObj()
-        self.__sessionId=self.__sObj.getId()
-        self.__sessionPath=self.__sObj.getPath()
+        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
+        self.__sObj = self.__reqObj.getSessionObj()
+        self.__sessionId = self.__sObj.getId()
+        self.__sessionPath = self.__sObj.getPath()
         #
 
-    def run(self,entryId,inpFile): 
+    def run(self, entryId, inpFile):
         """  Run conversion.
         """
         try:
-            inpPath=os.path.join(self.__sessionPath,inpFile)
-            logPath=os.path.join(self.__sessionPath,entryId+"-public_cif.log")
-            retPath=os.path.join(self.__sessionPath,entryId+"_model-review_P1.cif")
+            inpPath = os.path.join(self.__sessionPath, inpFile)
+            logPath = os.path.join(self.__sessionPath, entryId + "-public_cif.log")
+            retPath = os.path.join(self.__sessionPath, entryId + "_model-review_P1.cif")
             #
-            for filePath in ( logPath, retPath):
+            for filePath in (logPath, retPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
@@ -54,7 +60,7 @@ class PublicPdbxFile(SessionWebDownloadUtils):
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
             dp.op("annot-cif-to-public-pdbx")
-            dp.exp(retPath);
+            dp.exp(retPath)
             dp.expLog(logPath)
             dp.cleanup()
             #
@@ -62,4 +68,3 @@ class PublicPdbxFile(SessionWebDownloadUtils):
         except:
             traceback.print_exc(file=self.__lfh)
             return False
-
