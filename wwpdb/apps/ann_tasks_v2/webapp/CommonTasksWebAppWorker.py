@@ -47,19 +47,15 @@ except ImportError:
     import pickle as pickle
 
 import glob
-import json
 # from json import loads, dumps
 import logging
 import ntpath
 import operator
 import os
 import shutil
-import string
 import sys
 import time
 import traceback
-import types
-from time import localtime, strftime, sleep
 
 from wwpdb.io.file.DataExchange import DataExchange
 from wwpdb.io.file.DataFile import DataFile
@@ -69,7 +65,7 @@ from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
 from wwpdb.utils.session.FileUtils import FileUtils
 from wwpdb.utils.session.UtilDataStore import UtilDataStore
 from wwpdb.utils.session.WebAppWorkerBase import WebAppWorkerBase
-from wwpdb.utils.session.WebRequest import ResponseContent, InputRequest
+from wwpdb.utils.session.WebRequest import ResponseContent
 from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
 #
 from wwpdb.utils.wf.dbapi.WfTracking import WfTracking
@@ -120,8 +116,6 @@ from wwpdb.apps.ann_tasks_v2.solvent.Solvent import Solvent
 from wwpdb.apps.ann_tasks_v2.transformCoord.TransformCoord import TransformCoord
 from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
-from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
-from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 #
@@ -1282,7 +1276,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
     def _setSessionInfoWf(self, entryId, entryFileName):
         if (self._verbose):
             self._lfh.write("\n\n+CommonTasksWebAppWorker._setSessionInfoWf() entryId %s entryFileName %s\n" % (
-            entryId, entryFileName))
+                entryId, entryFileName))
 
         #
         # uds=UtilDataStore(reqObj=self._reqObj,prefix=entryId, verbose=self._verbose, log=self._lfh)
@@ -1322,7 +1316,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if (self._verbose):
                 self._lfh.write(
                     "+CommonTasksWebAppWorker._getSessionInfoOp() using entryId %s and entryFileName %s\n" % (
-                    entryId, fileName))
+                        entryId, fileName))
 
             rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             rC.setReturnFormat("json")
@@ -2052,11 +2046,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             'downloads'
         ]:
             myD[ky] = None
-        myD['entry-info'] = {'pdb_id': '', 'struct_title': '', 'my_entry_id': entryId, 'useversion': '1',
-                             'usesaved': 'yes'}
+        myD['entry-info'] = {'pdb_id': '',
+                             'struct_title': '',
+                             'my_entry_id': entryId,
+                             'useversion': '1',
+                             'usesaved': 'yes',
+                             }
+        myD['exp-report'] = ''
+        myD['misc-report'] = ''
         #
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         aTagList = []
+        dTagList = []
+        vTagList = []
         downloadList = []
         #
         pR = PdbxReport(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -2070,13 +2072,18 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     versionId = 'none'
                 ok = du.fetchId(entryId, contentType='model', formatType='pdbx', fileSource=fileSource,
                                 instance=instance, versionId=versionId)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = '\n'.join(
                         pR.makeTabularReport(filePath=downloadPath, contentType='model', idCode=entryId, layout=layout))
+
+                    downloadPath = du.getWebPath()
+                    myD['model-session'] = downloadPath
+
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup('No model data file.')
+                    myD['model-session'] = ''
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
                                      'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
                 self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
@@ -2093,20 +2100,22 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # DCC report
                 ok = du.fetchId(entryId, contentType='dcc-report', formatType='pdbx', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = '\n'.join(
+                    report = '\n'.join(
                         pR.makeTabularReport(filePath=downloadPath, contentType='dcc-report', idCode=entryId,
                                              layout=layout))
-                else:
-                    # myD[cT] = self.__getMessageTextWithMarkup('No X-ray experimental data check report.')
-                    myD[cT] = self.__getMessageTextWithMarkup('')
+
+                    myD['exp-report'] += report
+                #else:
+                #    # myD[cT] = self.__getMessageTextWithMarkup('No X-ray experimental data check report.')
+                #    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'geometry-check-report':
                 # Geometry report
                 ok = du.fetchId(entryId, contentType='geometry-check-report', formatType='pdbx', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = '\n'.join(
@@ -2119,18 +2128,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # Misc check report
                 ok = du.fetchId(entryId, contentType='misc-check-report', formatType='txt', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
-                else:
-                    # myD[cT] = self.__getMessageTextWithMarkup('No miscellaneous issues.')
-                    myD[cT] = self.__getMessageTextWithMarkup('')
+                    report = self.__getFileTextWithMarkup(downloadPath)
+                    if report:
+                        myD['misc-report'] += report
+                #else:
+                #    # myD[cT] = self.__getMessageTextWithMarkup('No miscellaneous issues.')
+                #    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'format-check-report':
                 # Format check report
                 ok = du.fetchId(entryId, contentType='format-check-report', formatType='txt', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
@@ -2152,7 +2163,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # Dictionary check report
                 ok = du.fetchId(entryId, contentType='dict-check-report-r4', formatType='txt', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
@@ -2163,7 +2174,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # Dictionary check report
                 ok = du.fetchId(entryId, contentType='dict-check-report-next', formatType='txt', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
@@ -2174,25 +2185,75 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 #
                 ok = du.fetchId(entryId, contentType='special-position-report', formatType='txt', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
-                else:
-                    # myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
-                    # Biocuration requested no message be returned
-                    myD[cT] = self.__getMessageTextWithMarkup('')
+                    report = self.__getFileTextWithMarkup(downloadPath)
+                    #myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                    if report:
+                        myD['misc-report'] += report
+                #else:
+                #    # myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
+                #    # Biocuration requested no message be returned
+                #
             elif cT == 'emd-xml-header-report':
                 # EMD XML header generation report
                 ok = du.fetchId(entryId, contentType='emd-xml-header-report', formatType='txt', fileSource=fileSource,
                                 instance=instance)
-                if (ok):
+                if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
-                else:
-                    # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
-                    myD[cT] = self.__getMessageTextWithMarkup('')
+                    report = self.__getFileTextWithMarkup(downloadPath)
+                    if report:
+                        myD['exp-report'] += report
+                #else:
+                #    # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
+                #    myD[cT] = self.__getMessageTextWithMarkup('')
+
+        for data_file in (('model', 'pdbx'),
+                          ('model', 'pdb'),
+                          ("structure-factors", 'pdbx'),
+                          ('nmr-chemical-shifts', 'pdbx'),
+                          ('nmr-data-str', 'pdbx'),
+                          ('em-volume', 'map')
+                          ):
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+                            instance=instance)
+            if ok:
+                downloadPath = du.getDownloadPath()
+                dTagList.append(du.getAnchorTag())
+                data_file_report = '-report'.format(data_file[0])
+                myD[data_file_report] = self.__getFileTextWithMarkup(downloadPath)
+
+        if len(dTagList) > 0:
+            myD[
+                'data-downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(
+                dTagList)
+
+        ok = du.fetchId(entryId, contentType='validation-report-slider', formatType='png', fileSource=fileSource,
+                        instance=instance)
+        if ok:
+            downloadPath = du.getWebPath()
+            myD['val_image'] = '<div class="container"><p><img src={} alt="validation slider "style="width:600px"></p></div><br />'.format(downloadPath)
+        else:
+            myD['val_image'] = ''
+
+        for val_file in (('validation-report-full', 'pdf'),
+                         ('validation-data', 'xml'),
+                         ('validation-report-slider', 'png')):
+            ok = du.fetchId(entryId, contentType=val_file[0], formatType=val_file[1], fileSource=fileSource,
+                            instance=instance)
+            if ok:
+                downloadPath = du.getDownloadPath()
+                vTagList.append(du.getAnchorTag())
+                myD[val_file[0]] = self.__getFileTextWithMarkup(downloadPath)
+
+        if len(vTagList) > 0:
+            myD[
+                'validation-downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(
+                vTagList)
+        else:
+            myD['validation-downloads'] = ''
 
         if len(aTagList) > 0:
             myD['downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(
@@ -2398,7 +2459,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         if (self._verbose):
             self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() content %s fetch id(s) %r\n" % (
-            contentType, entryIdList))
+                contentType, entryIdList))
         #
         if (operation == "fetch_entry"):
             return self._makeIdListFetchResponse(entryIdList, contentType='model', formatType='pdbx',
@@ -2810,7 +2871,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if (self._verbose):
                     self._lfh.write(
                         "+CommonTasksWebAppWorker._editEmMapHeaderOp() type %r partitionNo %r modelD %r\n" % (
-                        mapType, partitionNo, mD.items()))
+                            mapType, partitionNo, mD.items()))
             except:
                 if (self._verbose):
                     self._lfh.write(
@@ -2896,7 +2957,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if (self._verbose):
                     self._lfh.write(
                         "+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (
-                        mapType, partitionNo, modelD.items()))
+                            mapType, partitionNo, modelD.items()))
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo,
                                           outModelFilePath=modelFilePath)
             except:
@@ -3111,7 +3172,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if (self._verbose):
                     self._lfh.write(
                         "+CommonTasksWebAppWorker._uploadMultipleFilesOp() csAuthFileName %s session path is %s\n" % (
-                        csAuthFileName, tPath))
+                            csAuthFileName, tPath))
 
                 dN, fN = os.path.split(tPath)
                 csFileName = wuu.copyToSession(fileTag='file', sessionFileName=fN, uncompress=True)
@@ -3141,7 +3202,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if len(fD) > 0:
             if (self._verbose):
                 self._lfh.write("+CommonTasksWebAppWorker._nmrCsUploadCheckOp() for id %s recovered CS files %r\n" % (
-                entryId, fD.items()))
+                    entryId, fD.items()))
             #
             authFilePathList = []
             authNameList = []
@@ -3472,7 +3533,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     rC.setHtmlText("Uploaded file %s renamed to standard file name %s" % (uploadFileName, outFileName))
                 else:
                     rC.setHtmlText("Uploaded file %s renamed to standard file name %s and converted to %s" % (
-                    uploadFileName, inpFileName, outFileName))
+                        uploadFileName, inpFileName, outFileName))
             else:
                 rC.setHtmlText("%s successfully uploaded!" % outFileName)
         else:
@@ -3589,7 +3650,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 dumpFilePath = os.path.join(self._sessionPath, entryId + "-sf-dump.log")
                 logFilePath = os.path.join(self._sessionPath, entryId + "-sf-convert.log")
                 self._lfh.write("+CommonTasksWebApp.py._uploadFileOp() calling mtz2Pdbx() with %s %s\n" % (
-                inpFilePath, outFilePath))
+                    inpFilePath, outFilePath))
                 ok = dfa.mtz2Pdbx(inpFilePath, outFilePath, pdbxFilePath=None, logFilePath=logFilePath,
                                   diagsFilePath=diagsFilePath,
                                   dumpFilePath=dumpFilePath, timeout=timeOut)
