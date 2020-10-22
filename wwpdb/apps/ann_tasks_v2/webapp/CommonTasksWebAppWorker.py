@@ -2052,8 +2052,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                              'useversion': '1',
                              'usesaved': 'yes',
                              }
-        myD['exp-report'] = ''
-        myD['misc-report'] = ''
         #
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         aTagList = []
@@ -2103,14 +2101,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    report = '\n'.join(
+                    myD[cT] = '\n'.join(
                         pR.makeTabularReport(filePath=downloadPath, contentType='dcc-report', idCode=entryId,
                                              layout=layout))
 
-                    myD['exp-report'] += report
-                #else:
-                #    # myD[cT] = self.__getMessageTextWithMarkup('No X-ray experimental data check report.')
-                #    myD[cT] = self.__getMessageTextWithMarkup('')
+                else:
+                    # myD[cT] = self.__getMessageTextWithMarkup('No X-ray experimental data check report.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'geometry-check-report':
                 # Geometry report
                 ok = du.fetchId(entryId, contentType='geometry-check-report', formatType='pdbx', fileSource=fileSource,
@@ -2131,12 +2128,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    report = self.__getFileTextWithMarkup(downloadPath)
-                    if report:
-                        myD['misc-report'] += report
-                #else:
-                #    # myD[cT] = self.__getMessageTextWithMarkup('No miscellaneous issues.')
-                #    myD[cT] = self.__getMessageTextWithMarkup('')
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                else:
+                    # myD[cT] = self.__getMessageTextWithMarkup('No miscellaneous issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
             elif cT == 'format-check-report':
                 # Format check report
                 ok = du.fetchId(entryId, contentType='format-check-report', formatType='txt', fileSource=fileSource,
@@ -2188,14 +2183,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    report = self.__getFileTextWithMarkup(downloadPath)
-                    #myD[cT] = self.__getFileTextWithMarkup(downloadPath)
-                    if report:
-                        myD['misc-report'] += report
-                #else:
-                #    # myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
-                #    # Biocuration requested no message be returned
-                #
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+
+                else:
+                    # myD[cT] = self.__getMessageTextWithMarkup('No special positions.')
+                    # Biocuration requested no message be returned
+                    myD[cT] = ''
+
             elif cT == 'emd-xml-header-report':
                 # EMD XML header generation report
                 ok = du.fetchId(entryId, contentType='emd-xml-header-report', formatType='txt', fileSource=fileSource,
@@ -2203,12 +2197,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    report = self.__getFileTextWithMarkup(downloadPath)
-                    if report:
-                        myD['exp-report'] += report
-                #else:
-                #    # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
-                #    myD[cT] = self.__getMessageTextWithMarkup('')
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                else:
+                    # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
+                    myD[cT] = self.__getMessageTextWithMarkup('')
 
         for data_file in (('model', 'pdbx'),
                           ('model', 'pdb'),
@@ -2234,7 +2226,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         instance=instance)
         if ok:
             downloadPath = du.getWebPath()
-            myD['val_image'] = '<div class="container"><p><img src={} alt="validation slider "style="width:600px"></p></div><br />'.format(downloadPath)
+            myD[
+                'val_image'] = '<div class="container"><p><img src={} alt="validation slider "style="width:600px"></p></div><br />'.format(
+                downloadPath)
         else:
             myD['val_image'] = ''
 
