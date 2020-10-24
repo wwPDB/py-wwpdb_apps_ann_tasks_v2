@@ -2508,7 +2508,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                  'checkNext': 'dict-check-report-next',
                  'check-misc': 'misc-check-report',
                  'check-format': 'format-check-report',
-                 # 'check-geometry': 'geometry-check-report',
+                 'check-geometry': 'geometry-check-report',
                  'check-sf': 'dcc-report',
                  'check-special-position': 'special-position-report',
                  'cif2pdb': 'model-pdb',
@@ -2522,7 +2522,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                       'checkNext',
                       'check-format',
                       'check-misc',
-                      # 'check-geometry',
+                      'check-geometry',
                       'check-special-position',
                       'check-sf',
                       'check-emd-xml']
