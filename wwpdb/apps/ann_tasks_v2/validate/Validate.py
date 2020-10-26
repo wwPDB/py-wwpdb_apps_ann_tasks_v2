@@ -57,11 +57,11 @@ class Validate(SessionWebDownloadUtils):
     def run(self, entryId, modelInputFile=None, expInputFile=None, updateInput=True):
         """  Old entry point. Believed not in use...
         """
-        ret = self.runAll(entryId, modelInputFile=modelInputFile, reflnInputFile= expInputFile, updateInput=updateInput)
+        ret = self.runAll(entryId, modelInputFile=modelInputFile, reflnInputFile=expInputFile, updateInput=updateInput)
         return ret
 
     def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None, authorFscFile=None,
-               updateInput=True, annotationContext=False, validation_mode="annotate"):
+               restraintInputFile = None, updateInput=True, annotationContext=False, validation_mode="annotate"):
         """  Run the validation operation for all supported methods
         """
         uploadVersionOp = "none"
@@ -89,6 +89,12 @@ class Validate(SessionWebDownloadUtils):
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
+            if restraintInputFile is None:
+                restraintFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                resPath = os.path.join(self.__sessionPath, restraintFileName)
+            else:
+                resPath = os.path.join(self.__sessionPath, restraintInputFile)
+            #
             if volInputFile is None or not volInputFile:
                 volPath = pI.getEmVolumeFilePath(entryId, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
             else:
@@ -98,6 +104,7 @@ class Validate(SessionWebDownloadUtils):
             else:
                 authorFscPath = os.path.join(pI.getArchivePath(entryId), authorFscFile)
             #
+            # Will not look for restraint file
             #
             fName = pI.getFileName(entryId, contentType="validation-report", formatType="pdf", versionId=uploadVersionOp, partNumber='1')
             resultPdfPath = os.path.join(self.__sessionPath, fName)
@@ -143,11 +150,15 @@ class Validate(SessionWebDownloadUtils):
             if os.access(csPath, os.R_OK):
                 dp.addInput(name="cs_file_path", value=csPath)
 
+            if os.access(resPath, os.R_OK):
+                dp.addInput(name="nmr_restraint_file_path", value=csPath)
+
             if os.access(volPath, os.R_OK):
                 dp.addInput(name="vol_file_path", value=volPath)
 
             if os.access(authorFscPath, os.R_OK):
                 dp.addInput(name="fsc_file_path", value=authorFscPath)
+
             #
             if annotationContext:
                 dp.addInput(name='request_annotation_context', value="yes")
