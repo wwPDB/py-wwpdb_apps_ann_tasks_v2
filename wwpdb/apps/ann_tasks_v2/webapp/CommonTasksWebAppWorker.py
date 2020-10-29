@@ -725,16 +725,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 starFileName = None
             #
         # nmr-data trumps CS
+        pdbxResFile = None
         if (os.access(os.path.join(self._sessionPath, pdbxNmrDataFileName), os.R_OK)):
             pdbxCsFileName = pdbxNmrDataFileName
+            pdbxResFile = pdbxCsFileName
 
         if self._verbose:
             self._lfh.write(
-                "+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s volInputFile %s\n" %
-                (modelFileName, expFileName, pdbxCsFileName, volFileName))
+                "+CommonTasksWebAppWorker._valReportOp() calling runAll with modelInputFile %s reflnInputFile %s csInputFile %s restrainFile %s volInputFile %s\n" %
+                (modelFileName, expFileName, pdbxCsFileName, pdbxResFile, volFileName))
             #
         ok = calc.runAll(entryId, modelInputFile=modelFileName, reflnInputFile=expFileName, csInputFile=pdbxCsFileName,
-                         volInputFile=volFileName, authorFscFile=authorFscName, annotationContext=True)
+                         volInputFile=volFileName, authorFscFile=authorFscName, restraintInputFile=pdbxResFile,
+                         annotationContext=True)
 
         if (self._verbose):
             self._lfh.write("+CommonTasksWebAppWorker._valReportOp() status %r\n" % ok)

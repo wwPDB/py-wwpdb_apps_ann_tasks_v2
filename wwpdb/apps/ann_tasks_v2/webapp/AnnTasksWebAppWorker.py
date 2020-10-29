@@ -38,10 +38,12 @@ from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.expIoUtils.MtzTommCIF import MtzTommCIF
 from wwpdb.apps.ann_tasks_v2.expIoUtils.ReSetFreeRinSFmmCIF import ReSetFreeRinSFmmCIF
 from wwpdb.apps.ann_tasks_v2.related.Related import Related
+from wwpdb.apps.ann_tasks_v2.utils.GetCloseContact import GetCloseContact
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 from wwpdb.apps.ann_tasks_v2.utils.TlsRange import TlsRange
+from wwpdb.apps.ann_tasks_v2.utils.UpdateCloseContact import UpdateCloseContact
 
 from wwpdb.utils.session.WebRequest import ResponseContent
 from wwpdb.io.file.DataExchange import DataExchange
@@ -139,6 +141,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/ann_tasks_v2/list_em_maps': '_listEmMapsOp',
                            '/service/ann_tasks_v2/edit_em_map_header': '_editEmMapHeaderOp',
                            '/service/ann_tasks_v2/edit_em_map_header_responder': '_editEmMapHeaderResponderOp',
+                           '/service/ann_tasks_v2/get_close_contact_content': '_getCloseContactContentOp',
+                           '/service/ann_tasks_v2/update_close_contact_content': '_updateCloseContactContentOp',
                            'placeholder': '_dumpOp'
                            }
         self.addServices(self.__appPathD)
@@ -641,6 +645,66 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         rC.setHtmlText(self.__getNmrDiagnosticsHtmlText(entryId))
+
+        return rC
+
+    def _getCloseContactContentOp(self):
+        """ Read close contact information from coordinate model file
+        """
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._getCloseContactContentOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        fileName = self._reqObj.getValue("entryfilename")
+        entryId = self._reqObj.getValue("entryid")
+        #
+        calc = GetCloseContact(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        retD = calc.run(entryId, fileName)
+
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        rC.addDictionaryItems(cD=retD)
+
+        return rC
+
+    def _updateCloseContactContentOp(self):
+        """ Update selected close contact(s) as linkage(s) in coordinate model file
+        """
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._updateCloseContactContentOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        fileName = self._reqObj.getValue("entryfilename")
+        entryId = self._reqObj.getValue("entryid")
+        close_contact_list = []
+        close_contact_num_str = self._reqObj.getValue("total_close_contact_num")
+        if close_contact_num_str:
+            close_contact_num = int(close_contact_num_str)
+            for i in range(0, close_contact_num):
+                close_contact = self._reqObj.getValue("close_contact_" + str(i))
+                if close_contact:
+                    close_contact_list.append(close_contact)
+                #
+            #
+        #
+        if not close_contact_list:
+            rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+            rC.setReturnFormat("json")
+            rC.setError(errMsg="No record selected")
+            return rC
+        #
+        calc = UpdateCloseContact(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok = calc.run(entryId, fileName, close_contact_list)
+
+        if (self._verbose):
+            self._lfh.write("+AnnTasksWebAppWorker._updateCloseContactContentOp() status %r\n" % ok)
+
+        tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
+        #
+        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        tss.assign(name="Update link from close contact", formId="#review-close-contact-form", args="", completionFlag=ok, tagList=tagL, \
+                   entryId=entryId, entryFileName=fileName)
+        rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
 
