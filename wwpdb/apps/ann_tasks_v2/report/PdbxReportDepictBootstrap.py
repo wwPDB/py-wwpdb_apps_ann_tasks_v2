@@ -79,6 +79,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('struct_ref', 'Sequence reference', 'row-wise'),
                 ('struct_ref_seq', 'Sequence alignment details', 'row-wise'),
                 ('pdbx_struct_ref_seq_depositor_info', 'Depositors cross reference', 'row-wise'),
+                ('struct_ref_seq_dif', 'Sequence discrepancies', 'row-wise'),
                 ('pdbx_entity_nonpoly', 'Non-polymers', 'row-wise'),
                 ('pdbx_entity_instance_feature', 'Ligand of Interest', 'row-wise'),
                 ('pdbx_chem_comp_depositor_info', 'Depositor ligand info', 'row-wise'),

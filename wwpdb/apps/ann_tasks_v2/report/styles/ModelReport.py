@@ -813,6 +813,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_entity.pdbx_description', '%s', 'str', ''),
             ('_entity.formula_weight', '%s', 'str', ''),
             ('_entity.pdbx_number_of_molecules', '%s', 'str', ''),
+            ('_entity.pdbx_mutation', '%s', 'str', ''),
             ('_entity.details', '%s', 'str', ''),
             ('_entity.pdbx_nonpoly_type', '%s', 'str', '')
         ],
