@@ -2075,13 +2075,21 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = '\n'.join(
                         pR.makeTabularReport(filePath=downloadPath, contentType='model', idCode=entryId, layout=layout))
-
-                    downloadPath = du.getWebPath()
-                    myD['model-session'] = downloadPath
+                    pdb_id = pR.getPdbIdCode()
+                    if pdb_id:
+                        downloadPath = du.getWebPath()
+                        myD['model-session'] = downloadPath
+                        myD['molStar'] = """onLoad='display_mol_star(molecule_url="{}")'""".format(downloadPath)
+                        myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'
+                    else:
+                        myD['molStar'] = ''
+                        myD['molStar-display'] = 'no model available'
 
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup('No model data file.')
                     myD['model-session'] = ''
+                    myD['molStar'] = ''
+                    myD['molStar-display'] = 'no model available'
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
                                      'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
                 self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
