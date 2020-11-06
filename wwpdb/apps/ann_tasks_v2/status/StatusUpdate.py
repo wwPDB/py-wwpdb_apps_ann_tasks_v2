@@ -96,7 +96,7 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
             return False
 
-    def wfLoad(self, idCode, statusCode, annotatorInitials=None, initialDepositionDate=None, authRelCode=None, postRelStatusCode=None, 
+    def wfLoad(self, idCode, statusCode=None, annotatorInitials=None, initialDepositionDate=None, authRelCode=None, postRelStatusCode=None, 
                postRelRecvdCoord=None, postRelRecvdCoordDate=None):
         """
              c=WfDbApi(self.__lfh, self.__verbose)
@@ -119,7 +119,8 @@ class StatusUpdate(object):
                     self.__lfh.write("+StatusUpdate.__wfload() %r  %r\n" % (k, v))
 
             self.__savedStatusD = copy.deepcopy(rd)
-            rd['STATUS_CODE'] = statusCode
+            if statusCode is not None:
+                rd['STATUS_CODE'] = statusCode
 
             if postRelStatusCode is not None:
                 if len(postRelStatusCode) > 0:
@@ -186,10 +187,10 @@ class StatusUpdate(object):
             self.__savedStatusD = copy.deepcopy(rd)
             rd['STATUS_CODE_EMDB'] = statusCode
 
-            if ('TITLE_EMDB' in rd and (len(rd['TITLE_EMDB']) > 0)):
+            if ('TITLE_EMDB' in rd and rd['TITLE_EMDB'] is not None and (len(rd['TITLE_EMDB']) > 0)):
                 rd['TITLE'] = str(rd['TITLE']).replace("'", "''")
 
-            if ('AUTHOR_LIST_EMDB' in rd and (len(rd['AUTHOR_LIST_EMDB']) > 0)):
+            if ('AUTHOR_LIST_EMDB' in rd and rd['AUTHOR_LIST_EMDB'] is not None and (len(rd['AUTHOR_LIST_EMDB']) > 0)):
                 rd['AUTHOR_LIST_EMDB'] = str(rd['AUTHOR_LIST_EMDB']).replace("'", "''")
 
             if ((authRelCode is not None) and (len(authRelCode) > 2)):
@@ -211,9 +212,32 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
             return False
 
-    def setEmStatusDetails(self, inpFilePath, outFilePath, statusD, processSite, annotatorInitials, approvalType):
+
+    def setEmStatusDetails(self, inpFilePath, outFilePath, statusD, processSite=None, annotatorInitials=None, approvalType=None):
+        self.__lfh.write("\n+StatusUpdate.setEmStatusDetails() statuD %s, processSite %s, annotatorInitials %s, approvalType %s \n" %
+                         (statusD, processSite, annotatorInitials, approvalType))
+
+        try:
+            cList = self.__io.readFile(inpFilePath)
+            container = cList[0]
+
+            ok = self.__setEmStatusDetails(container, statusD=statusD, processSite=processSite, annotatorInitials=annotatorInitials, approvalType=approvalType)
+            if ok:
+                return self.__io.writeFile(outFilePath, cList)
+
+        except:
+            if (self.__verbose):
+                self.__lfh.write("+StatusUpdate.setEmStatusDetails() failed file %s outPath %s\n" %
+                                 (inpFilePath, outFilePath))
+                traceback.print_exc(file=self.__lfh)
+
+        return False
+
+
+    def __setEmStatusDetails(self, cObj, statusD, processSite=None, annotatorInitials=None, approvalType=None):
         """ Set selected status items in the em_admin data category represented as attributes in
             input dictionary --  Input dictionary assumed to have artificial "em_" key prefixes ---
+                                 keys starting em_depui are handled in em_depui category
         """
         #
         attributeNameList = ['entry_id',
@@ -228,9 +252,11 @@ class StatusUpdate(object):
                              'header_release_date',
                              'replace_existing_entry_flag',
                              'title']
+
+
+        depuiAttributeNameList = ['depositor_hold_instructions']
+
         try:
-            cList = self.__io.readFile(inpFilePath)
-            cObj = cList[0]
             dcObj = cObj.getObj('pdbx_database_status')
             if dcObj is not None:
                 #    _pdbx_database_status.pdbx_annotator
@@ -254,25 +280,26 @@ class StatusUpdate(object):
                 if dcObj.getAttributeIndex('author_approval_type') < 0:
                     dcObj.appendAttribute('author_approval_type')
 
-                if approvalType == 'unassigned':
-                    dcObj.setValue('.', attributeName='author_approval_type', rowIndex=0)
-                else:
-                    dcObj.setValue(approvalType, attributeName='author_approval_type', rowIndex=0)
+                if approvalType is not None:
+                    if approvalType == 'unassigned':
+                        dcObj.setValue('.', attributeName='author_approval_type', rowIndex=0)
+                    else:
+                        dcObj.setValue(approvalType, attributeName='author_approval_type', rowIndex=0)
 
-                if approvalType in ['implicit', 'unassigned']:
-                    recApprov = 'N'
-                else:
-                    recApprov = 'Y'
+                    if approvalType in ['implicit', 'unassigned']:
+                        recApprov = 'N'
+                    else:
+                        recApprov = 'Y'
 
-                if dcObj.getAttributeIndex('recvd_author_approval') < 0:
-                    dcObj.appendAttribute('recvd_author_approval')
-                dcObj.setValue(recApprov, attributeName='recvd_author_approval', rowIndex=0)
+                    if dcObj.getAttributeIndex('recvd_author_approval') < 0:
+                        dcObj.appendAttribute('recvd_author_approval')
+                    dcObj.setValue(recApprov, attributeName='recvd_author_approval', rowIndex=0)
 
-                if approvalType in ['implicit', 'explicit']:
-                    lt = time.strftime("%Y-%m-%d", time.localtime())
-                    if dcObj.getAttributeIndex('date_author_approval') < 0:
-                        dcObj.appendAttribute('date_author_approval')
-                    dcObj.setValue(str(lt), attributeName='date_author_approval', rowIndex=0)
+                    if approvalType in ['implicit', 'explicit']:
+                        lt = time.strftime("%Y-%m-%d", time.localtime())
+                        if dcObj.getAttributeIndex('date_author_approval') < 0:
+                            dcObj.appendAttribute('date_author_approval')
+                        dcObj.setValue(str(lt), attributeName='date_author_approval', rowIndex=0)
 
             dcObj = cObj.getObj('em_admin')
             if dcObj is None:
@@ -294,18 +321,47 @@ class StatusUpdate(object):
                 self.__lfh.write("+StatusUpdate.setEmStatusDetails() statusD %r\n" % statusD.items())
 
             for emKy in statusD.keys():
-                if emKy.startswith("em_"):
+                if emKy.startswith("em_") and not emKy.startswith("em_depui_"):
                     ky = emKy[3:]
                 else:
                     continue
                 if ky in kys:
                     dcObj.setValue(statusD[emKy], attributeName=ky, rowIndex=0)
 
+
+            dcObj = cObj.getObj('em_depui')
+            if dcObj is None:
+                newCat = DataCategory('em_depui')
+                for attributeName in depuiAttributeNameList:
+                    newCat.appendAttribute(attributeName)
+                if cObj is not None:
+                    cObj.append(newCat)
+                dcObj = cObj.getObj('em_depui')
+            else:
+                # handle incomplete categories --
+                for ky in depuiAttributeNameList:
+                    if not dcObj.hasAttribute(ky):
+                        dcObj.appendAttribute(ky)
+            #
+            kys = dcObj.getAttributeList()
+            if self.__debug:
+                self.__lfh.write("+StatusUpdate.setEmStatusDetails() em_depui kys %r\n" % kys)
+                self.__lfh.write("+StatusUpdate.setEmStatusDetails() statusD %r\n" % statusD.items())
+
+            for emKy in statusD.keys():
+                if emKy.startswith("em_depui_"):
+                    ky = emKy[9:]
+                else:
+                    continue
+                if ky in kys:
+                    dcObj.setValue(statusD[emKy], attributeName=ky, rowIndex=0)
+
+
             #
             if self.__debug:
                 self.__lfh.write("+StatusUpdate.setEmStatusDetails() before writefile \n")
                 dcObj.dumpIt(fh=self.__lfh)
-            return self.__io.writeFile(outFilePath, cList)
+            return True
 
         except:
             if (self.__verbose):
@@ -314,7 +370,33 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
         return False
 
+
     def set(self, inpFilePath, outFilePath, statusCode, approvalType, annotatorInitials, authReleaseCode=None, holdCoordinatesDate=None, expMethods=None, processSite=None, postRelStatusCode=None):
+        """ Set selected status items in the input model file """
+
+        #
+        self.__lfh.write("\n+StatusUpdate.set() statusCode %s approvalType %s initials %s authRelCode %s holdDate %s expMethod %r postRelStatusCode %s\n" %
+                         (statusCode, approvalType, annotatorInitials, authReleaseCode, holdCoordinatesDate, expMethods, postRelStatusCode))
+
+        try:
+            cList = self.__io.readFile(inpFilePath)
+            container = cList[0]
+
+            ok = self.__set(container, statusCode=statusCode, approvalType=approvalType, annotatorInitials=annotatorInitials, authReleaseCode=authReleaseCode, 
+                            holdCoordinatesDate=holdCoordinatesDate, expMethods=expMethods, processSite=processSite, postRelStatusCode=postRelStatusCode)
+            if ok:
+                return self.__io.writeFile(outFilePath, cList)
+
+        except:
+            if (self.__verbose):
+                self.__lfh.write("+StatusUpdate.__set() failed file %s statusCode %s approvalType %s outPath %s\n" %
+                                 (inpFilePath, statusCode, approvalType, outFilePath))
+                traceback.print_exc(file=self.__lfh)
+
+        return False
+
+
+    def __set(self, container, statusCode, approvalType, annotatorInitials, authReleaseCode=None, holdCoordinatesDate=None, expMethods=None, processSite=None, postRelStatusCode=None):
         """ Set selected status items in the input model file
 
         _pdbx_database_status.status_code                  (HPUB,REL,PROC,...)
@@ -324,12 +406,12 @@ class StatusUpdate(object):
         _pdbx_database_status.pdbx_annotator                XX
 
         """
-        #
-        self.__lfh.write("\n+StatusUpdate.set() statusCode %s approvalType %s initials %s authRelCode %s holdDate %s expMethod %r postRelStatusCode %s\n" %
+
+        self.__lfh.write("\n+StatusUpdate.__set() statusCode %s approvalType %s initials %s authRelCode %s holdDate %s expMethod %r postRelStatusCode %s\n" %
                          (statusCode, approvalType, annotatorInitials, authReleaseCode, holdCoordinatesDate, expMethods, postRelStatusCode))
+
+
         try:
-            cList = self.__io.readFile(inpFilePath)
-            container = cList[0]
             dcObj = container.getObj('pdbx_database_status')
             if dcObj is not None:
                 #
@@ -342,10 +424,10 @@ class StatusUpdate(object):
                         dcObj.appendAttribute('process_site')
                     dcObj.setValue(processSite, attributeName='process_site', rowIndex=0)
                 #
-                if dcObj.getAttributeIndex('status_code') < 0:
-                    dcObj.appendAttribute('status_code')
-                dcObj.setValue(statusCode, attributeName='status_code', rowIndex=0)
-
+                if statusCode and len(statusCode) > 1:
+                    if dcObj.getAttributeIndex('status_code') < 0:
+                        dcObj.appendAttribute('status_code')
+                    dcObj.setValue(statusCode, attributeName='status_code', rowIndex=0)
 
                 # 
                 if postRelStatusCode and len(postRelStatusCode) > 1:
@@ -358,7 +440,7 @@ class StatusUpdate(object):
                         dcObj.appendAttribute('status_code_sf')
                     dcObj.setValue(statusCode, attributeName='status_code_sf', rowIndex=0)
 
-                if expMethods is not None and self.__inMethod('NMR', expMethods):
+                if expMethods is not None and statusCode is not None and self.__inMethod('NMR', expMethods):
                     have_cs_data = dcObj.getValueOrDefault(attributeName='recvd_chemical_shifts', rowIndex=0, defaultValue='').upper()
                     if have_cs_data == "Y":
                         if dcObj.getAttributeIndex('status_code_cs') < 0:
@@ -380,19 +462,20 @@ class StatusUpdate(object):
                 if dcObj.getAttributeIndex('author_approval_type') < 0:
                     dcObj.appendAttribute('author_approval_type')
 
-                if approvalType == 'unassigned':
-                    dcObj.setValue('.', attributeName='author_approval_type', rowIndex=0)
-                else:
-                    dcObj.setValue(approvalType, attributeName='author_approval_type', rowIndex=0)
+                if approvalType is not None:
+                    if approvalType == 'unassigned':
+                        dcObj.setValue('.', attributeName='author_approval_type', rowIndex=0)
+                    else:
+                        dcObj.setValue(approvalType, attributeName='author_approval_type', rowIndex=0)
 
-                if approvalType in ['implicit', 'unassigned']:
-                    recApprov = 'N'
-                else:
-                    recApprov = 'Y'
+                    if approvalType in ['implicit', 'unassigned']:
+                        recApprov = 'N'
+                    else:
+                        recApprov = 'Y'
 
-                if dcObj.getAttributeIndex('recvd_author_approval') < 0:
-                    dcObj.appendAttribute('recvd_author_approval')
-                dcObj.setValue(recApprov, attributeName='recvd_author_approval', rowIndex=0)
+                    if dcObj.getAttributeIndex('recvd_author_approval') < 0:
+                        dcObj.appendAttribute('recvd_author_approval')
+                    dcObj.setValue(recApprov, attributeName='recvd_author_approval', rowIndex=0)
 
                 # If statusCode is REL when you come here, means that postRel entry - do not change approval date
                 if approvalType in ['implicit', 'explicit'] and statusCode != 'REL':
@@ -439,7 +522,7 @@ class StatusUpdate(object):
                 if self.__debug:
                     self.__lfh.write("+StatusUpdate.__set() before writefile \n")
                     dcObj.dumpIt(fh=self.__lfh)
-                return self.__io.writeFile(outFilePath, cList)
+                return True
             else:
                 return False
         except:
@@ -553,6 +636,48 @@ class StatusUpdate(object):
                                  (inpFilePath, outFilePath))
                 traceback.print_exc(file=self.__lfh)
             return False
+
+    def setBoth(self, inpFilePath, outFilePath, reqAccTypes, statusCode, statusD, approvalType, annotatorInitials, authReleaseCode=None, holdCoordinatesDate=None, expMethods=None, processSite=None, postRelStatusCode=None):
+        """ Set both PDB and EM statuses in model file based on requested accession types.  statusD containts the EM update"""
+
+        #
+        self.__lfh.write("\n+StatusUpdate.setBoth() reqtypes %s statusCode %s approvalType %s initials %s authRelCode %s holdDate %s expMethod %r postRelStatusCode %s statusD %s\n" %
+                         (reqAccTypes, statusCode, approvalType, annotatorInitials, authReleaseCode, holdCoordinatesDate, expMethods, postRelStatusCode, statusD))
+
+        hasPdb = False
+        hasEM = False
+        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:
+            hasPdb = True
+        if "EMDB" in reqAccTypes:
+            hasEM = True
+
+        try:
+            cList = self.__io.readFile(inpFilePath)
+            container = cList[0]
+
+            ok = True
+            if hasPdb:
+                ok = self.__set(container, statusCode=statusCode, approvalType=approvalType, annotatorInitials=annotatorInitials, authReleaseCode=authReleaseCode, 
+                                holdCoordinatesDate=holdCoordinatesDate, expMethods=expMethods, processSite=processSite, postRelStatusCode=postRelStatusCode)
+                self.__lfh.write("\n+StatusUpdate.setBoth() __set returns %s\n" % ok)
+
+            if ok and hasEM:
+                ok = self.__setEmStatusDetails(container, statusD=statusD, processSite=processSite, annotatorInitials=annotatorInitials, approvalType=approvalType)
+                self.__lfh.write("\n+StatusUpdate.setBoth() __setEmStatusDetails returns %s\n" % ok)
+
+
+            if ok:
+                self.__lfh.write("\n+StatusUpdate.setBoth() about to write file %s\n" % outFilePath)
+                return self.__io.writeFile(outFilePath, cList)
+
+        except:
+            if (self.__verbose):
+                self.__lfh.write("+StatusUpdate.__set() failed file %s statusCode %s approvalType %s outPath %s\n" %
+                                 (inpFilePath, statusCode, approvalType, outFilePath))
+                traceback.print_exc(file=self.__lfh)
+
+        return False
+
 
 
 if __name__ == '__main__':

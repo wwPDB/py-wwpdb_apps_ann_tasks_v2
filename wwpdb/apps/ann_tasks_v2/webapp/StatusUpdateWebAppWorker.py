@@ -99,7 +99,10 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                           '/service/status_update_tasks_v2/process_site_update': '_statusProcessSiteUpdateOp',
                           '/service/status_update_tasks_v2/set_idcode_em': '_setIdCodeFetchEmOp',
                           '/service/status_update_tasks_v2/status_code_update_em': '_statusCodeUpdateEmOp',
+                          # New service for updating 
+                          '/service/status_update_tasks_v2/other_update': '_statusUpdateOtherOp',
                           }
+
         self.addServices(self._appPathD)
         self.__debug = False
         self.__topPath = self._reqObj.getValue("TopPath")
@@ -219,12 +222,13 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat('html')
-        if ((pdbId is not None) and (len(pdbId) > 3)):
-            templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin.html")
-        elif ((emdbId is not None) and (len(emdbId) > 3)):
-            templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin_em.html")
-        else:
-            templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin.html")
+        templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin.html")
+#        if ((pdbId is not None) and (len(pdbId) > 3)):
+#            templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin.html")
+#        elif ((emdbId is not None) and (len(emdbId) > 3)):
+#            templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin_em.html")
+#        else:
+#            templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "status_admin.html")
         webIncludePath = os.path.join(self._reqObj.getValue("TopPath"), "htdocs")
         rC.setHtmlTextFromTemplate(templateFilePath=templateFilePath, webIncludePath=webIncludePath, parameterDict=myD, insertContext=True)
         if self.__debug:
@@ -1078,6 +1082,128 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         return rC
     #
+
+
+    def _statusUpdateOtherOp(self):
+        """ Update header including site, annotator, auth hold requests and date
+
+        """
+        self._getSession(useContext=True, overWrite=False)
+
+        idCode = self._reqObj.getValue('idcode')
+        if (self._verbose):
+            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOtherOp() starting with idCode %s\n" % idCode)
+        contentType = 'model'
+        formatType = 'pdbx'
+
+        #
+        newPdbStatus = self._reqObj.getValue("new-auth-status-code")
+        newPdbHoldDate = self._reqObj.getValue("auth-status-hold-date") # Could be empty
+        newEmStatus = self._reqObj.getValue("em_depui_depositor_hold_instructions")
+        newEmHoldDate = self._reqObj.getValue("em_map_hold_date")
+        newAnnotatorInitials = self._reqObj.getValue("annotator-initials")
+        newProcessSite = self._reqObj.getValue("process-site")
+        # also sent back
+        reqAccTypes = self._reqObj.getValue('reqacctypes')
+
+        # Saved away
+        expMethods = self._reqObj.getValue('experimental_methods')
+
+        logger.info("New PDB status :%s: Hold :%s:  EMDB status :%s: hold :%s:", newPdbStatus, newPdbHoldDate, newEmStatus, newEmHoldDate)
+        logger.info("New annotator :%s: and site :%s:", newAnnotatorInitials, newProcessSite)
+        logger.info("Req is %s", reqAccTypes)
+
+        msg = 'ok'
+        # If there are any policy decisions here is where they would be with msg changed
+
+
+        aTagList = []
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat('json')
+
+
+        # Return policy violation
+        if msg != 'ok':
+            rC.setError(errMsg=msg)
+            return rC
+
+        du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok = du.fetchId(idCode, contentType, formatType=formatType)
+        if ok:
+            # target input model file -
+            filePath = du.getDownloadPath()
+            webPath = du.getWebDownloadPath()
+            pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
+
+            pdbxArchivePath = pI.getModelPdbxFilePath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", versionId="next", mileStone=None)
+            pdbxFileName = pI.getFileName(dataSetId=idCode, wfInstanceId=None, contentType='model', formatType='pdbx',
+                                          fileSource="archive", versionId="next", partNumber='1', mileStone=None)
+            if (self._verbose):
+                self._lfh.write("+StatusUpdateWebAppWorker.__statusUpdateOtherOpeOp() model input path %s model archive output path %s\n" %
+                                (filePath, pdbxArchivePath))
+
+            # filePath is session directory
+
+            # Setup em status setting
+            kyPairListEm = [('em_map_hold_date', 'em_map_hold_date'),
+                            ("em_depui_depositor_hold_instructions", "em_depui_depositor_hold_instructions")
+            ]
+            statusD = {}
+            for kyPair in kyPairListEm:
+                statusD[kyPair[0]] = self._reqObj.getValue(kyPair[0])
+
+            # wfload - only load PDB portion....
+            sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+
+            ok1 = False
+            ok2 = False
+            ok1 = sU.wfLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=newPdbStatus)
+            if (self._verbose):
+                self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() wf load completed %r\n" % ok1)
+
+
+            # Differentiate experimental types XXXX
+
+            # PDB code
+            if ok1:
+                ok2 = sU.setBoth(filePath, filePath, reqAccTypes, statusCode=None, statusD=statusD, approvalType=None, annotatorInitials=newAnnotatorInitials, 
+                             authReleaseCode=newPdbStatus, holdCoordinatesDate=newPdbHoldDate, processSite=newProcessSite,
+                             expMethods=expMethods)
+                self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateOtherOp() set completed %r\n" % ok2)
+                    
+            if ok1 and ok2:
+                # Copy to archive
+                shutil.copyfile(filePath, pdbxArchivePath)
+
+                # Fetch again
+                du.fetchId(idCode, 'model', formatType='pdbx')
+                aTagList.append(du.getAnchorTag())
+                rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ','.join(aTagList))
+                rC.setStatus(statusMsg="Status updated")
+
+                myD = {}
+                myD['authrelcode'] = newPdbStatus
+                myD['holdcoordinatesdate'] = newPdbHoldDate
+                myD['process_site'] = newProcessSite
+                myD['annotator_initials'] = newAnnotatorInitials
+                myD['em_depui_depositor_hold_instructions'] = newEmStatus
+                myD['em_map_hold_date'] = newEmHoldDate 
+
+                for k, v in myD.items():
+                    rC.set(k, v)
+                self._saveSessionParameter(pvD=myD)
+
+            else:
+                rC.setError(errMsg='Update failed.')
+
+
+        else:
+            rC.setError(errMsg='Status update failed, data file cannot be accessed.')
+            # do nothing
+
+
+        return rC
+
     def __getFileTextWithMarkup(self, downloadPath):
         """  Internal methods used by _makeCheckReports()
         """
