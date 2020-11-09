@@ -90,6 +90,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                           '/service/status_update_tasks_v2/start': '_startOp',
                           #
                           '/service/status_update_tasks_v2/set_idcode': '_setIdCodeFetchModelOp',
+                          # Deprecated, to be removed
                           '/service/status_update_tasks_v2/status_code_update': '_statusCodeUpdateOp',
                           '/service/status_update_tasks_v2/status_reload': '_statusReloadOp',
                           '/service/status_update_tasks_v2/inline_fileops': '_statusInlineFileOps',
@@ -101,6 +102,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                           '/service/status_update_tasks_v2/status_code_update_em': '_statusCodeUpdateEmOp',
                           # New service for updating 
                           '/service/status_update_tasks_v2/other_update': '_statusUpdateOtherOp',
+                          '/service/status_update_tasks_v2/status_code_update_v2': '_statusCodeUpdateV2Op',
                           }
 
         self.addServices(self._appPathD)
@@ -1162,6 +1164,9 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() wf load completed %r\n" % ok1)
 
 
+            # XXX
+            #ok3a = sU.wfEmLoad(idCode, statusCode=statusD['em_current_status'], title=statusD['em_title'], annotatorInitials=annotatorInitials)
+
             # Differentiate experimental types XXXX
 
             # PDB code
@@ -1203,6 +1208,250 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
 
         return rC
+
+    # --------------------------------------------------------------------------------------------------------------------------------
+    #                      File production options implementing JSON responses -
+    #
+    #
+    def _statusCodeUpdateV2Op(self):
+        """ Status code updates on data files identified by id and type. Combined EM and PDB operation
+        """
+        self._getSession(useContext=True)
+
+        idCode = self._reqObj.getValue('idcode')
+        if (self._verbose):
+            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateV2Op() starting with idCode %s\n" % idCode)
+        contentType = 'model'
+        formatType = 'pdbx'
+        newHistoryFile = False
+
+        # Values from the input form --
+        #
+        statusCode = self._reqObj.getValue('status-code')
+        approvalType = self._reqObj.getValue('approval-type')
+        # Only sent in postrel situration
+        postRelStatusCode = self._reqObj.getValue('postrel-status-code')
+
+        annotatorInitials = self._reqObj.getValue('cur-annotator-initials')
+        # authStatusHoldDate = self._reqObj.getValue('auth-status-hold-date')
+        # authStatusCode = self._reqObj.getValue('auth-status-code')
+        # processSite = self._reqObj.getValue('process-site')
+        #
+        #  Values from the current version of the model file --
+        #
+        orgStatusCode = self._reqObj.getValue('statuscode')
+        orgPostRelStatusCode = self._reqObj.getValue('postrelstatuscode')
+        orgInitialDepositionDate = self._reqObj.getValue('initialdepositdate')
+        orgHoldCoordinatesDate = self._reqObj.getValue('holdcoordinatesdate')
+        orgCoordinatesDate = self._reqObj.getValue('coordinatesdate')
+        orgAuthRelCode = self._reqObj.getValue('authrelcode')
+        orgPostRelRecvdCoord = self._reqObj.getValue('postrelrecvdcoord')
+        orgPostRelRecvdCoordDate = self._reqObj.getValue('postrelrecvdcoorddate')
+        orgEmStatus = self._reqObj.getValue('em_current_status')
+        orgEmAuthStatus = self._reqObj.getValue('em_depui_depositor_hold_instructions')
+        #
+        expMethods = self._reqObj.getValue('experimental_methods')
+        #
+        reqAccTypes = self._reqObj.getValue('reqacctypes')
+        #
+
+        # Em related - note we pull "new" status code
+        kyPairListEm = [     
+            ('em_current_status', 'em_new_status')
+        ]
+
+        statusD = {}
+        emdbId = self._reqObj.getValue('emdb_id')
+        for kyPair in kyPairListEm:
+            statusD[kyPair[0]] = self._reqObj.getValue(kyPair[1])
+
+        #
+        # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
+        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s" % (orgStatusCode, statusCode, 
+                                                                                   orgPostRelStatusCode, postRelStatusCode))
+
+        if (self._verbose):
+            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateV2Op() statusD %r\n" % statusD.items())
+
+
+        hasPdb = False
+        hasEM = False
+        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:
+            hasPdb = True
+        if "EMDB" in reqAccTypes:
+            hasEM = True
+
+
+        msg = 'ok'
+        # Test if any conditions are violated
+        #
+
+        if hasPdb:
+            if ((str(statusCode).upper() == 'HPUB') and (str(authStatusCode).upper() == 'HOLD')):
+                # ((str(statusCode).upper() == 'HOLD') and (str(authStatusCode).upper() == 'HPUB')):
+                msg = 'Processing status code and author release status are inconsistent'
+
+            if ((str(orgStatusCode).upper() == 'PROC') and (str(statusCode).upper() in ['HPUB', 'HOLD'])):
+                msg = 'Processing status code change from PROC to HPUB or HOLD prohibited'
+
+            if str(orgStatusCode).upper() =='REL':
+                if len(orgPostRelStatusCode) == 0:
+                    msg = 'Processing status code change from REL prohibited'
+                else:
+                    # Web form does not set in this case
+                    statusCode='REL'
+
+            if str(orgStatusCode).upper() =='OBS':
+                msg = 'Processing status code change from OBS prohibited'
+
+
+        if hasEM and msg == 'ok':
+            newEmStatus = statusD['em_current_status']
+            if ((str(orgEmStatus).upper() == 'PROC') and (str(newEmStatus).upper() in ['HPUB', 'HOLD'])):
+                msg = 'EM processing status code change from PROC to HPUB or HOLD prohibited'
+
+            if ((str(newEmStatus).upper() == 'HPUB') and (str(orgEmAuthStatus).upper() == 'HOLD')):
+                # ((str(statusCode).upper() == 'HOLD') and (str(authStatusCode).upper() == 'HPUB')):
+                msg = 'Processing status code and author release status are inconsistent'
+
+
+
+        if (self._verbose):
+            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpateOp() id %s check status message is: %s\n" % (idCode, msg))
+        #
+
+        aTagList = []
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat('json')
+        #
+        if msg != 'ok':
+            rC.setError(errMsg=msg)
+            return rC
+
+
+
+        # Update status history
+        if hasPdb:
+            try:
+                #   Update status history - first create a new history file if required.
+                shu = StatusHistoryUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+                if statusCode in ['AUTH', 'WAIT']:
+                    rL = shu.createHistory([idCode], overWrite=False, statusUpdateAuthWait=statusCode)
+                else:
+                    rL = shu.createHistory([idCode], overWrite=False)
+                if len(rL) > 0:
+                    if (self._verbose):
+                        newHistoryFile = True
+                        self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() %s new status history file created\n" % idCode)
+            except:
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() %s status history file create failed with exception\n" % idCode)
+                    traceback.print_exc(file=self._lfh)
+
+
+        # Ok - cleared for operation
+
+        du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok = du.fetchId(idCode, contentType, formatType=formatType)
+        if ok:
+            # target input model file -
+            filePath = du.getDownloadPath()
+            webPath = du.getWebDownloadPath()
+            pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
+
+            pdbxArchivePath = pI.getModelPdbxFilePath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", versionId="next", mileStone=None)
+            pdbxFileName = pI.getFileName(dataSetId=idCode, wfInstanceId=None, contentType='model', formatType='pdbx',
+                                          fileSource="archive", versionId="next", partNumber='1', mileStone=None)
+            if (self._verbose):
+                self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() model input path %s model archive output path %s\n" %
+                                (filePath, pdbxArchivePath))
+
+            sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+
+            ok1 = True
+            if hasPdb:
+                ok1 = sU.wfLoad(idCode, statusCode, initialDepositionDate=orgInitialDepositionDate, postRelStatusCode=postRelStatusCode, postRelRecvdCoord=orgPostRelRecvdCoord, postRelRecvdCoordDate=orgPostRelRecvdCoordDate)
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() wf load completed %r\n" % ok1)
+
+            ok1a = True
+            if hasEM:
+                ok1a = sU.wfEmLoad(idCode, statusCode=statusD['em_current_status'], annotatorInitials=annotatorInitials)
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateEmOp() database status.deposition update completed %r\n" % ok1a)
+
+
+            if ok1 and ok1a:
+                ok2 = sU.setBoth(filePath, filePath, reqAccTypes, statusCode, statusD, approvalType, annotatorInitials=None, expMethods=expMethods,
+                                 postRelStatusCode=postRelStatusCode)
+                if ok2:
+                    shutil.copyfile(filePath, pdbxArchivePath)
+
+                # Regardless, kill WF
+                status1 = killAllWF(idCode, 'statMod')
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() killallwf returns %r\n" % status1)
+
+                ok3 = sU.dbLoad(filePath)
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() data file status update completed %r\n" % ok3)
+                if ok2 & ok3:
+                    du.fetchId(idCode, 'model', formatType='pdbx')
+                    aTagList.append(du.getAnchorTag())
+                    rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ','.join(aTagList))
+                    rC.setStatus(statusMsg="Status updated")
+                    rC.set("statuscode", statusCode)
+                    #
+                    # Update internal context for return to client
+                    myD = {}
+                    if hasPdb:
+                        myD['statuscode'] = statusCode
+                    if hasEM:
+                        myD['em_current_status'] = statusD['em_current_status']
+                    myD['approval_type'] = approvalType
+                    myD['initialdepositdate'] = orgInitialDepositionDate
+                    myD['postrelstatuscode'] = postRelStatusCode
+                    myD['emdb_id'] = emdbId
+
+                    for k, v in myD.items():
+                        rC.set(k, v)
+                    self._saveSessionParameter(pvD=myD)
+                    try:
+                        okShLoad = False
+                        shu = StatusHistoryUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                        okShUpdate = shu.updateEntryStatusHistory(
+                            entryIdList=[idCode],
+                            statusCode=statusCode,
+                            annotatorInitials=annotatorInitials,
+                            details="Update by status module",
+                            statusCodePrior=orgStatusCode)
+                        if (self._verbose):
+                            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() %s status history file update status %r newHistoryFile %r\n" % (idCode, okShUpdate, newHistoryFile))
+                        if okShUpdate or newHistoryFile:
+                            okShLoad = shu.loadEntryStatusHistory(entryIdList=[idCode])
+                        if (self._verbose):
+                            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() %s status history database load status %r\n" % (idCode, okShLoad))
+                    except:
+                        if (self._verbose):
+                            self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() %s status history update and database load failed with exception\n")
+                            traceback.print_exc(file=self._lfh)
+                    #
+                else:
+                    rC.setError(errMsg='Data file status update failed.')
+                    if ok1 or ok1a:
+                        okRb = sU.wfRollBack(idCode=idCode)
+                        if not okRb:
+                            rC.setError(errMsg='Data file status update failed and workflow status roll back failed.')
+                        else:
+                            rC.setError(errMsg='Data file status update failed and workflow status rolled back.')
+            else:
+                rC.setError(errMsg='WF status database update failed.')
+        else:
+            rC.setError(errMsg='Status update failed, data file cannot be accessed.')
+            # do nothing
+
+        return rC
+    #
 
     def __getFileTextWithMarkup(self, downloadPath):
         """  Internal methods used by _makeCheckReports()
