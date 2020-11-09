@@ -1341,8 +1341,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             rC.setError(errMsg=msg)
             return rC
 
-
-
         # Update status history
         if hasPdb:
             try:
@@ -1394,6 +1392,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateEmOp() database status.deposition update completed %r\n" % ok1a)
 
 
+            ok2 = False
+            ok3 = False
             if ok1 and ok1a:
                 ok2 = sU.setBoth(filePath, filePath, reqAccTypes, statusCode, statusD, approvalType, annotatorInitials=None, expMethods=expMethods,
                                  postRelStatusCode=postRelStatusCode)
@@ -1408,7 +1408,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 ok3 = sU.dbLoad(filePath)
                 if (self._verbose):
                     self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() data file status update completed %r\n" % ok3)
-                if ok2 & ok3:
+                if ok2 and ok3:
                     du.fetchId(idCode, 'model', formatType='pdbx')
                     aTagList.append(du.getAnchorTag())
                     rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ','.join(aTagList))
@@ -1459,6 +1459,54 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                             rC.setError(errMsg='Data file status update failed and workflow status rolled back.')
             else:
                 rC.setError(errMsg='WF status database update failed.')
+                return rC
+
+            # If no errors and EM - check header
+            if ok1 and ok1a and ok2 and ok3 and hasEM:
+                self._lfh.write("About to do xml header\n")
+                emdFilePath = du.getFilePath(idCode, contentType='model-emd', formatType='pdbx', fileSource='session-download', versionId='latest')
+                emdbLogPath = os.path.join(self._sessionPath, 'cif2emdbxml.log')
+                emdbFilePath = du.getFilePath(idCode, contentType='em-volume-header', formatType='xml', fileSource='session', versionId='latest')
+                # 
+                # Clear out existing log file - so we get new errors only - not repeats
+                if os.path.exists(emdbLogPath):
+                    os.remove(emdbLogPath)
+                #
+                # Create emd flavored file - no title suppression
+                headerFilters = []
+
+                emhu = EmHeaderUtils(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
+                emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
+                #
+                # Create XML file
+                ok3c = emhu.transHeader(emdFilePath, emdbFilePath, emdbLogPath)
+                #
+                du.copyToDownload(emdFilePath)
+                aTagList.append(du.getAnchorTag())
+
+                ok5 = False
+                if ok3c and os.access(emdbFilePath, os.R_OK):
+                    du.copyToDownload(emdbFilePath)
+                    aTagList.append(du.getAnchorTag())
+                    ok5 = True
+                    #
+                else:
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateEmOp() NO HEADER FILE CREATED %s" % emdbFilePath)
+                #
+                du.copyToDownload(emdbLogPath)
+                aTagList.append(du.getAnchorTag())
+                #
+                #
+                #
+                rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ', '.join(aTagList))
+                htmlText = self.__getFileTextWithMarkup(emdbLogPath)
+                rC.setHtmlText(htmlText)
+
+                if ok5:
+                    rC.setStatus(statusMsg="Status updated - header file produced")
+                else:
+                    rC.setError(errMsg="Status updated - no header file produced")
+
         else:
             rC.setError(errMsg='Status update failed, data file cannot be accessed.')
             # do nothing
