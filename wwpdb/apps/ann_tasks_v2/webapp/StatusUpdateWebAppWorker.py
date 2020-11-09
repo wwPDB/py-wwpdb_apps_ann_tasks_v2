@@ -1115,6 +1115,13 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         logger.info("New annotator :%s: and site :%s:", newAnnotatorInitials, newProcessSite)
         logger.info("Req is %s", reqAccTypes)
 
+        hasPdb = False
+        hasEM = False
+        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:
+            hasPdb = True
+        if "EMDB" in reqAccTypes:
+            hasEM = True
+
         msg = 'ok'
         # If there are any policy decisions here is where they would be with msg changed
 
@@ -1154,29 +1161,35 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             for kyPair in kyPairListEm:
                 statusD[kyPair[0]] = self._reqObj.getValue(kyPair[0])
 
-            # wfload - only load PDB portion....
             sU = StatusUpdate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
 
             ok1 = False
+            ok1a = False
             ok2 = False
-            ok1 = sU.wfLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=newPdbStatus)
-            if (self._verbose):
-                self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() wf load completed %r\n" % ok1)
+
+            if hasPdb:
+                ok1 = sU.wfLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=newPdbStatus)
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() wf load completed %r\n" % ok1)
+            else:
+                ok1 = True
 
 
-            # XXX
-            #ok3a = sU.wfEmLoad(idCode, statusCode=statusD['em_current_status'], title=statusD['em_title'], annotatorInitials=annotatorInitials)
+            if hasEM and ok1:
+                ok1a = sU.wfEmLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=statusD["em_depui_depositor_hold_instructions"])
+                if (self._verbose):
+                    self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() EM wf load completed %r\n" % ok1a)
+            else:
+                ok1a = True
 
-            # Differentiate experimental types XXXX
 
-            # PDB code
-            if ok1:
+            if ok1 and ok1a:
                 ok2 = sU.setBoth(filePath, filePath, reqAccTypes, statusCode=None, statusD=statusD, approvalType=None, annotatorInitials=newAnnotatorInitials, 
                              authReleaseCode=newPdbStatus, holdCoordinatesDate=newPdbHoldDate, processSite=newProcessSite,
                              expMethods=expMethods)
                 self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateOtherOp() set completed %r\n" % ok2)
                     
-            if ok1 and ok2:
+            if ok1 and ok1a and ok2:
                 # Copy to archive
                 shutil.copyfile(filePath, pdbxArchivePath)
 
