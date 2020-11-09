@@ -168,7 +168,7 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
             return False
 
-    def wfEmLoad(self, idCode, statusCode, title=None, authRelCode=None, annotatorInitials=None):
+    def wfEmLoad(self, idCode, statusCode=None, title=None, authRelCode=None, annotatorInitials=None):
         """
              c=WfDbApi(self.__lfh, self.__verbose)
              rd = c.getObject('D_1100200206')
@@ -185,7 +185,9 @@ class StatusUpdate(object):
             c = WfDbApi(self.__lfh, self.__verbose)
             rd = c.getObject(idCode)
             self.__savedStatusD = copy.deepcopy(rd)
-            rd['STATUS_CODE_EMDB'] = statusCode
+
+            if statusCode is not None and len(statusCode) > 0:
+                rd['STATUS_CODE_EMDB'] = statusCode
 
             if ('TITLE_EMDB' in rd and rd['TITLE_EMDB'] is not None and (len(rd['TITLE_EMDB']) > 0)):
                 rd['TITLE'] = str(rd['TITLE']).replace("'", "''")
