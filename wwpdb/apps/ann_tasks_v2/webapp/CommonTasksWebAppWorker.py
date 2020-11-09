@@ -2666,7 +2666,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         ('em_title', 'em_title'),
                         ('em_header_release_date', 'em_header_release_date')
                         ]
+
+        # Limit what is returned
+        kyPairListEmDepui = [
+                             # ('em_depui_entry_id', 'em_depui_entry_id'),
+                             ('em_depui_depositor_hold_instructions', 'em_depui_depositor_hold_instructions'),
+                             # ('em_depui_macromolecule_description', 'em_depui_macromolecule_description'),
+                             # ('em_depui_obsolete_instructions', 'em_depui_obsolete_instructions'),
+                             # ('em_depui_same_authors_as_pdb', 'em_depui_same_authors_as_pdb'),
+                             # ('em_depui_same_title_as_pdb', 'em_depui_same_title_as_pdb')
+                         ]
+
         kyPairList.extend(kyPairListEm)
+        kyPairList.extend(kyPairListEmDepui)
         #
         if (self._verbose):
             self._lfh.write("+CommonTasksWebAppWorker._entryInfoOp() starting\n")
@@ -2717,6 +2729,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             oD = pdbxI.getInfoD(contextType='info')
             if (('emdb_id' in oD) and (oD['emdb_id'] is not None) and (len(oD['emdb_id']) > 0)):
                 oD.update(pdbxI.getInfoD(contextType='em_admin'))
+                oD.update(pdbxI.getInfoD(contextType='em_depui'))
             #
             for kyPair in kyPairList:
                 if kyPair[1] in oD:
