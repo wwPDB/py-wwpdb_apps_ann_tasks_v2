@@ -843,7 +843,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         'entity_poly': [
             ('_entity_poly.entity_id', '%s', 'str', ''),
             ('_entity_poly.type', '%s', 'str', ''),
-            ('_entity_poly.pdbx_chain_id', '%s', 'str', ''),
+            ('_entity_poly.pdbx_strand_id', '%s', 'str', ''),
             # ('_entity_poly.nstd_linkage', '%s', 'str', ''),
             # ('_entity_poly.nstd_monomer', '%s', 'str', ''),
             ('_entity_poly.pdbx_seq_one_letter_code', '%s', 'str', ''),
