@@ -125,6 +125,17 @@ class PdbxReportIo(PdbxStyleIoUtil):
         except Exception as e:
             return ''
 
+    def getContourLevelMap(self, mapId='primary'):
+        """ Return the contour level for a given map
+        """
+        try:
+            cObj = self.getCurrentContainer()
+            catObj = cObj.getObj('em_map')
+            vals = catObj.selectValuesWhere('contour_level', mapId, 'type')
+            return self._firstOrDefault(vals, default='')
+        except Exception as e:
+            return ''
+
 
 class PdbxGeometryReportIo(PdbxStyleIoUtil):
     """ Methods for reading PDBx geometry data files for reporting applications including style details.

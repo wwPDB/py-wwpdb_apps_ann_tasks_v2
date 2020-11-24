@@ -64,6 +64,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         elif self.__st.getStyleId() in ['PDBX_REPORT_V1'] :
             self.__reportCategories = [
                 ('exptl', 'Experimental', 'row-wise'),
+                ('pdbx_database_status', 'PDB Status', 'row-wise'),
                 ('em_admin', 'EM admin', 'row-wise'),
                 ('em_experiment', 'EM experiment', 'row-wise'),
                 ('database_PDB_caveat', 'Caveat', 'row-wise'),
@@ -87,7 +88,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('pdbx_struct_assembly', 'Assembly Details', 'row-wise'),
                 ('pdbx_struct_assembly_depositor_info', 'Author Assembly Details', 'row-wise'),
                 ('pdbx_struct_assembly_auth_evidence', 'Author Assembly Evidence', 'row-wise'),
-                #('pdbx_database_status', 'Status', 'column-wise'),
                 #('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),
                 ('pdbx_SG_project', 'Structural genomics', 'row-wise'),
                 ('pdbx_database_related', 'Related entries', 'row-wise'),
