@@ -1300,7 +1300,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         #
 
         if hasPdb:
-            if ((str(statusCode).upper() == 'HPUB') and (str(authStatusCode).upper() == 'HOLD')):
+            if ((str(statusCode).upper() == 'HPUB') and (str(orgAuthRelCode).upper() == 'HOLD')):
                 # ((str(statusCode).upper() == 'HOLD') and (str(authStatusCode).upper() == 'HPUB')):
                 msg = 'Processing status code and author release status are inconsistent'
 
