@@ -132,7 +132,10 @@ class StatusUpdate(object):
                 rd['ANNOTATOR_INITIALS'] = annotatorInitials
 
             if ('TITLE' in rd and (len(rd['TITLE']) > 0)):
+                maxlen = 370
                 rd['TITLE'] = str(rd['TITLE']).replace("'", "''")
+                if len(rd['TITLE']) > maxlen:
+                    rd['TITLE'] = rd['TITLE'][0:maxlen]
             if ('AUTHOR_LIST' in rd and (len(rd['AUTHOR_LIST']) > 0)):
                 rd['AUTHOR_LIST'] = str(rd['AUTHOR_LIST']).replace("'", "''")
 
