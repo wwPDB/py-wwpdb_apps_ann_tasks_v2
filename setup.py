@@ -48,8 +48,7 @@ setup(
                       'wwpdb.utils.wf ~= 0.13', 'wwpdb.utils.session',
                       'mmcif >= 0.25',
                       'wwpdb.utils.dp ~= 0.19', 'wwpdb.utils.detach',
-                      'mmcif.utils ~= 0.22', 'matplotlib', 'pygal',
-                      'wwpdb.apps.validation ~= 2.3'],
+                      'mmcif.utils ~= 0.22', 'matplotlib', 'pygal'],
     packages=find_packages(exclude=['wwpdb.apps.tests-ann', 'mock-data']),
     # Enables Manifest to be used
     #include_package_data = True,
@@ -64,6 +63,7 @@ setup(
     #
     # Not configured ...
     extras_require={
+        'buster': ['wwpdb.apps.validation ~= 2.3'],
         'dev': ['check-manifest'],
         'test': ['coverage'],
     },
