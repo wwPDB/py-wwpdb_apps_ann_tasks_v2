@@ -117,7 +117,7 @@ class CoordEditorUpdate(object):
             dp.imp(os.path.join(self.__sessionPath, self.__entryId + "_index.cif"))
             dp.addInput(name="select", value=os.path.join(self.__sessionPath, self.__entryId + "_select.cif"))
             dp.op("annot-check-select-number")
-            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_check.log"))
+            dp.expLog(dstPath=os.path.join(self.__sessionPath, self.__entryId + "_check.log"), appendMode=False)
             dp.cleanup()
             #
             return self.__readLogFile('_check.log', 'Run numbering checking failed')
@@ -136,7 +136,7 @@ class CoordEditorUpdate(object):
             dp.addInput(name="assign", value=os.path.join(self.__sessionPath, self.__entryId + "_select.cif"))
             dp.op("annot-update-molecule")
             dp.exp(os.path.join(self.__sessionPath, self.__entryFile))
-            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_update.log"))
+            dp.expLog(dstPath=os.path.join(self.__sessionPath, self.__entryId + "_update.log"), appendMode=False)
             dp.cleanup()
             #
             return self.__readLogFile('_update.log', 'Update failed!')

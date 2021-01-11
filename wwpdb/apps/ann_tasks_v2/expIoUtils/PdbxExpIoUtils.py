@@ -111,30 +111,49 @@ class PdbxExpFileIo(object):
 
         return False
 
+    def __getUniqueList(self, num):
+        letterList = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", \
+                       "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" ]
+        #
+        uniqueList = []
+        uniqueList.append("")
+        found = False
+        start = 0
+        while True:
+            end = len(uniqueList)
+            for letterCode in letterList:
+                for ii in range(start, end):
+                    uniqueList.append(uniqueList[ii] + letterCode)
+                    if len(uniqueList) > num:
+                        found = True
+                        break
+                    #
+                #
+                if found:
+                    break
+                #
+            #
+            if found:
+                break
+            #
+            start = end
+        #
+        return uniqueList
+
     def updateContainerNames(self,idCode,containerList):
         try:
+            suffixList = self.__getUniqueList(len(containerList) + 1)
             for ii,container in enumerate(containerList):
-                if ii < 1:
-                    cName='r'+str(idCode).lower()+'sf'
-                else:
-                    rem = int((ii -1)/26)
-                    mod = (ii -1) % 26
-                    opt = ""
-                    if sys.version_info[0] > 2:
-                        if rem > 0:
-                            opt = str(chr(rem+64))
-                        cName='r'+str(idCode).lower()+str(chr(mod+65))+opt+'sf'
-                    else:
-                        if rem > 0:
-                            opt = str(unichr(rem+64))
-                        cName='r'+str(idCode).lower()+str(unichr(mod+65))+opt+'sf'
+                cName = "r" + str(idCode).lower() + suffixList[ii] + "sf"
                 container.setName(cName)
+            #
             return True
         except:
             if (self.__verbose):
                 traceback.print_exc(file=self.__lfh)
+            #
+        #
         return False
-            
 
     def updateEntryIds(self,idCode,containerList):
         catNameList=[('cell','entry_id'),('entry','id'),('symmetry','entry_id')]
