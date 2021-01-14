@@ -2226,7 +2226,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 downloadPath = du.getDownloadPath()
                 dTagList.append(du.getAnchorTag())
                 data_file_report = '-report'.format(data_file[0])
-                myD[data_file_report] = self.__getFileTextWithMarkup(downloadPath)
+                # myD[data_file_report] = self.__getFileTextWithMarkup(downloadPath)
+                myD[data_file_report] = self.__getMessageTextWithMarkup(downloadPath)
 
         if len(dTagList) > 0:
             myD[
@@ -2251,7 +2252,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if ok:
                 downloadPath = du.getDownloadPath()
                 vTagList.append(du.getAnchorTag())
-                myD[val_file[0]] = self.__getFileTextWithMarkup(downloadPath)
+                # myD[val_file[0]] = self.__getFileTextWithMarkup(downloadPath)
+                myD[val_file[0]] = self.__getMessageTextWithMarkup(downloadPath)
 
         if len(vTagList) > 0:
             myD[
