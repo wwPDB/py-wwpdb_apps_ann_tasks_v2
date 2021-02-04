@@ -2242,7 +2242,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 'em_image'] = '<div class="container"><p><img src={} alt="EM image "style="width:600px"></p></div><br />'.format(
                 downloadPath)
         else:
-            myD['val_image'] = ''
+            myD['em_image'] = ''
 
         ok = du.fetchId(entryId, contentType='validation-report-slider', formatType='png', fileSource=fileSource,
                         instance=instance)
