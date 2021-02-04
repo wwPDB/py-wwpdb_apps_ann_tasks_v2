@@ -2234,6 +2234,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 'data-downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(
                 dTagList)
 
+        ok = du.fetchId(entryId, contentType='img-emdb', formatType='png', fileSource=fileSource,
+                        instance=instance)
+        if ok:
+            downloadPath = du.getWebPath()
+            myD[
+                'em_image'] = '<div class="container"><p><img src={} alt="EM image "style="width:600px"></p></div><br />'.format(
+                downloadPath)
+        else:
+            myD['val_image'] = ''
+
         ok = du.fetchId(entryId, contentType='validation-report-slider', formatType='png', fileSource=fileSource,
                         instance=instance)
         if ok:
