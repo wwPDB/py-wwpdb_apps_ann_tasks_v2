@@ -86,6 +86,8 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('pdbx_chem_comp_depositor_info', 'Depositor ligand info', 'row-wise'),
                 ('struct_keywords', 'Keywords', 'row-wise'),
                 ('pdbx_struct_assembly', 'Assembly Details', 'row-wise'),
+                ('pdbx_struct_assembly_gen', 'Assembly Gen Details', 'row-wise'),
+                ('pdbx_struct_oper_list', 'Assembly Oper List Details', 'row-wise'),
                 ('pdbx_struct_assembly_depositor_info', 'Author Assembly Details', 'row-wise'),
                 ('pdbx_struct_assembly_auth_evidence', 'Author Assembly Evidence', 'row-wise'),
                 #('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),

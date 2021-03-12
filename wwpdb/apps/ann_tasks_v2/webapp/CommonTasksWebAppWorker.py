@@ -123,6 +123,8 @@ from wwpdb.apps.ann_tasks_v2.utils.TerminalAtoms import TerminalAtoms
 from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
 from wwpdb.apps.ann_tasks_v2.view3d.ModelViewer3D import ModelViewer3D
 
+from wwpdb.apps.ann_tasks_v2.density.DensityGeneration import DensityConversionInSession
+
 #
 try:
     from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
@@ -2078,23 +2080,23 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = '\n'.join(
                         pR.makeTabularReport(filePath=downloadPath, contentType='model', idCode=entryId, layout=layout))
+
+                    downloadWebPath = du.getWebPath()
+                    myD['model-session'] = downloadWebPath
                     pdb_id = pR.getPdbIdCode()
                     if pdb_id:
-                        downloadPath = du.getWebPath()
-                        myD['model-session'] = downloadPath
-                        myD['molStar'] = """onLoad='display_mol_star(molecule_url="{}")'""".format(downloadPath)
-                        myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'
-                    else:
-                        myD['molStar'] = ''
-                        myD['molStar-display'] = 'no model available'
+                        myD.setdefault('molStar-display-objects', []).append('molecule_url="{}"'.format(downloadWebPath))
 
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup('No model data file.')
                     myD['model-session'] = ''
-                    myD['molStar'] = ''
-                    myD['molStar-display'] = 'no model available'
+
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
-                                     'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'}
+                                     'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'
+                                     }
+                contour_level = pR.getPrimaryContourlevel()
+                if contour_level:
+                    myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
                 self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
 
             elif cT == 'model-pdb':
@@ -2213,6 +2215,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
                     myD[cT] = self.__getMessageTextWithMarkup('')
 
+        # downloads
+
         for data_file in (('model', 'pdbx'),
                           ('model', 'pdb'),
                           ("structure-factors", 'pdbx'),
@@ -2225,7 +2229,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if ok:
                 downloadPath = du.getDownloadPath()
                 dTagList.append(du.getAnchorTag())
-                data_file_report = '-report'.format(data_file[0])
+                data_file_report = '{}-report'.format(data_file[0])
                 # myD[data_file_report] = self.__getFileTextWithMarkup(downloadPath)
                 myD[data_file_report] = self.__getMessageTextWithMarkup(downloadPath)
 
@@ -2233,6 +2237,39 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             myD[
                 'data-downloads'] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % '<br />'.join(
                 dTagList)
+        else:
+            myD['data-downloads'] = ''
+
+        # map conversion to binary cif
+
+        for data_file in (('em-volume', 'map'),
+                          ('em-mask-volume', 'map'),
+                          ):
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+                            instance=instance)
+            if ok:
+                downloadPath_in = du.getDownloadPath()
+                logging.info(downloadPath_in)
+                # web_download_path = du.getWebDownloadPath()
+                full_bcif_file_path = du.getFilePath(entryId, contentType=data_file[0], formatType="bcif", fileSource=fileSource,
+                            instance=instance)
+                logging.info(full_bcif_file_path)
+                if full_bcif_file_path is not None:
+                    bcif_file_name = os.path.split(full_bcif_file_path)[1]
+                    session_id = self._reqObj.getSessionId()
+                    session_path = self._reqObj.getSessionPath()
+                    downloadPath_out = os.path.join(session_path, session_id, du.getDownloadSubFolderName(), bcif_file_name)
+                    webDowloadPath = du.getWebDownloadPath()
+                    web_downloadPath_out = os.path.join(webDowloadPath, bcif_file_name)
+                    logging.debug('running conversion of {} to {}'.format(downloadPath_in, downloadPath_out))
+                    dci = DensityConversionInSession(reqObj=self._reqObj)
+                    converted = dci.em_volume_conversion(in_map=downloadPath_in, out_map=downloadPath_out)
+                    if converted:
+                        logging.debug('converted {} to bcif {}, {}'.format(data_file[0], downloadPath_out, web_downloadPath_out))
+                        url_name = '{}_url'.format(data_file[0].replace('-', '_'))
+                        myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, web_downloadPath_out))
+
+        # EM image
 
         ok = du.fetchId(entryId, contentType='img-emdb', formatType='png', fileSource=fileSource,
                         instance=instance)
@@ -2253,6 +2290,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 downloadPath)
         else:
             myD['val_image'] = ''
+
+        # validation downloads
 
         for val_file in (('validation-report-full', 'pdf'),
                          ('validation-data', 'xml'),
@@ -2277,6 +2316,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 aTagList)
         myD['identifier'] = entryId
         myD['aTagList'] = aTagList
+
+        if myD.get('molStar-display-objects'):
+            display_object_str = ','.join(myD.get('molStar-display-objects', []))
+            logging.debug('MOLSTAR COMMAND: {}'.format(display_object_str))
+            myD['molStar'] = """onLoad='display_mol_star({})'""".format(display_object_str)
+            myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'.format()
+
+        else:
+            myD['molStar'] = ''
+            myD['molStar-display'] = 'no model available'
         #
         return myD
 
