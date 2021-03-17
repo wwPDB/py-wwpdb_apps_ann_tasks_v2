@@ -282,7 +282,12 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             if hasAssemblyInfo:
                 auto_assembly_status = "existed"
             method = str(self._reqObj.getValue("method")).strip().upper()
-            auto_methods = ['SOLUTION NMR', 'SOLID-STATE NMR', 'NMR', 'ELECTRON MICROSCOPY']
+            auto_methods = [
+                'SOLUTION NMR',
+                'SOLID-STATE NMR',
+                'NMR',
+                # 'ELECTRON MICROSCOPY',
+            ]
             if method in auto_methods:
                 if not hasAssemblyInfo:
                     assem = AssemblySelect(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
