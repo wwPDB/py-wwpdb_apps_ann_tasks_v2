@@ -276,24 +276,30 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(entryCsFilePath, os.R_OK):
             csOk = True
         #
-        nmr_assembly_status = ""
+        auto_assembly_status = ""
         if bIsWorkflow:
+            hasAssemblyInfo = self.__checkAssemblyInfo(os.path.join(self._sessionPath, entryFileName))
+            if hasAssemblyInfo:
+                auto_assembly_status = "existed"
             method = str(self._reqObj.getValue("method")).strip().upper()
-            if (method == "SOLUTION NMR") or (method == "SOLID-STATE NMR") or (method == "NMR"):
-                hasAssemblyInfo = self.__checkAssemblyInfo(os.path.join(self._sessionPath, entryFileName))
-                if hasAssemblyInfo:
-                    nmr_assembly_status = "existed"
-                else:
+            auto_methods = [
+                'SOLUTION NMR',
+                'SOLID-STATE NMR',
+                'NMR',
+                # 'ELECTRON MICROSCOPY',
+            ]
+            if method in auto_methods:
+                if not hasAssemblyInfo:
                     assem = AssemblySelect(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                     assem.autoAssignDefaultAssembly(entryId, entryFileName)
                     #
                     updatedModelPath = os.path.join(self._sessionPath, entryId + "_model-assembly-updated_P1.cif")
                     hasAssemblyInfo = self.__checkAssemblyInfo(updatedModelPath)
                     if hasAssemblyInfo:
-                        nmr_assembly_status = "updated";
+                        auto_assembly_status = "updated"
                         os.rename(updatedModelPath, os.path.join(self._sessionPath, entryFileName))
                     else:
-                        nmr_assembly_status = "failed";
+                        auto_assembly_status = "failed"
                         if os.access(updatedModelPath, os.F_OK):
                             os.remove(updatedModelPath)
                         #
@@ -302,9 +308,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             #
             self._setSessionInfoWf(entryId, entryFileName)
         #
-        nmr_assembly_status_url = ""
-        if nmr_assembly_status:
-            nmr_assembly_status_url = "&nmrassemblystatus=" + nmr_assembly_status
+        auto_assembly_status_url = ""
+        if auto_assembly_status:
+            auto_assembly_status_url = "&assemblystatus=" + auto_assembly_status
         #
         htmlList = []
         htmlList.append('<!DOCTYPE html>')
@@ -313,13 +319,13 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         htmlList.append('<title>Annotation Tasks Module</title>')
         if sfOk:
             htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
-                            (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, nmr_assembly_status_url))
+                            (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, auto_assembly_status_url))
         elif csOk:
             htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrycsfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
-                            (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode, nmr_assembly_status_url))
+                            (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode, auto_assembly_status_url))
         else:
             htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
-                            (sessionId, entryId, entryFileName, wfStatus, standaloneMode, nmr_assembly_status_url))
+                            (sessionId, entryId, entryFileName, wfStatus, standaloneMode, auto_assembly_status_url))
         # htmlList.append('<body>')
         # htmlList.append('</body>')
         # htmlList.append('</html>')
