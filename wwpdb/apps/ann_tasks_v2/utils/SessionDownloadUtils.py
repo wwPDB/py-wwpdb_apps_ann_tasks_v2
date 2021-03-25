@@ -199,6 +199,13 @@ class SessionDownloadUtils(object):
         """
         return self.__downloadFilePath
 
+    def getDownloadSubFolderName(self):
+        """
+
+        :return: sub folder for downloads folder
+        """
+        return self.__downloadDir
+
     def getAnchorTag(self, label=None, target='_blank'):
         """ Return the anchor tag corresponding the current download file selection.
         """

@@ -125,7 +125,7 @@ class PdbxReportIo(PdbxStyleIoUtil):
         except Exception as e:
             return ''
 
-    def getContourLevelMap(self, mapId='primary'):
+    def getContourLevelMap(self, mapId='primary map'):
         """ Return the contour level for a given map
         """
         try:
@@ -134,6 +134,7 @@ class PdbxReportIo(PdbxStyleIoUtil):
             vals = catObj.selectValuesWhere('contour_level', mapId, 'type')
             return self._firstOrDefault(vals, default='')
         except Exception as e:
+            logging.error(e)
             return ''
 
 

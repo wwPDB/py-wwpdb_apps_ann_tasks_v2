@@ -65,6 +65,7 @@ class PdbxReport(object):
         #
         self.__pdbIdCode = None
         self.__structTitle = None
+        self.__primary_contour_level = None
         #
 
     def getPdbIdCode(self):
@@ -72,6 +73,9 @@ class PdbxReport(object):
 
     def getStructTitle(self):
         return self.__structTitle
+
+    def getPrimaryContourlevel(self):
+        return self.__primary_contour_level
 
     def makeTabularReport(self, filePath=None, contentType=None, idCode=None, layout="tabs", leadingHtmlL=None,
                           trailingHtmlL=None):
@@ -100,6 +104,8 @@ class PdbxReport(object):
                     self.__pdbIdCode = dd['pdb_id']
                 if 'struct_title' in dd:
                     self.__structTitle = dd['struct_title']
+                if 'primary_contour_level' in dd:
+                    self.__primary_contour_level = dd['primary_contour_level']
                 #
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxReportCategoryStyle(), includePath=includePath,
                                                 verbose=self.__verbose, log=self.__lfh)
@@ -198,6 +204,7 @@ class PdbxReport(object):
             if contentType == 'model':
                 oD['pdb_id'] = pdbxR.getDbCode(dbId='PDB')
                 oD['struct_title'] = pdbxR.getStructTitle()
+                oD['primary_contour_level'] = pdbxR.getContourLevelMap(mapId='primary map')
 
             if (self.__verbose):
                 self.__lfh.write("+PdbxReport.doReport() - completed  - report object built\n")
