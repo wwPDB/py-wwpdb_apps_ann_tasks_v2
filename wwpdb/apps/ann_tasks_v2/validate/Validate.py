@@ -124,6 +124,9 @@ class Validate(SessionWebDownloadUtils):
             fName = pI.getFileName(entryId, contentType="validation-report-images", formatType="tar", versionId=uploadVersionOp, partNumber='1')
             resultImageTarPath = os.path.join(self.__sessionPath, fName)
 
+            fName = pI.getFileName(entryId, contentType="validation-data", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+            resultCifPath = os.path.join(self.__sessionPath, fName)
+
             fName = pI.getFileName(entryId, contentType="validation-report-2fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
             result2FoPath = os.path.join(self.__sessionPath, fName)
 
@@ -169,7 +172,7 @@ class Validate(SessionWebDownloadUtils):
                 dp.addInput(name="validate_arguments", value=self.__validateArgs)
             dp.op("annot-wwpdb-validate-all-sf")
             dp.expLog(logPath)
-            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultImageTarPath, resultFoPath, result2FoPath])
+            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultImageTarPath, resultCifPath, resultFoPath, result2FoPath])
 
             self.addDownloadPath(resultPdfPath)
             self.addDownloadPath(resultXmlPath)
@@ -177,6 +180,7 @@ class Validate(SessionWebDownloadUtils):
             self.addDownloadPath(resultPngPath)
             self.addDownloadPath(resultSvgPath)
             self.addDownloadPath(resultImageTarPath)
+            self.addDownloadPath(resultCifPath)
             self.addDownloadPath(resultFoPath)
             self.addDownloadPath(result2FoPath)
             self.addDownloadPath(logPath)

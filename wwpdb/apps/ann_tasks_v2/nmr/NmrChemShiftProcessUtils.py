@@ -70,7 +70,8 @@ class NmrChemShiftProcessUtils(object):
         #
         self.__validationResultPath = []
         for contentFormatType in ( ( "validation-report", "pdf" ), ( "validation-data", "xml" ), ( "validation-report-full", "pdf" ), \
-                                   ( "validation-report-slider", "png" ), ( "validation-report-slider", "svg" ) ):
+                                   ( "validation-report-slider", "png" ), ( "validation-report-slider", "svg" ), ( "validation-report-images", "tar" ), \
+                                   ( "validation-data", "pdbx" ) ):
             fileName = pI.getFileName(identifier, contentType=contentFormatType[0], formatType=contentFormatType[1], versionId="none", partNumber="1")
             self.__validationResultPath.append(os.path.join(self.__workingDirPath, fileName))
         #

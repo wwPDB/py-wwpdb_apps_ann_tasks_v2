@@ -68,6 +68,8 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         self.__fullReportFile = pI.getFilePath(self.__entryId, contentType="validation-report-full", formatType="pdf", fileSource="session", versionId="next")
         self.__sliderPngFile = pI.getFilePath(self.__entryId, contentType="validation-report-slider", formatType="png", fileSource="session", versionId="next")
         self.__sliderSvgFile = pI.getFilePath(self.__entryId, contentType="validation-report-slider", formatType="svg", fileSource="session", versionId="next")
+        self.__imageTargFile = pI.getFilePath(self.__entryId, contentType="validation-report-images", formatType="tar", fileSource="session", versionId="next")
+        self.__validationCifFile = pI.getFilePath(self.__entryId, contentType="validation-data", formatType="pdbx", fileSource="session", versionId="next")
 
     def tearDown(self):
         pass
@@ -95,7 +97,7 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
             util.setOutputNefFileName(fileName=self.__outputNefFile)
             util.setOutputReportFileName(fileName=self.__outputReportFile)
             util.setOutputValidationFileList(dstPathList=[ self.__validationReportFile, self.__validationDataFile, self.__fullReportFile, \
-                                                           self.__sliderPngFile, self.__sliderSvgFile ])
+                                                           self.__sliderPngFile, self.__sliderSvgFile, self.__imageTargFile, self.__validationCifFile ])
             #
             util.run()
             util.runNefProcess()
