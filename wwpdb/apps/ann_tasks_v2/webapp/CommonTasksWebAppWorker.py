@@ -1597,8 +1597,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # assembly model files
         #
         for ii in range(1, 50):
-            pth = de.copyToSession(contentType="assembly-model-xyz", formatType="pdbx", version="latest",
-                                   partitionNumber=ii)
+            pth = de.copyToSession(contentType="assembly-model-xyz", formatType="pdbx", version="latest", partitionNumber=ii)
             if pth is None:
                 break
         #
@@ -1607,15 +1606,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # Validation files
         #
         pth = de.copyToSession(contentType="validation-report", formatType="pdf", version="latest", partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-full", formatType="pdf", version="latest",
-                               partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-slider", formatType="svg", version="latest",
-                               partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-full", formatType="pdf", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-slider", formatType="svg", version="latest", partitionNumber=1)
         pth = de.copyToSession(contentType="validation-data", formatType="xml", version="latest", partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-2fo-map-coef", formatType="pdbx", version="latest",
-                               partitionNumber=1)
-        pth = de.copyToSession(contentType="validation-report-fo-map-coef", formatType="pdbx", version="latest",
-                               partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-data", formatType="pdbx", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-2fo-map-coef", formatType="pdbx", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="validation-report-fo-map-coef", formatType="pdbx", version="latest", partitionNumber=1)
         #
         # dictionary check file
         #
@@ -1638,8 +1634,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if pth is None:
             deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf,
                                      fileSource="archive", verbose=self._verbose, log=self._lfh)
-            pth = deArchive.copyToSession(contentType="structure-factors", formatType="pdbx", version="latest",
-                                          partitionNumber=1)
+            pth = deArchive.copyToSession(contentType="structure-factors", formatType="pdbx", version="latest", partitionNumber=1)
 
         # CS file (PDBx)
         #
@@ -1657,11 +1652,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if pth is None:
             deArchive = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=None,
                                      fileSource="archive", verbose=self._verbose, log=self._lfh)
-            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest",
-                                          partitionNumber=1)
+            pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
         #
-        pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest",
-                               partitionNumber=1)
+        pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
 
         # fsc file (xml)
         #
@@ -2295,6 +2288,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         for val_file in (('validation-report-full', 'pdf'),
                          ('validation-data', 'xml'),
+                         ('validation-data', 'pdbx'),
                          ('validation-report-slider', 'png')):
             ok = du.fetchId(entryId, contentType=val_file[0], formatType=val_file[1], fileSource=fileSource,
                             instance=instance)
