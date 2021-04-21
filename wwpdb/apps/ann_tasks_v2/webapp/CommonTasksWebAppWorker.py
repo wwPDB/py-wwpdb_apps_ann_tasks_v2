@@ -1718,7 +1718,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         #
                         topHtmlPath = os.path.join("/sessions", str(self._sessionId), "LVW_" + entryId.upper())
                         htmlUtil = LVW_GetHTML(siteId=self._siteId, rundir=rundir, topHtmlPath=topHtmlPath,
-                                               LOIMap=loiMap, \
+                                               LOIMap=loiMap,
                                                verbose=self._verbose, log=self._lfh)
                         htmlUtil.setLigandOfInterestingList(loiUtil.getLOIList())
                         content = htmlUtil.getHtmlText()
@@ -2215,7 +2215,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                           ("structure-factors", 'pdbx'),
                           ('nmr-chemical-shifts', 'pdbx'),
                           ('nmr-data-str', 'pdbx'),
-                          ('em-volume', 'map')
+                          # ('em-volume', 'map')
                           ):
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                             instance=instance)
@@ -2235,32 +2235,34 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         # map conversion to binary cif
 
-        for data_file in (('em-volume', 'map'),
-                          ('em-mask-volume', 'map'),
-                          ):
-            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-                            instance=instance)
-            if ok:
-                downloadPath_in = du.getDownloadPath()
-                logging.info(downloadPath_in)
-                # web_download_path = du.getWebDownloadPath()
-                full_bcif_file_path = du.getFilePath(entryId, contentType=data_file[0], formatType="bcif", fileSource=fileSource,
-                            instance=instance)
-                logging.info(full_bcif_file_path)
-                if full_bcif_file_path is not None:
-                    bcif_file_name = os.path.split(full_bcif_file_path)[1]
-                    session_id = self._reqObj.getSessionId()
-                    session_path = self._reqObj.getSessionPath()
-                    downloadPath_out = os.path.join(session_path, session_id, du.getDownloadSubFolderName(), bcif_file_name)
-                    webDowloadPath = du.getWebDownloadPath()
-                    web_downloadPath_out = os.path.join(webDowloadPath, bcif_file_name)
-                    logging.debug('running conversion of {} to {}'.format(downloadPath_in, downloadPath_out))
-                    dci = DensityConversionInSession(reqObj=self._reqObj)
-                    converted = dci.em_volume_conversion(in_map=downloadPath_in, out_map=downloadPath_out)
-                    if converted:
-                        logging.debug('converted {} to bcif {}, {}'.format(data_file[0], downloadPath_out, web_downloadPath_out))
-                        url_name = '{}_url'.format(data_file[0].replace('-', '_'))
-                        myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, web_downloadPath_out))
+        #for data_file in (('em-volume', 'map'),
+        #                  ('em-mask-volume', 'map'),
+        #                  ):
+        #    ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+        #                    instance=instance)
+        #    if ok:
+        #        downloadPath_in = du.getDownloadPath()
+        #        logging.info(downloadPath_in)
+        #        # web_download_path = du.getWebDownloadPath()
+        #        full_bcif_file_path = du.getFilePath(entryId, contentType=data_file[0], formatType="bcif",
+        #                    fileSource=fileSource,
+        #                    instance=instance)
+        #        logging.info(full_bcif_file_path)
+        #        if full_bcif_file_path is not None:
+        #            bcif_file_name = os.path.split(full_bcif_file_path)[1]
+        #            session_id = self._reqObj.getSessionId()
+        #            session_path = self._reqObj.getSessionPath()
+        #            downloadPath_out = os.path.join(session_path, session_id, du.getDownloadSubFolderName(),
+        #                                            bcif_file_name)
+        #            webDowloadPath = du.getWebDownloadPath()
+        #            web_downloadPath_out = os.path.join(webDowloadPath, bcif_file_name)
+        #            logging.debug('running conversion of {} to {}'.format(downloadPath_in, downloadPath_out))
+        #            dci = DensityConversionInSession(reqObj=self._reqObj)
+        #            converted = dci.em_volume_conversion(in_map=downloadPath_in, out_map=downloadPath_out)
+        #            if converted:
+        #                logging.debug('converted {} to bcif {}, {}'.format(data_file[0], downloadPath_out, web_downloadPath_out))
+        #                url_name = '{}_url'.format(data_file[0].replace('-', '_'))
+        #                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, web_downloadPath_out))
 
         # EM image
 
@@ -3759,7 +3761,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         fileTimeList = []
         for fileFormat in content_format_type[1]:
             latestFile = pathIofo.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=content_format_type[0],
-                                              formatType=fileFormat, \
+                                              formatType=fileFormat,
                                               fileSource="archive", versionId="latest", partNumber="1")
             #   
             if (not latestFile) or (not os.access(latestFile, os.F_OK)):
@@ -3775,7 +3777,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #   
             for i in range(1, int(vList[1])):
                 previousFile = pathIofo.getFilePath(dataSetId=entryId, wfInstanceId=None,
-                                                    contentType=content_format_type[0], formatType=fileFormat, \
+                                                    contentType=content_format_type[0], formatType=fileFormat,
                                                     versionId=str(i), partNumber="1")
                 #   
                 if (not previousFile) or (not os.access(previousFile, os.F_OK)):
