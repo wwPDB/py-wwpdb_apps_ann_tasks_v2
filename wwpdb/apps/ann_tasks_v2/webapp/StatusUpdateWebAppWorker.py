@@ -1319,7 +1319,12 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
 
         if hasEM and msg == 'ok':
+            # For PostRel PDB - this will be empty
+            if statusD['em_current_status'] == '':
+                statusD['em_current_status'] = orgEmStatus
+
             newEmStatus = statusD['em_current_status']
+
             if ((str(orgEmStatus).upper() == 'PROC') and (str(newEmStatus).upper() in ['HPUB', 'HOLD'])):
                 msg = 'EM processing status code change from PROC to HPUB or HOLD prohibited'
 
