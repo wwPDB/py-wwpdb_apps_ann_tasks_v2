@@ -2233,36 +2233,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD['data-downloads'] = ''
 
-        # map conversion to binary cif
+        # map display in binary cif
 
-        #for data_file in (('em-volume', 'map'),
-        #                  ('em-mask-volume', 'map'),
-        #                  ):
-        #    ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-        #                    instance=instance)
-        #    if ok:
-        #        downloadPath_in = du.getDownloadPath()
-        #        logging.info(downloadPath_in)
-        #        # web_download_path = du.getWebDownloadPath()
-        #        full_bcif_file_path = du.getFilePath(entryId, contentType=data_file[0], formatType="bcif",
-        #                    fileSource=fileSource,
-        #                    instance=instance)
-        #        logging.info(full_bcif_file_path)
-        #        if full_bcif_file_path is not None:
-        #            bcif_file_name = os.path.split(full_bcif_file_path)[1]
-        #            session_id = self._reqObj.getSessionId()
-        #            session_path = self._reqObj.getSessionPath()
-        #            downloadPath_out = os.path.join(session_path, session_id, du.getDownloadSubFolderName(),
-        #                                            bcif_file_name)
-        #            webDowloadPath = du.getWebDownloadPath()
-        #            web_downloadPath_out = os.path.join(webDowloadPath, bcif_file_name)
-        #            logging.debug('running conversion of {} to {}'.format(downloadPath_in, downloadPath_out))
-        #            dci = DensityConversionInSession(reqObj=self._reqObj)
-        #            converted = dci.em_volume_conversion(in_map=downloadPath_in, out_map=downloadPath_out)
-        #            if converted:
-        #                logging.debug('converted {} to bcif {}, {}'.format(data_file[0], downloadPath_out, web_downloadPath_out))
-        #                url_name = '{}_url'.format(data_file[0].replace('-', '_'))
-        #                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, web_downloadPath_out))
+        for data_file in (('em-volume', 'bcif'),
+                          ('em-mask-volume', 'bcif'),
+                          ):
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+                            instance=instance)
+            if ok:
+                downloadPath = du.getDownloadPath()
+                logging.info(downloadPath)
+                downloadPath = du.getWebPath()
+                url_name = '{}_url'.format(data_file[0].replace('-', '_'))
+                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
 
         # EM image
 
@@ -2322,6 +2305,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD['molStar'] = ''
             myD['molStar-display'] = 'no model available'
+
         #
         return myD
 
