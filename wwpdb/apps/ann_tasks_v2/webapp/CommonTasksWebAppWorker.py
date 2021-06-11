@@ -2076,9 +2076,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
                     downloadWebPath = du.getWebPath()
                     myD['model-session'] = downloadWebPath
-                    pdb_id = pR.getPdbIdCode()
-                    if pdb_id:
-                        myD.setdefault('molStar-display-objects', []).append('molecule_url="{}"'.format(downloadWebPath))
+                    #pdb_id = pR.getPdbIdCode()
+                    #if pdb_id:
+                    #    pass
+                    myD.setdefault('molStar-display-objects', []).append('molecule_url="{}"'.format(downloadWebPath))
 
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup('No model data file.')
