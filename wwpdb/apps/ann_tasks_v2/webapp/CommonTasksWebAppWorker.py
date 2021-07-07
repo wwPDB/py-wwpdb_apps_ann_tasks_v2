@@ -2238,6 +2238,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         for data_file in (('em-volume', 'bcif'),
                           ('em-mask-volume', 'bcif'),
+                          ('map-xray', 'bcif')
                           ):
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                             instance=instance)
