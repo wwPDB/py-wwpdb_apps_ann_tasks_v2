@@ -450,6 +450,8 @@ class AssemblyInput(object):
             #
         #
         sorted(instanceIdList)
+        iC = ''
+        iS = ''
         if (len(instanceIdList) > 0):
             iC = 'Instance List (%d):' % len(instanceIdList)
             iS = str('<br />'.join([','.join(v) for v in self.__chunker(instanceIdList, 35)])).replace('"', '')
@@ -565,7 +567,7 @@ class AssemblyInput(object):
             </table>
             <br />
             %s
-            <table class="table table-bordered table-striped width100">
+            <table id="assembly_input_table" class="table table-bordered table-striped width100">
             <tr>
                <th class="width10">Assembly<br /> Id</th>
                <th class="width10">Provenance</th>
@@ -575,6 +577,8 @@ class AssemblyInput(object):
                <th class="width10">Oligomeric<br />Count</th>
                <th class="width30">Operations<br />
                   <input id="formassembly_select_all" value="Select All" type="button" onClick="select_entry('formassembly', 'formassembly_select_all');" />
+                  &nbsp; &nbsp; &nbsp; &nbsp;
+                  <input id="formassembly_set_monomer" value="All Monomers" type="button" onClick="set_all_monomers('formassembly', 'formassembly_set_monomer', '%s');" />
                </th>
              </tr>
         '''
@@ -583,6 +587,7 @@ class AssemblyInput(object):
             </table>
         <br  />
         <input type="submit" name="submit" value="Submit edits" class="btn btn-primary"  />
+        <input type="button" id="add_row_button" name="add_row_button" value="Add rows" class="btn btn-primary fltrgt" />
         <br />
         <span id="assembly-form-status" class="width50 fltright"></span>
         <br class="clearfloat" />
@@ -614,6 +619,7 @@ class AssemblyInput(object):
         branch2LinearMap = {}
         linear2BranchMap = {}
         linearInstList = []
+        linearbranchmap = ""
         branchInfoPath = os.path.join(self.__sessionPath, entryId + "-branch-info.cif")
         if os.access(branchInfoPath, os.R_OK):
             cifObj = mmCIFUtil(filePath=branchInfoPath)
@@ -636,6 +642,16 @@ class AssemblyInput(object):
                         linear2BranchMap[infoD["linear_polymer_chain_id"]] = [ ( infoD["branch_polymer_chain_id"], infoD["type"] ) ]
                     #
                 #
+            #
+            for key,valist in linear2BranchMap.items():
+                if linearbranchmap != "":
+                    linearbranchmap += ";"
+                #
+                branchIdList = []
+                for branchTup in valist:
+                    branchIdList.append(branchTup[0])
+                #
+                linearbranchmap += key + ":" + ",".join(branchIdList)
             #
         #
         branchInfoText = ""
@@ -677,15 +693,29 @@ class AssemblyInput(object):
         provenanceList = ['author_defined_assembly', 'software_defined_assembly', 'author_and_software_defined_assembly']
 
         defautSymOp = '1_555'
-        checkInstTemplate = ' %s <input name="a_%d_inst_%s" type="checkbox" checked="checked"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
-        chainInstTemplate = ' %s <input name="a_%d_inst_%s" type="checkbox"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
+        checkInstTemplate = ' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox" checked="checked"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
+        chainInstTemplate = ' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
+        #
+        allMonomerList = []
+        for assemId in range(0, len(instanceIdList)):
+            instId = "a_%d_inst_%s" % ((assemId + 1), instanceIdList[assemId])
+            allMonomerList.append(instId)
+            if instanceIdList[assemId] in linear2BranchMap:
+                for branchTup in linear2BranchMap[instanceIdList[assemId]]:
+                    instId = "a_%d_inst_%s" % ((assemId + 1), branchTup[0])
+                    allMonomerList.append(instId)
+                #
+            #
         #
         oL = []
-        oL.append(top_form_template % (entryId, self.__sessionId, tHtml, branchInfoTabletext))
+        oL.append(top_form_template % (entryId, self.__sessionId, tHtml, branchInfoTabletext, ",".join(allMonomerList)))
         defaultValue = self.__placeHolderValue
         nRows = 0
-        numAssem = len(fD)
-        for assemId in range(1, numAssem + 21):
+        numAssem = len(fD) + 21
+        if numAssem < len(instanceIdList) + 1:
+            numAssem = len(instanceIdList) + 1
+        #
+        for assemId in range(1, numAssem):
             if assemId in fD:
                 # JDW insert real values here ---
                 d = fD[assemId]
@@ -694,7 +724,6 @@ class AssemblyInput(object):
                 oL.append('<td><input type="hidden"  name="a_id_%d" value="%d" />%d</td>' % (assemId, assemId, assemId))
                 oL.append('<td><span  id="a_prov_%d" class="ief" data-ief-edittype="select" data-ief-selectvalues=\'%s\'>%s</span>' % (assemId, jsonTxt, d['provenance']))
                 for fTup in self.__formDefList[2:]:
-                    self.__lfh.write("AssemblyInput.makeAssemblyEditForm() d = %r\n" % (d.items()))
                     ky = fTup[1] + str(assemId)
                     if d[fTup[0]] == '?':
                         oL.append('<td><span  id="%s"   class="ief greyedout">%s</span></td>' % (ky, defaultValue))
@@ -709,10 +738,10 @@ class AssemblyInput(object):
                 oL.append('<td class="textleft">')
                 for instanceId in instanceIdList:
                     if instanceId in inD:
-                        oL.append(' %s <input name="a_%d_inst_%s" type="checkbox" checked="checked"></input>' % (instanceId, assemId, instanceId))
+                        oL.append(' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox" checked="checked"></input>' % (instanceId, assemId, instanceId, assemId, instanceId))
                         oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, inD[instanceId][1]))
                     else:
-                        oL.append(' %s <input name="a_%d_inst_%s" type="checkbox"></input>' % (instanceId, assemId, instanceId))
+                        oL.append(' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox"></input>' % (instanceId, assemId, instanceId, assemId, instanceId))
                         oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, defautSymOp))
                     #
                     if instanceId in linear2BranchMap:
@@ -720,9 +749,9 @@ class AssemblyInput(object):
                         for branchTup in linear2BranchMap[instanceId]:
                             instId = branchTup[0]
                             if instId in inD:
-                                includeBranchList.append(checkInstTemplate % (instId, assemId, instId, assemId, instId, inD[instId][1]))
+                                includeBranchList.append(checkInstTemplate % (instId, assemId, instId, assemId, instId, assemId, instId, inD[instId][1]))
                             else:
-                                includeBranchList.append(chainInstTemplate % (instId, assemId, instId, assemId, instId, defautSymOp))
+                                includeBranchList.append(chainInstTemplate % (instId, assemId, instId, assemId, instId, assemId, instId, defautSymOp))
                             #
                         #
                         if includeBranchList:
@@ -749,14 +778,14 @@ class AssemblyInput(object):
                 #
                 oL.append('<td class="textleft">')
                 for instanceId in instanceIdList:
-                    oL.append(' %s <input name="a_%d_inst_%s" type="checkbox"></input>' % (instanceId, assemId, instanceId))
+                    oL.append(' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox"></input>' % (instanceId, assemId, instanceId, assemId, instanceId))
                     oL.append(' OP <span  id="a_%d_symop_%s"  class="ief">%s</span> <br/>' % (assemId, instanceId, defautSymOp))
                     #
                     if instanceId in linear2BranchMap:
                         includeBranchList = []
                         for branchTup in linear2BranchMap[instanceId]:
                             instId = branchTup[0]
-                            includeBranchList.append(chainInstTemplate % (instId, assemId, instId, assemId, instId, defautSymOp))
+                            includeBranchList.append(chainInstTemplate % (instId, assemId, instId, assemId, instId, assemId, instId, defautSymOp))
                         #
                         if includeBranchList:
                             includeBranchList[0] = "( " + includeBranchList[0]
@@ -770,8 +799,10 @@ class AssemblyInput(object):
                 oL.append('</td>')
                 oL.append('</tr>')
             nRows += 1
-        oL.append('<input type="hidden"  name="formlength" value="%d" />' % nRows)
-        oL.append('<input type="hidden"  name="instanceidlist" value="%s" />' % ','.join(allInstanceIdList))
+        oL.append('<input type="hidden" id="formlength" name="formlength" value="%d" />' % nRows)
+        oL.append('<input type="hidden" name="instanceidlist" value="%s" />' % ','.join(allInstanceIdList))
+        oL.append('<input type="hidden" id="polyinstanceidlist" value="%s" />' % ','.join(instanceIdList))
+        oL.append('<input type="hidden" id="linearbranchmap" value="%s" />' % linearbranchmap)
         oL.append('</table>')
         oL.append(bottom_form_template)
         return '\n'.join(oL)

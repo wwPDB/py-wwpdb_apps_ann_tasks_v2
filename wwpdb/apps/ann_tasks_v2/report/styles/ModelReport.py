@@ -61,6 +61,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ('database_PDB_matrix', 'table'),
         ('database_PDB_remark', 'table'),
         ('exptl', 'table'),
+        ('pdbx_data_processing_status', 'table'),
         ('pdbx_reflns_twin', 'table'),
         ('struct_biol_keywords', 'table'),
         ('struct_ncs_dom', 'table'),
@@ -633,6 +634,9 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_exptl.entry_id', '%s', 'str', ''),
             ('_exptl.method', '%s', 'str', ''),
             ('_exptl.crystals_number', '%s', 'str', '')
+        ],
+        'pdbx_data_processing_status': [
+            ('_pdbx_data_processing_status.task_name', '%s', 'str', '')
         ],
         'pdbx_reflns_twin': [
             ('_pdbx_reflns_twin.domain_id', '%s', 'str', ''),

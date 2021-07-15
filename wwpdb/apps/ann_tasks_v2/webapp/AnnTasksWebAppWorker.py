@@ -87,7 +87,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/ann_tasks_v2/assemblyview': '_assemblyViewOp',
                            '/service/ann_tasks_v2/genassemblyview': '_genAssemblyViewOp',
                            '/service/ann_tasks_v2/assemblyselect': '_assemblySelectOp',
-                           '/service/ann_tasks_v2/sitecalc': '_siteCalcOp',
+                           # '/service/ann_tasks_v2/sitecalc': '_siteCalcOp',
                            '/service/ann_tasks_v2/dictcheck': '_dictCheckOp',
                            '/service/ann_tasks_v2/extracheck': '_extraCheckOp',
                            '/service/ann_tasks_v2/valreport': '_valReportOp',

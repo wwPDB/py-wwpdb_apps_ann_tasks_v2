@@ -63,6 +63,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ]
         elif self.__st.getStyleId() in ['PDBX_REPORT_V1'] :
             self.__reportCategories = [
+                ('pdbx_data_processing_status', 'Data Processing Skip Tasks', 'row-wise'), 
                 ('exptl', 'Experimental', 'row-wise'),
                 ('pdbx_database_status', 'PDB Status', 'row-wise'),
                 ('em_admin', 'EM admin', 'row-wise'),
