@@ -512,6 +512,26 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             # self._saveSessionParameter(param="assemcomplete",value=False,prefix=entryId)
         return rC
 
+    def _saveDefaultAssemblyOp(self):
+        entryId = self._reqObj.getValue("entryid")
+        ads = AssemblySelect(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok,htmlS = ads.saveAssemblyInput()
+        #
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        if ok:
+            rC.set("assemgentable", htmlS)
+            rC.setHtmlText("(assemblies updated in model file)")
+            self._saveSessionParameter(param="assemgentable", value=htmlS, prefix=entryId)
+            self._saveSessionParameter(param="assemupdatestatus", value="(assemblies updated in model file)", prefix=entryId)
+            self._saveSessionParameter(param="assemcomplete", value=True, prefix=entryId)
+        else:
+            rC.setError(errMsg="<p style='color:red'>(Assembly update failed)</p>")
+            self._saveSessionParameter(param="assemupdatestatus", value="(Assembly update failed)", prefix=entryId)
+            self._saveSessionParameter(param="assemcomplete", value=False, prefix=entryId)
+        #
+        return rC
+
     def _makeTaskResponse(self, tssObj):
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)

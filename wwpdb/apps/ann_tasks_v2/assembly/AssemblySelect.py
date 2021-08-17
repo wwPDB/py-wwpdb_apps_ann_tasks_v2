@@ -82,6 +82,11 @@ class AssemblySelect(object):
         self.__assemblyArgs = None
         self.__assemblySelectList = []
         self.__requestUrl = self.__reqObj.getValue("request_host")
+        self.__allMonomerFlag = False
+        allmonomerflag = self.__reqObj.getValue("allmonomerflag")
+        if allmonomerflag == "yes":
+            self.__allMonomerFlag = True
+        #
 
     def setArguments(self, assemblyArgs):
         self.__assemblyArgs = assemblyArgs
@@ -591,6 +596,28 @@ class AssemblySelect(object):
         """
         return self.__writeSelection(entryId, assemFormD=assemFormD, extraD=extraD)
 
+    def saveAssemblyInput(self):
+        """ Public method to support saving single assembly or all monomer assembiles
+        """
+        htmlS = ""
+        assemDict = self.__getAssemblyDict()
+        if len(assemDict) == 0:
+            return False,htmlS
+        #
+        if not self.__writeSelection(self.__entryId, assemFormD=assemDict):
+            return False,htmlS
+        #
+        assignPath = os.path.join(self.__sessionPath, self.__entryId + "_assembly-assign_P1.cif")
+        if not self.exportAssemblyAssignments(self.__entryId, assignPath):
+            return False,htmlS
+        #
+        if not self.updateModelFile(self.__entryId, self.__entryFileName, assignPath):
+            return False,htmlS
+        #
+        modelFilePath = os.path.join(self.__sessionPath, self.__entryId + "_model-updated_P1.cif")
+        htmlS = self.makeAssemblyDetailsTable(self.__entryId, modelFilePath=modelFilePath)
+        return True,htmlS
+
     def __writeSelection(self, entryId, selectString=None, provenanceString=None, assemFormD=None, extraD=None):
         """  Save assembly data in the session directory.
         """
@@ -635,6 +662,97 @@ class AssemblySelect(object):
                 self.__lfh.write("+AssemblySelect.__writeSelection() failed for entry %s\n" % entryId)
                 traceback.print_exc(file=self.__lfh)
         return False
+
+    def __getAssemblyDict(self):
+        """ Generate single assembly or all monomer assembiles dictionary
+        """
+        assemFormD = {}
+        modelFilePath = os.path.join(self.__sessionPath, self.__entryFileName)
+        
+        if (modelFilePath is not None) and (not os.access(modelFilePath, os.R_OK)):
+            return assemFormD
+        #
+        c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(modelFilePath)
+        sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
+        eD,branchInstList = sdf.getPolymerEntityChainDict()
+        #
+        assemInstIdList = []
+        if not self.__allMonomerFlag:
+            instanceIdList = []
+            for eId, instL in eD.items():
+                for inst in instL:
+                    instanceIdList.append(inst)
+                #
+            #
+            instanceIdList.sort()
+            assemInstIdList.append(instanceIdList)
+        else:
+            branch2LinearMap = {}
+            linear2BranchMap = {}
+            branchInfoPath = os.path.join(self.__sessionPath, self.__entryId + "-branch-info.cif")
+            if os.access(branchInfoPath, os.R_OK):
+                cifObj = mmCIFUtil(filePath=branchInfoPath)
+                status = cifObj.GetSingleValue("summary", "status")
+                if status == "yes":
+                    infoList = cifObj.GetValue("branch_polymer_info")
+                    for infoD in infoList:
+                        if ("branch_polymer_chain_id" not in infoD) or (not infoD["branch_polymer_chain_id"]) or \
+                           ("linear_polymer_chain_id" not in infoD) or (not infoD["linear_polymer_chain_id"]) or \
+                           ("type" not in infoD) or (not infoD["type"]):
+                            continue
+                        #
+                        branch2LinearMap[infoD["branch_polymer_chain_id"]] = infoD["linear_polymer_chain_id"]
+                        if infoD["linear_polymer_chain_id"] in linear2BranchMap:
+                            linear2BranchMap[infoD["linear_polymer_chain_id"]].append(infoD["branch_polymer_chain_id"])
+                        else:
+                            linear2BranchMap[infoD["linear_polymer_chain_id"]] = [infoD["branch_polymer_chain_id"]]
+                        #
+                    #
+                #
+            #
+            linearInstIdList = []
+            for eId, instL in eD.items():
+                for inst in instL:
+                    if inst in branch2LinearMap:
+                        continue
+                    #
+                    linearInstIdList.append(inst)
+                #
+            #
+            linearInstIdList.sort()
+            #
+            for linearInstId in linearInstIdList:
+                instanceIdList = []
+                instanceIdList.append(linearInstId)
+                if linearInstId in linear2BranchMap:
+                    for branchInstId in linear2BranchMap[linearInstId]:
+                        instanceIdList.append(branchInstId)
+                    #
+                #
+                assemInstIdList.append(instanceIdList)
+            #   
+        #
+        for instIdList in assemInstIdList:
+            op_list = []
+            for inst in instIdList:
+                op_list.append( ( inst, "1_555" ) )
+            #
+            assem_id = len(assemFormD) + 1
+            assemFormD[assem_id] = self.__generateAssemblyDict(str(assem_id), op_list)
+        #
+        return assemFormD
+
+    def __generateAssemblyDict(self, assem_id, op_list):
+        """ Generate a author define assembly
+        """
+        assemDic = {}
+        assemDic["assem_id"] = assem_id
+        assemDic["provenance"] = "author_defined_assembly"
+        for item in ( "buried_area", "surface_area", "free_energy", "oligomeric_count" ):
+            assemDic[item] = "?"
+        #
+        assemDic["op_list"] = op_list
+        return assemDic
 
     def __readSelection(self, entryId):
         """  Read stored assembly data for the current session.
@@ -865,14 +983,20 @@ class AssemblySelect(object):
         for rD in assemOpL:
             if 'id' in rD and 'name' in rD:
                 opD[rD['id']] = rD['name']
+            #
         #
+        intKey = []
         tD = {}
         for rD in assemL:
             if 'id' in rD:
-                id = rD['id']
-                tD[id] = {}
+                aid = rD['id']
+                intKey.append(int(str(aid)))
+                tD[aid] = {}
                 if 'details' in rD:
-                    tD[id]['details'] = rD['details']
+                    tD[aid]['details'] = rD['details']
+                #
+            #
+        #
 
         for k, v in tD.items():
             genL = []
@@ -883,20 +1007,25 @@ class AssemblySelect(object):
                     for opId in opIdL:
                         if opId in opD:
                             opL.append(opD[opId])
+                        #
+                    #
                     opS = ','.join(opL)
                     genL.append(opS + '(' + rD['asym_id_list'] + ')')
+                #
+            #
             v['generator'] = ','.join(genL)
-
         #
         if (self.__verbose):
             for k, v in tD.items():
                 self.__lfh.write('+AssemblySelect.__generatedAsemblyDataPrep() %r %r\n' % (k, v.items()))
-
+            #
+        #
         colList = ['id', 'viewop', 'details', 'generator']
         #
         # Generate data for the table including the viewer commands --
         #
-        for k in sorted(tD.keys()):
+        #for k in sorted(tD.keys()):
+        for k in sorted(intKey):
             rD = {}
             fullPath = os.path.join(self.__sessionPath, entryId + "_assembly-model_P" + str(k) + '.cif.V1')
             if os.access(fullPath, os.R_OK):
@@ -904,14 +1033,13 @@ class AssemblySelect(object):
                 jsurl = 'javascript:loadFileJsmol("myApp1","#jsmol-dialog-1","%s","secstruct1")' % assemblyFilePath
                 htjs = "<a href='%s'>Jsmol</a>" % (jsurl)
                 viewop =htjs
-                rD['id'] = k
+                rD['id'] = str(k)
                 rD['viewop'] = viewop
-                rD['details'] = tD[k]['details']
-                rD['generator'] = tD[k]['generator']
+                rD['details'] = tD[str(k)]['details']
+                rD['generator'] = tD[str(k)]['generator']
                 #
                 rowL.append(rD)
-        #
-
+            #
         #
         return colList, rowL
 

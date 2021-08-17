@@ -123,6 +123,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                            '/service/ann_tasks_v2/wfadmin_reassign_entry': '_reassignEntryWfOp',
                            '/service/ann_tasks_v2/assemblyloadform': '_loadAssemblyFormOp',
                            '/service/ann_tasks_v2/assemblysaveform': '_saveAssemblyFormOp',
+                           '/service/ann_tasks_v2/assemblysavedefaultinfo': '_saveDefaultAssemblyOp',
                            '/service/ann_tasks_v2/assemblyloaddepinfo': '_loadAssemblyDepInfoOp',
                            '/service/ann_tasks_v2/entityloadinfo': '_loadEntityInfoOp',
                            '/service/ann_tasks_v2/symoploadinfo':  '_loadSymopInfoOp',
