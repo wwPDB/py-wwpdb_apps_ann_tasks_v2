@@ -68,6 +68,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ('pdbx_database_status', 'PDB Status', 'row-wise'),
                 ('em_admin', 'EM admin', 'row-wise'),
                 ('em_experiment', 'EM experiment', 'row-wise'),
+                ('em_3d_reconstruction', 'EM 3D reconstruction', 'row-wise'),
                 ('database_PDB_caveat', 'Caveat', 'row-wise'),
                 ('entity', 'Entity description', 'row-wise'),
                 ('entity_poly', 'Polymers', 'row-wise'),
