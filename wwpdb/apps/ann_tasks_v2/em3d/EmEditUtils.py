@@ -83,7 +83,17 @@ class EmEditUtils(SessionWebDownloadUtils):
               'em-mask-volume': 'mask',
               'em-additional-volume': 'additional map',
               'em-half-volume': 'half map',
-              'em-volume-header': 'map header'}
+              'em-volume-header': 'map header',
+              'em-raw-volume': 'raw map',
+              'em-fsc-half-mask-volume': 'FSC half map mask',
+              'em-fsc-map-model-mask-volume': 'FSC map-model mask',
+              'em-alignment-mask-volume': 'alignment mask',
+              'em-focused-refinement-mask-volume': 'focused refinement mask',
+              'em-3d-classification-additional-volume': '3D classification map',
+              'em-focus-refinement-additional-volume': 'focus refinement map',
+              'em-segmentation-volume': 'segmentation'
+        }
+
         try:
             rfc = ReferenceFileComponents(fileName=fileName, verbose=self.__verbose, log=self.__lfh)
             cT = rfc.getContentType()

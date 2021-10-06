@@ -2844,6 +2844,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD['mask_list'] = ''
         myD['additional_map_list'] = ''
         myD['half_map_list'] = ''
+        myD['raw_map_list'] = ''
+        myD['fsc_half_mask_list'] = ''
+        myD['fsc_map_model_mask_list'] = ''
+        myD['alignment_mask_list'] = ''
+        myD['focused_refinement_mask_list'] = ''
+        myD['three_d_classification_map_list'] = ''
+        myD['focus_refinement_map_list'] = ''
+        myD['segmentation_volume_list'] = ''
         myD['em_download_files'] = ''
         myD['my_entryid'] = entryId
 
@@ -2872,7 +2880,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         ctupL = [('em-volume', 'map file', 'map_list'),
                  ('em-mask-volume', 'mask files', 'mask_list'),
                  ('em-additional-volume', 'additional map files', 'additional_map_list'),
-                 ('em-half-volume', 'half volume files', 'half_map_list')
+                 ('em-half-volume', 'half volume files', 'half_map_list'),
+                 ("em-raw-volume", 'raw volume files', 'raw_map_list'),
+                 ("em-fsc-half-mask-volume", 'fsc half mask volume files', 'fsc_half_mask_list'),
+                 ("em-fsc-map-model-mask-volume", 'fsc map-model mask volume files', 'fsc_map_model_mask_list'),
+                 ("em-alignment-mask-volume", 'alignment mask volume files', 'alignment_mask_list'),
+                 ("em-focused-refinement-mask-volume", 'focused refinement mask volume files', 'focused_refinement_mask_list'),
+                 ("em-3d-classification-additional-volume", '3D classification additional map files', 'three_d_classification_map_list'),
+                 ("em-focus-refinement-additional-volume", 'focus refinement additional map files', 'focus_refinement_map_list'),
+                 ("em-segmentation-volume", "segmentation volume files", 'segmentation_volume_list')
                  ]
         #
         emu = EmUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -3050,15 +3066,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             myD['map_edit_status'] = 'Map edits completed'
             #
-            nMap, htmlMapList = emu.renderMapFileList(entryId)
-            if nMap > 0:
-                myD['map_list'] = htmlMapList
-            nMask, htmlMaskList = emu.renderMaskFileList(entryId)
-            if nMask > 0:
-                myD['mask_list'] = htmlMaskList
-            nAddMap, htmlAdditionalMapList = emu.renderAdditionalMapFileList(entryId)
-            if nAddMap > 0:
-                myD['additional_map_list'] = htmlAdditionalMapList
+            # nMap, htmlMapList = emu.renderMapFileList(entryId)
+            # if nMap > 0:
+            #     myD['map_list'] = htmlMapList
+            # nMask, htmlMaskList = emu.renderMaskFileList(entryId)
+            # if nMask > 0:
+            #     myD['mask_list'] = htmlMaskList
+            # nAddMap, htmlAdditionalMapList = emu.renderAdditionalMapFileList(entryId)
+            # if nAddMap > 0:
+            #     myD['additional_map_list'] = htmlAdditionalMapList
+            myD.update(self.__emListMaps(entryId))
+
         else:
             myD['map_edit_status'] = 'Map edit failed'
 
