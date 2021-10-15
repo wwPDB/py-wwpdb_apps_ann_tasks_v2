@@ -38,7 +38,16 @@ class EmAutoFix(object):
                      'mask': 'em-mask-volume',
                      'additional map': 'em-additional-volume',
                      'half map': 'em-half-volume',
-                     'map header': 'em-volume-header'}
+                     'map header': 'em-volume-header',
+                     'raw map': 'em-raw-volume',
+                     'FSC half map mask': 'em-fsc-half-mask-volume',
+                     'FSC map-model mask': 'em-fsc-map-model-mask-volume',
+                     'alignment mask': 'em-alignment-mask-volume',
+                     'focused refinement mask': 'em-focused-refinement-mask-volume',
+                     '3D classification map': 'em-3d-classification-additional-volume',
+                     'focus refinement map': 'em-focus-refinement-additional-volume',
+                     'segmentation': 'em-segmentation-volume'
+                     }
 
     @staticmethod
     def __getEmdDbCode(blockobj):
