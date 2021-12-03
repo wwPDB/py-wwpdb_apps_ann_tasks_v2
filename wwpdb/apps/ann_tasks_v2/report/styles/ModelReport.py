@@ -710,7 +710,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ('_struct_ref_seq_dif.align_id', '%s', 'str', ''),
             ('_struct_ref_seq_dif.pdbx_pdb_id_code', '%s', 'str', ''),
             ('_struct_ref_seq_dif.mon_id', '%s', 'str', ''),
-            ('_struct_ref_seq_dif.pdbx_pdb_chain_id', '%s', 'str', ''),
+            ('_struct_ref_seq_dif.pdbx_pdb_strand_id', '%s', 'str', ''),
             ('_struct_ref_seq_dif.seq_num', '%s', 'str', ''),
             ('_struct_ref_seq_dif.pdbx_pdb_ins_code', '%s', 'str', ''),
             ('_struct_ref_seq_dif.pdbx_seq_db_name', '%s', 'str', ''),
