@@ -65,11 +65,13 @@ class StatusUpdate(object):
         self.__savedStatusD = {}
         #
         # Temporary placeholder for annotator initials to assign - process_site - defaults
+        # Also used for list of processing sites
         #
         self.__annInitials = {
             'PDBJ': ['MC', 'KM', 'JPN', 'JS', 'PDBJ', 'RI', 'USJS', 'USMC', 'USRI', 'USYK', 'YK'],
             'PDBE': ['DA', 'EBI', 'SS', 'MJC', 'AM', 'AC', 'GS', 'GVG', 'JB'],
-            'RCSB': ['LEAD', 'BD', 'BH', 'BN', 'CS', 'EP', 'GG', 'IP', 'JW', 'JY', 'LD', 'LT', 'MRS', 'MZ', 'SG', 'SKB']
+            'RCSB': ['LEAD', 'BD', 'BH', 'BN', 'CS', 'EP', 'GG', 'IP', 'JW', 'JY', 'LD', 'LT', 'MRS', 'MZ', 'SG', 'SKB'],
+            'PDBC': ['PDBC']
         }
         #
 
