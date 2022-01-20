@@ -2255,11 +2255,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             myD['data-downloads'] = ''
 
         # map display in binary cif
-
+        # list of em file types to find
         for data_file in (('em-volume', 'bcif'),
                           ('em-mask-volume', 'bcif'),
                           ('map-xray', 'bcif'),
-                          ('em-half-volume', 'bcif')
+                          ('em-half-volume', 'bcif'),
+                          ('em-additional-volume', 'bcif')
                           ):
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                             instance=instance)
