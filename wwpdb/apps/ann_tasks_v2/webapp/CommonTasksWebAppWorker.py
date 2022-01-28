@@ -2259,54 +2259,30 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # map display in binary cif
         # list of em file types to find
 
-
-        for data_file in (('em-volume', 'bcif'),
-                          ('em-mask-volume', 'bcif'),
-                          ('map-xray', 'bcif'),
-                          ('em-half-volume', 'bcif'),
-                          ('em-additional-volume', 'bcif')
-                          ):
-            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-                            instance=instance)
-
-            if len(ok) > 1:
-                for map in ok:
-                    identifier = 1
-                    downloadPath = du.getDownloadPath()
-                    downloadPath = du.getWebPath()
-                    url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), identifier)
-                    myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
-                    identifier = identifier + 1
-            else:
-                downloadPath = du.getDownloadPath()
-                downloadPath = du.getWebPath()
-                url_name = '{}_url'.format(data_file[0].replace('-', '_'))
-                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
-                '''
-                ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
-                dIn = ioObj.readFile(inputFilePath=downloadPath, selectList=["em_map"])
-                if not dIn or len(dIn) == 0:
-                    return True
-
-                cObj = dIn[0].getObj("em_map")
-                if not cObj:
-                    # No em_map
-                    return True
-
-                cI = ConfigInfo()
-                siteId = cI.get("SITE_PREFIX")
-                pi = PathInfo(siteId=siteId)
-
+        ok = du.getFilePath(entryId)
+        ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
+        dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
+        data_files = [('map-xray', 'bcif', '1')]
+        if dIn and len(dIn) != 0:
+            cObj = dIn[0].getObj("em_map")
+            if cObj:
                 # loop through all the map file names in the mmcif file and convert to Bcif files
                 for mapNumber in range(0, len(cObj)):
-                    mapName = cObj.getValue('file', mapNumber)
-                    mapNameInfo = pi.parseFileName(mapName)
-                    mapPath = pi.getFilePath(mapNameInfo[0], contentType=mapNameInfo[1], formatType=mapNameInfo[2],
-                                             partNumber=mapNameInfo[3])
-                                           return True
-            except Exception as _e:  # noqa: F841
-            traceback.pri                  
-                '''
+                    mapLocation = cObj.getValue('file', mapNumber)
+                    mapContentType = du.getContentTypeFromFileName(mapLocation)
+                    mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
+
+                    data_files.append((mapContentType, 'bcif', mapPartitionNumber))
+
+        for data_file in data_files:
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+                        instance=instance, partNumber=data_file[2])
+
+
+            downloadPath = du.getDownloadPath()
+            downloadPath = du.getWebPath()
+            url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
+            myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
 
         # EM image
 
