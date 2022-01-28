@@ -112,6 +112,8 @@ from wwpdb.apps.ann_tasks_v2.secstruct.SecondaryStructure import SecondaryStruct
 from wwpdb.apps.ann_tasks_v2.site.Site import Site
 from wwpdb.apps.ann_tasks_v2.solvent.Solvent import Solvent
 #
+from mmcif.io.IoAdapterCore import IoAdapterCore
+
 #
 from wwpdb.apps.ann_tasks_v2.transformCoord.TransformCoord import TransformCoord
 from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
@@ -2256,6 +2258,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         # map display in binary cif
         # list of em file types to find
+
+
         for data_file in (('em-volume', 'bcif'),
                           ('em-mask-volume', 'bcif'),
                           ('map-xray', 'bcif'),
@@ -2264,12 +2268,45 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                           ):
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                             instance=instance)
-            if ok:
+
+            if len(ok) > 1:
+                for map in ok:
+                    identifier = 1
+                    downloadPath = du.getDownloadPath()
+                    downloadPath = du.getWebPath()
+                    url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), identifier)
+                    myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
+                    identifier = identifier + 1
+            else:
                 downloadPath = du.getDownloadPath()
-                logging.info(downloadPath)
                 downloadPath = du.getWebPath()
                 url_name = '{}_url'.format(data_file[0].replace('-', '_'))
                 myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
+                '''
+                ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
+                dIn = ioObj.readFile(inputFilePath=downloadPath, selectList=["em_map"])
+                if not dIn or len(dIn) == 0:
+                    return True
+
+                cObj = dIn[0].getObj("em_map")
+                if not cObj:
+                    # No em_map
+                    return True
+
+                cI = ConfigInfo()
+                siteId = cI.get("SITE_PREFIX")
+                pi = PathInfo(siteId=siteId)
+
+                # loop through all the map file names in the mmcif file and convert to Bcif files
+                for mapNumber in range(0, len(cObj)):
+                    mapName = cObj.getValue('file', mapNumber)
+                    mapNameInfo = pi.parseFileName(mapName)
+                    mapPath = pi.getFilePath(mapNameInfo[0], contentType=mapNameInfo[1], formatType=mapNameInfo[2],
+                                             partNumber=mapNameInfo[3])
+                                           return True
+            except Exception as _e:  # noqa: F841
+            traceback.pri                  
+                '''
 
         # EM image
 
