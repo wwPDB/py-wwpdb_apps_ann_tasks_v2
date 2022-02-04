@@ -111,4 +111,3 @@ test-output
 #Ignoring idea files
 *.iml
 .idea
-idea/
