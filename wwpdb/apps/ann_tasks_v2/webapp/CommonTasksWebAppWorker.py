@@ -2110,9 +2110,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
                                      'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'
                                      }
-                contour_level = pR.getPrimaryContourlevel()
-                if contour_level:
-                    myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
+                #contour_level = pR.getPrimaryContourlevel()
+                #if contour_level:
+                #    myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
                 self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
 
             elif cT == 'model-pdb':
@@ -2269,10 +2269,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # loop through all the map file names in the mmcif file and convert to Bcif files
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue('file', mapNumber)
+                    mapContour = cObj.getValue('contour_level', mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
 
-                    data_files.append((mapContentType, 'bcif', mapPartitionNumber))
+                    data_files.append((mapContentType, 'bcif', mapPartitionNumber, mapContour))
 
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
@@ -2282,6 +2283,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
                 myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
+                contourMap = '{}_contourLevel'.format(data_file[0].replace('-', '_'))
+                myD.setdefault('molStar-display-objects', []).append(
+                    '{}={}'.format(contourMap, float(data_file[3])))
 
         # EM image
 
