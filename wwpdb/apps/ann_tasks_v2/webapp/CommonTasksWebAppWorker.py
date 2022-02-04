@@ -2275,9 +2275,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     data_files.append((mapContentType, 'bcif', mapPartitionNumber))
 
         for data_file in data_files:
-            if data_file:
-                ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-                        instance=instance, partNumber=data_file[2])
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+                    instance=instance, partNumber=data_file[2])
+            if ok:
                 downloadPath = du.getDownloadPath()
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
