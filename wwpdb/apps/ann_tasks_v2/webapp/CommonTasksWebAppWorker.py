@@ -2272,7 +2272,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
 
-                    data_files.append((mapContentType, 'bcif', mapPartitionNumber))
+                    data_files.append(('{}'.format(mapContentType), 'bcif', '{}'.format(mapPartitionNumber)))
 
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
