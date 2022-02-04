@@ -2277,7 +2277,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                     instance=instance, partNumber=data_file[2])
-            if ok:
+            if ok != 'None':
                 downloadPath = du.getDownloadPath()
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
