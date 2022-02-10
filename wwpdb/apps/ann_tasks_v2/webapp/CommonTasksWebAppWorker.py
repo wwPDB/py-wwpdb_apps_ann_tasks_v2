@@ -2262,11 +2262,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         ok = du.getFilePath(entryId)
         ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
         dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
+        #initiate data_files with map-xray to be appended with em files
         data_files = [('map-xray', 'bcif', '1')]
         if dIn and len(dIn) != 0:
             cObj = dIn[0].getObj("em_map")
             if cObj:
-                # loop through all the map file names in the mmcif file and convert to Bcif files
+                # loop through all the map file names in the mmcif file, get content type partition num and contour
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue('file', mapNumber)
                     mapContour = cObj.getValue('contour_level', mapNumber)
@@ -2283,8 +2284,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
                 myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
-
-                if data_file[3]:
+                #This if statement is horrible, fix it at some point
+                if len(data_file) == 4:
                     contourMap = '{}_contourLevel'.format(data_file[0].replace('-', '_'))
                     myD.setdefault('molStar-display-objects', []).append(
                         '{}={}'.format(contourMap, float(data_file[3])))
