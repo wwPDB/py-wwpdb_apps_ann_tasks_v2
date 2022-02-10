@@ -2280,17 +2280,21 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                     instance=instance, partNumber=data_file[2])
             if ok:
-                downloadPath = du.getDownloadPath()
-                downloadPath = du.getWebPath()
-                url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
-                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
-                '''
-                #This if statement is horrible, fix it at some point
                 if len(data_file) == 4:
+                    downloadPath = du.getDownloadPath()
+                    downloadPath = du.getWebPath()
+                    url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
+                    myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
+                    '''
                     contourMap = '{}_contourLevel'.format(data_file[0].replace('-', '_'))
                     myD.setdefault('molStar-display-objects', []).append(
                         '{}={}'.format(contourMap, float(data_file[3])))
-                        '''
+                      '''
+                else:
+                downloadPath = du.getDownloadPath()
+                downloadPath = du.getWebPath()
+                url_name = '{}_url'.format(data_file[0].replace('-', '_'))
+                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
 
         # EM image
 
