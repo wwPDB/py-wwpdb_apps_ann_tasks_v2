@@ -2287,7 +2287,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
                 #This if statement is horrible, fix it at some point
                 if len(data_file) == 4:
-                    contourMap = '{}_contourLevel'.format(data_file[0].replace('-', '_'))
+                    contourMap = '{}_{}_contourLevel'.format(data_file[0].replace('-', '_'), data_file[2])
                     myD.setdefault('molStar-display-objects', []).append(
                         '{}={}'.format(contourMap, float(data_file[3])))
 
