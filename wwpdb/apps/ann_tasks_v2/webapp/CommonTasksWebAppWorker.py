@@ -2110,9 +2110,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
                                      'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'
                                      }
-                #contour_level = pR.getPrimaryContourlevel()
-                #if contour_level:
-                #    myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
+                contour_level = pR.getPrimaryContourlevel()
+                if contour_level:
+                    myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
                 self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
 
             elif cT == 'model-pdb':
@@ -2285,12 +2285,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
                 myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
 
+'''
                 #This if statement is horrible, fix it at some point
                 if len(data_file) == 4:
                     contourMap = '{}_{}_contourLevel'.format(data_file[0].replace('-', '_'), data_file[2])
                     myD.setdefault('molStar-display-objects', []).append(
                         '{}={}'.format(contourMap, float(data_file[3])))
-
+'''
 
         # EM image
 
