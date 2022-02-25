@@ -2282,13 +2282,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 logging.info(downloadPath)
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
-                myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
+                myD.setdefault('molStar-display-objects', []).append('{}:"{}"'.format(url_name, downloadPath))
 
                 #This if statement is horrible, fix it at some point
                 if len(data_file) == 4:
                     contourMap = '{}_{}_contourLevel'.format(data_file[0].replace('-', '_'), data_file[2])
                     myD.setdefault('molStar-display-objects', []).append(
-                        '{}={}'.format(contourMap, float(data_file[3])))
+                        '{}:{}'.format(contourMap, float(data_file[3])))
 
 
         # EM image
@@ -2343,7 +2343,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if myD.get('molStar-display-objects'):
             display_object_str = ','.join(myD.get('molStar-display-objects', []))
             logging.debug('MOLSTAR COMMAND: {}'.format(display_object_str))
-            myD['molStar'] = """onLoad='display_mol_star({})'""".format(display_object_str)
+            myD['molStar'] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
             myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'.format()
 
         else:
