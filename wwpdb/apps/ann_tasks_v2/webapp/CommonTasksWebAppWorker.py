@@ -2101,7 +2101,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     #pdb_id = pR.getPdbIdCode()
                     #if pdb_id:
                     #    pass
-                    myD.setdefault('molStar-display-objects', []).append('molecule_url="{}"'.format(downloadWebPath))
+                    myD.setdefault('molStar-display-objects', []).append('molecule_url:"{}"'.format(downloadWebPath))
 
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup('No model data file.')
