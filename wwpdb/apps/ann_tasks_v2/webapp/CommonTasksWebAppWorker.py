@@ -2110,10 +2110,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
                                      'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'
                                      }
-                contour_level = pR.getPrimaryContourlevel()
-                if contour_level:
-                    myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
-                self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
+                #contour_level = pR.getPrimaryContourlevel()
+                #if contour_level:
+                    #myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
+                #self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
 
             elif cT == 'model-pdb':
                 ok = du.fetchId(entryId, contentType='model', formatType='pdb', fileSource=fileSource,
@@ -2258,7 +2258,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         # map display in binary cif
         # list of em file types to find
-
         ok = du.getFilePath(entryId)
         ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
         dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
@@ -2273,7 +2272,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapContour = cObj.getValue('contour_level', mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
-
                     data_files.append((mapContentType, 'bcif', mapPartitionNumber, mapContour))
 
         for data_file in data_files:
@@ -2281,17 +2279,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     instance=instance, partNumber=data_file[2])
             if ok:
                 downloadPath = du.getDownloadPath()
+                logging.info(downloadPath)
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
                 myD.setdefault('molStar-display-objects', []).append('{}="{}"'.format(url_name, downloadPath))
 
-'''
                 #This if statement is horrible, fix it at some point
                 if len(data_file) == 4:
                     contourMap = '{}_{}_contourLevel'.format(data_file[0].replace('-', '_'), data_file[2])
                     myD.setdefault('molStar-display-objects', []).append(
                         '{}={}'.format(contourMap, float(data_file[3])))
-'''
+
 
         # EM image
 
