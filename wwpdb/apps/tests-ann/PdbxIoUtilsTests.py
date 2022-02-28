@@ -20,12 +20,15 @@ import sys
 import unittest
 import os.path
 
+if __package__ is None or __package__ == "":
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from commonsetup import HERE  # noqa:  F401 pylint: disable=import-error,unused-import
+else:
+    from .commonsetup import HERE  # noqa: F401 pylint: disable=relative-beyond-top-level
 
 from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo,PdbxFileIo
 
-HERE = os.path.abspath(os.path.dirname(__file__))
 TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
 
 class PdbxIoUtilsTests(unittest.TestCase):
     def setUp(self):
@@ -33,7 +36,7 @@ class PdbxIoUtilsTests(unittest.TestCase):
         self.__verbose=True
         self.__lfh=sys.stdout
         ## Old examples - 
-        self.__pathExamples    = os.path.abspath(os.path.join(mockTopPath, 'MODELS'))
+        self.__pathExamples    = os.path.abspath(os.path.join(HERE, 'tests'))
         #
         self.__examFileList    = ['3rer.cif']
 

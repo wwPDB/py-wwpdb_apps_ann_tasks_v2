@@ -24,6 +24,13 @@ import os.path
 import platform
 import logging
 
+if __package__ is None or __package__ == "":
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from commonsetup import HERE  # noqa:  F401 pylint: disable=import-error,unused-import
+else:
+    from .commonsetup import HERE  # noqa: F401 pylint: disable=relative-beyond-top-level
+
+
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
 from mmcif.api.PdbxContainers                   import *
 from mmcif.api.DataCategory                     import DataCategory
@@ -42,7 +49,8 @@ formatter = logging.Formatter('[%(levelname)s] [%(module)s.%(funcName)s] %(messa
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 logger.setLevel(logging.DEBUG)
-
+l2 = logging.getLogger("mmcif")
+l2.setLevel(logging.INFO)
 
 class PdbxExpIoUtilsTests(unittest.TestCase):
     def setUp(self):
@@ -52,8 +60,8 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         self.__pathExamplesRel = "./tests"
         mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
         
-        self.__pathExamples = os.path.join(mockTopPath, 'SF')
-        self.__pathModelExamples = os.path.join(mockTopPath, 'MODELS')
+        self.__pathExamples = os.path.join(HERE, 'tests')
+        self.__pathModelExamples = os.path.join(HERE, 'tests')
         self.__examSFFileList = ['3oqp-sf.cif']
 
         self.__examFileRegex = os.path.join(HERE, 'tests', 'regex-input.cif')
@@ -92,9 +100,9 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         replacement = r"\n#END\ndata_"
         reObj = re.compile(pattern, re.MULTILINE | re.DOTALL | re.VERBOSE)
         # Flush changes made to the in-memory copy of the file back to disk
-        ofh = open(outFn, 'w')
-        ofh.write(reObj.sub(replacement, open(inpFn, 'r').read()) + '\n#END OF REFLECTIONS\n')
-        ofh.close()
+        with open(outFn, 'w') as ofh:
+            with open(inpFn, "r") as ifh:
+                ofh.write(reObj.sub(replacement, ifh.read()) + '\n#END OF REFLECTIONS\n')
         return True
 
     def testInsertComments(self):
