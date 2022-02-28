@@ -368,9 +368,9 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             replacement=r"\n#END\ndata_"
             reObj=re.compile(pattern, re.MULTILINE|re.DOTALL|re.VERBOSE)
             # Flush changes made to the in-memory copy of the file back to disk
-            ofh=open(outFn,'w')
-            ofh.write(reObj.sub(replacement, open(inpFn, 'r').read()) + '\n#END OF REFLECTIONS\n')
-            ofh.close()
+            with open(outFn,'w') as ofh:
+                with open(inptFn, "r") as ifh:
+                    ofh.write(reObj.sub(replacement, ifh.read()) + '\n#END OF REFLECTIONS\n')
             return True
         except:
             if self.__verbose:
