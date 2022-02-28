@@ -16,17 +16,31 @@ __email__     = "jwest@rcsb.rutgers.edu"
 __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.001"
 
-import sys, unittest, traceback
-import time, os, os.path, shutil
+import sys
+import unittest
+import traceback
+import time
+import os
+import os.path
+import shutil
+
+if __package__ is None or __package__ == "":
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from commonsetup import HERE, TESTOUTPUT  # noqa:  F401 pylint: disable=import-error,unused-import
+else:
+    from .commonsetup import HERE, TESTOUTPUT  # noqa: F401 pylint: disable=relative-beyond-top-level
+
 from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
+
 
 class PisaReaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh=sys.stdout
-        self.__pisaAssembliesFilePath='./data/pisa-assemblies.xml'
+        self.__pisaAssembliesFilePath = os.path.join(HERE, 'tests', 'pisa-assemblies.xml')
         #self.__pisaAssembliesFilePath='./data/3rij-assemblies.xml'
-        self.__pisaInterfacesFilePath='./data/pisa-interfaces.xml'        
-        self.__pisaAssembliesFilePath='./data/3rer_assembly-report_P1.xml'
+        self.__pisaInterfacesFilePath = os.path.join(HERE, 'tests', 'pisa-interfaces.xml')
+        self.__pisaAssembliesFilePath = os.path.join(HERE, 'tests', '3rer_assembly-report_P1.xml')
+        
     def tearDown(self):
         pass
     
@@ -36,9 +50,10 @@ class PisaReaderTests(unittest.TestCase):
         try:
             rC=PisaAssemblyReader(verbose=True,log=self.__lfh)
             rC.read(self.__pisaAssembliesFilePath)
-            rC.dump("pisa-assemblies.dump")
+            rC.dump(os.path.join(TESTOUTPUT, "pisa-assemblies.dump"))
             nA=rC.getAssemblySetCount()
             self.__lfh.write("Number of assembly sets %d\n" % nA)
+            self.assertEqual(nA, 3)
         except:
             traceback.print_exc(file=self.__lfh)
             self.fail()
