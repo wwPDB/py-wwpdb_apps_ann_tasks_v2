@@ -16,8 +16,6 @@ __author__ = "John Westbrook"
 __email__ = "john.westbrook@rcsb.org"
 __license__ = "Apache 2.0"
 
-
-
 from mmcif_utils.style.PdbxCategoryStyleBase import PdbxCategoryStyleBase
 
 

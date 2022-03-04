@@ -6,16 +6,18 @@
 #
 ##
 """
-EMD XML generation check 
+EMD XML generation check
 
 """
 __docformat__ = "restructuredtext en"
-__author__    = "Ezra Peisach"
-__email__     = "peisach@rcsb.rutgers.edu"
-__license__   = "Creative Commons Attribution 3.0 Unported"
-__version__   = "V0.01"
+__author__ = "Ezra Peisach"
+__email__ = "peisach@rcsb.rutgers.edu"
+__license__ = "Creative Commons Attribution 3.0 Unported"
+__version__ = "V0.01"
 
-import sys,os.path,os,traceback
+import sys
+import os.path
+import os
 import logging
 
 from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
@@ -30,33 +32,33 @@ class EmdXmlCheck(SessionWebDownloadUtils):
      Encapsulates checking of EMD XML generation
 
      Operations are performed in the current session context defined in the input
-     reqObj().  
+     reqObj().
 
     """
-    def __init__(self,reqObj=None,verbose=False,log=sys.stderr):
-        super(EmdXmlCheck,self).__init__(reqObj=reqObj,verbose=verbose,log=log)
-        self.__verbose=verbose
-        self.__lfh=log
-        self.__reqObj=reqObj
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
+        super(EmdXmlCheck, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
+        self.__verbose = verbose
+        self.__lfh = log
+        self.__reqObj = reqObj
         self.__setup()
-        
+
     def __setup(self):
-        self.__siteId=self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__sObj=self.__reqObj.getSessionObj()
+        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
+        self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__exportPath = self.__sessionPath
         self.__checkArgs = None
         self.__cleanup = False
-        self.__reportFileSize = 0        
+        self.__reportFileSize = 0
         self.__reportPath = None
 
-    def setExportPath(self,exportPath):
-        """  Set the path where output files are copyied.  
+    def setExportPath(self, exportPath):
+        """  Set the path where output files are copyied.
         """
         self.__exportPath = exportPath
 
-    def setArguments(self,checkArgs):
+    def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs
 
     def __logerr(self, errstr):
@@ -74,11 +76,11 @@ class EmdXmlCheck(SessionWebDownloadUtils):
         logger.debug("About to perform emd-xml check")
         try:
             self.clearFileList()
-            logPath=os.path.join(self.__exportPath,entryId+"_emd-check-report.log")
+            logPath = os.path.join(self.__exportPath, entryId + "_emd-check-report.log")
             if os.access(logPath, os.R_OK):
                 os.remove(logPath)
             #
-            self.__reportPath = os.path.join(self.__exportPath,entryId+"_emd-xml-header-report_P1.txt.V1")
+            self.__reportPath = os.path.join(self.__exportPath, entryId + "_emd-xml-header-report_P1.txt.V1")
             if os.access(self.__reportPath, os.R_OK):
                 os.remove(self.__reportPath)
             #
@@ -93,7 +95,6 @@ class EmdXmlCheck(SessionWebDownloadUtils):
             if not cObj:
                 # No em_admin
                 return True
-
 
             emh = EmHeaderUtils(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             #
@@ -115,7 +116,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
             if os.access(emdXmlPath, os.R_OK):
                 os.remove(emdXmlPath)
 
-            status = emh.transHeader(emdModelPath, emdXmlPath, self.__reportPath, validateXml = True)
+            status = emh.transHeader(emdModelPath, emdXmlPath, self.__reportPath, validateXml=True)
             logger.debug("Status of translation %s" % status)
 
             if self.__getSize(emdXmlPath):
@@ -125,7 +126,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
 
             return True
         except Exception as e:
-            if (self.__verbose):
+            if self.__verbose:
                 logger.error("emd xml header check failed for entryId %s file %s error: %s", entryId, modelInputFile, str(e))
             logger.exception("Failed to check XML file production")
             return False
@@ -135,11 +136,10 @@ class EmdXmlCheck(SessionWebDownloadUtils):
 
     def getReportPath(self):
         return self.__reportPath
-    
-    def __getSize(self,fn):
-        try:
-            statInfo=os.stat(fn)
-            return statInfo.st_size
-        except:
-            return 0
 
+    def __getSize(self, fn):
+        try:
+            statInfo = os.stat(fn)
+            return statInfo.st_size
+        except:  # noqa: E722 pylint: disable=bare-except
+            return 0

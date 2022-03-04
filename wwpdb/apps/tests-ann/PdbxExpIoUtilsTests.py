@@ -21,26 +21,17 @@ import traceback
 import time
 import os
 import os.path
-import platform
 import logging
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from commonsetup import HERE  # noqa:  F401 pylint: disable=import-error,unused-import
+    from commonsetup import HERE, TESTOUTPUT  # noqa:  F401 pylint: disable=import-error,unused-import
 else:
-    from .commonsetup import HERE  # noqa: F401 pylint: disable=relative-beyond-top-level
-
+    from .commonsetup import HERE, TESTOUTPUT  # noqa: F401 pylint: disable=relative-beyond-top-level
 
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
-from mmcif.api.PdbxContainers                   import *
-from mmcif.api.DataCategory                     import DataCategory
-
-
-HERE = os.path.abspath(os.path.dirname(__file__))
-TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
-if not os.path.exists(TESTOUTPUT):
-    os.makedirs(TESTOUTPUT)
+from mmcif.api.PdbxContainers import DataContainer
+from mmcif.api.DataCategory import DataCategory
 
 # Create logger
 logger = logging.getLogger()
@@ -52,14 +43,14 @@ logger.setLevel(logging.DEBUG)
 l2 = logging.getLogger("mmcif")
 l2.setLevel(logging.INFO)
 
+
 class PdbxExpIoUtilsTests(unittest.TestCase):
     def setUp(self):
         #
         self.__verbose = True
         self.__lfh = sys.stdout
         self.__pathExamplesRel = "./tests"
-        mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
-        
+
         self.__pathExamples = os.path.join(HERE, 'tests')
         self.__pathModelExamples = os.path.join(HERE, 'tests')
         self.__examSFFileList = ['3oqp-sf.cif']
@@ -82,7 +73,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         reObj = re.compile(pattern, re.MULTILINE | re.DOTALL)
 
         f = open(fn, 'a+b')
-        m = mmap.mmap(f.fileno(), 0, access = mmap.ACCESS_WRITE)
+        m = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_WRITE)
         reObj.sub(replacement, m)
         m.append('\n#END OF REFLECTIONS\n')
         # Flush changes made to the inmemory copy of the file back to disk
@@ -92,7 +83,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
 
     @staticmethod
     def __insertComments(inpFn, outFn):
-        """  Insert end of block/file comments in the input file -- 
+        """  Insert end of block/file comments in the input file --
         """
         import re
         #
@@ -118,7 +109,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
             fnInp = self.__examFileRegex
             fnOut = os.path.join(TESTOUTPUT, "test-regex-sf.cif")
             self.__insertComments(fnInp, fnOut)
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
@@ -155,7 +146,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 pIo.writeContainerList(fnOut, containerList)
                 self.__insertComments(fnOut, fnCmt)
 
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
@@ -167,9 +158,9 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                                                                        endTime - startTime))
 
     def testReadExpItems(self):
-        """ Read selected items from model and reflection data files -- 
+        """ Read selected items from model and reflection data files --
 
-            This is an illustration of the available accessor methods -- 
+            This is an illustration of the available accessor methods --
         """
         startTime = time.time()
         self.__lfh.write(
@@ -217,7 +208,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 # pIo.writeContainerList(fnOut,containerList)
                 # self.__insertComments(fnOut,fnCmt)
 
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
@@ -229,9 +220,9 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                                                                        endTime - startTime))
 
     def testUpdateExpItems(self):
-        """ update selected items from model and reflection data files -- 
+        """ update selected items from model and reflection data files --
 
-            This is an illustration of the available accessor methods -- 
+            This is an illustration of the available accessor methods --
         """
         startTime = time.time()
         self.__lfh.write(
@@ -240,8 +231,6 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                                                      sys._getframe().f_code.co_name,
                                                      time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
-
-            pIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
             for ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
                 # First get the get model data --
                 #
@@ -251,10 +240,10 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 if len(mcList) < 1:
                     continue
                 #
-                #  Read relevant data items in the first container -- 
+                #  Read relevant data items in the first container --
                 #
                 mE = PdbxExpIoUtils(dataContainer=mcList[0], verbose=self.__verbose, log=self.__lfh)
-                entryId = mE.getEntryId()
+                _entryId = mE.getEntryId()  # noqa: F841
                 pdbId = mE.getDbCode(dbId='PDB')
                 modelDiffrnSourceIdList = mE.getDiffrnSourceIds()
                 modelWavelengthD = {}
@@ -268,7 +257,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 containerList = sfIo.getContainerList(sfPath)
                 if len(containerList) < 1:
                     continue
-                # 
+                #
                 # ---- simple updates ----
                 sfIo.updateContainerNames(idCode=pdbId, containerList=containerList)
                 sfIo.updateEntryIds(idCode=pdbId, containerList=containerList)
@@ -281,12 +270,12 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     curContainerName = mE.getContainerName()
                     diffrnIdList = pE.getDiffrnIds()
                     curMuList = pE.getDiffrnRadiationWavelengthList()
-                    # 
+                    #
                     # Try to assign the diffrn_id for the current reflection data section ...
                     #
                     if len(diffrnIdList) > 1:
                         self.__lfh.write("+ERROR multiple diffrn_id codes %r in reflection data section %r\n" % (
-                        diffrnIdList, curContainerName))
+                            diffrnIdList, curContainerName))
                         continue
                     #
                     if len(diffrnIdList) < 1:
@@ -302,10 +291,10 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     else:
                         muList = []
                         muD = {}
-                        # no data -- move on  
+                        # no data -- move on
                         continue
                     #
-                    # Limited substitution - 
+                    # Limited substitution -
                     #
                     updMuList = []
                     for muId, mu, wt in curMuList:
@@ -316,14 +305,15 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                             updMuList.append((muId, mu, wt))
                             #
                     self.__lfh.write(" +++ updating wavelength setting in container %r updMuList %r\n" % (
-                    curContainerName, updMuList))
-                    ok = sfIo.updateRadiationWavelength(updMuList, container)
+                        curContainerName, updMuList))
+                    ok = sfIo.updateRadiationWavelength(updMuList, container)  # noqa: F841
+                    self.assertTrue(ok)
                 #
                 sfOutPath = os.path.join(TESTOUTPUT, sfFn + '-out')
                 sfIo.writeContainerList(sfOutPath, containerList)
-                fnCmt = os.path.join(TESTOUTPUT,sfFn + '-out-comment')
+                fnCmt = os.path.join(TESTOUTPUT, sfFn + '-out-comment')
                 self.__insertComments(sfOutPath, fnCmt)
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             self.fail()
 
@@ -341,7 +331,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         cl = []
         for i in range(100):
             container = DataContainer(name=str(i))
-            dc=DataCategory('diffrn_radiation_wavelength')
+            dc = DataCategory('diffrn_radiation_wavelength')
             dc.appendAttribute('id')
             dc.appendAttribute('wavelength')
             dc.append(['1', '1.1'])
@@ -357,8 +347,6 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         self.assertEqual(cl[1].getName(), "r1abcAsf")
         self.assertEqual(cl[50].getName(), "r1abcXAsf")
         self.assertEqual(cl[53].getName(), "r1abcABsf")
-            
-        
 
 
 def suiteUpdateExpItemsTests():
@@ -383,6 +371,7 @@ def suiteRegexTests():
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(PdbxExpIoUtilsTests("testInsertComments"))
     return suiteSelect
+
 
 def suiteNameTests():
     suiteSelect = unittest.TestSuite()

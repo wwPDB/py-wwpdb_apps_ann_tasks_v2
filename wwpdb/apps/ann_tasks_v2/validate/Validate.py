@@ -22,8 +22,11 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import os, shutil, sys, traceback
-#from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+import os
+import shutil
+import sys
+import traceback
+
 from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
@@ -61,7 +64,7 @@ class Validate(SessionWebDownloadUtils):
         return ret
 
     def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None, authorFscFile=None,
-               restraintInputFile = None, updateInput=True, annotationContext=False, validation_mode="annotate"):
+               restraintInputFile=None, updateInput=True, annotationContext=False, validation_mode="annotate"):
         """  Run the validation operation for all supported methods
         """
         uploadVersionOp = "none"
@@ -191,7 +194,7 @@ class Validate(SessionWebDownloadUtils):
             if (self.__cleanup):
                 dp.cleanup()
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("+Validate.runAll-  failed with exception for entryId %s\n" % entryId)
 

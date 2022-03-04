@@ -28,13 +28,12 @@ from wwpdb.io.locator.DataReference import ReferenceFileComponents
 
 class SessionDownloadUtils(object):
 
-    """ Common methods for managing download operations for project files within the session context.
-    """
+    """Common methods for managing download operations for project files within the session context."""
+
     #
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
-        """ Input request object is used to determine session context.
-        """
+        """Input request object is used to determine session context."""
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
@@ -51,7 +50,7 @@ class SessionDownloadUtils(object):
         self.__downloadDir = "downloads"
         #
         self.__downloadDirPath = os.path.join(self.__sessionPath, self.__sessionId, self.__downloadDir)
-        self.__webDownloadDirPath = os.path.join('/', self.__sessionDir, self.__sessionId, self.__downloadDir)
+        self.__webDownloadDirPath = os.path.join("/", self.__sessionDir, self.__sessionId, self.__downloadDir)
         self.__webDownloadFilePath = None
         #
         self.__targetFilePath = None
@@ -63,7 +62,7 @@ class SessionDownloadUtils(object):
         if not os.access(self.__downloadDirPath, os.W_OK):
             os.makedirs(self.__downloadDirPath, 0o755)
 
-    def getFilePath(self, idCode, contentType='model', formatType='pdbx', fileSource='archive', instance=None, mileStone=None, versionId='latest'):
+    def getFilePath(self, idCode, contentType="model", formatType="pdbx", fileSource="archive", instance=None, mileStone=None, versionId="latest"):
         return self.__pI.getFilePath(idCode, contentType=contentType, formatType=formatType, fileSource=fileSource, wfInstanceId=instance, mileStone=mileStone, versionId=versionId)
 
     def getWebDownloadPath(self):
@@ -79,7 +78,7 @@ class SessionDownloadUtils(object):
             rfc.set(fileName)
             idCode = rfc.getDepositionDataSetId()
             return idCode
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+SessionDownloadUtils.getIdFromFileName() + failed for file %s\n" % filePath)
                 traceback.print_exc(file=self.__lfh)
@@ -95,7 +94,7 @@ class SessionDownloadUtils(object):
             # return fields[2]
             cType = rfc.getContentType()
             return cType
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+SessionDownloadUtils.getContetTypeFromFileName() + failed for file %s\n" % filePath)
                 traceback.print_exc(file=self.__lfh)
@@ -114,7 +113,7 @@ class SessionDownloadUtils(object):
             #    return 'pdbx'
             # else:
             #    return fields[1]
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+SessionDownloadUtils.getContetFormatFromFileName() + failed for file %s\n" % filePath)
             return None
@@ -126,25 +125,21 @@ class SessionDownloadUtils(object):
             rfc.set(fileName)
             partNo = rfc.getPartitionNumber()
             return partNo
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+SessionDownloadUtils.getContetFormatFromFileName() + failed for file %s\n" % filePath)
             return 1
 
-    def fetchId(self, idCode, contentType='model', formatType='pdbx', fileSource='archive', instance=None, mileStone=None, versionId='latest'):
-        """ Copy the file with the input signature from the fileSource directory to the session download directory.
-        """
+    def fetchId(self, idCode, contentType="model", formatType="pdbx", fileSource="archive", instance=None, mileStone=None, versionId="latest"):
+        """Copy the file with the input signature from the fileSource directory to the session download directory."""
         filePath = self.__pI.getFilePath(
-            idCode,
-            contentType=contentType,
-            formatType=formatType,
-            fileSource=fileSource,
-            wfInstanceId=instance,
-            mileStone=mileStone,
-            versionId=versionId)
+            idCode, contentType=contentType, formatType=formatType, fileSource=fileSource, wfInstanceId=instance, mileStone=mileStone, versionId=versionId
+        )
         if self.__verbose:
-            self.__lfh.write("+SessionDownloadUtils.fetchId() id %s contentType %s format %s file source %s mileStone %s \n                       path %s\n" %
-                             (idCode, contentType, formatType, fileSource, mileStone, filePath))
+            self.__lfh.write(
+                "+SessionDownloadUtils.fetchId() id %s contentType %s format %s file source %s mileStone %s \n                       path %s\n"
+                % (idCode, contentType, formatType, fileSource, mileStone, filePath)
+            )
         if filePath is not None:
             return self.__fetchFile(filePath)
         else:
@@ -156,14 +151,12 @@ class SessionDownloadUtils(object):
         downloadFilePath = os.path.join(self.__downloadDirPath, targetFileName)
         if os.path.exists(downloadFilePath):
             os.unlink(downloadFilePath)
-        
 
     def copyToDownload(self, filePath):
         self.__fetchFile(filePath)
 
     def __fetchFile(self, filePath):
-        """ Save input file in session download directory -
-        """
+        """Save input file in session download directory -"""
         try:
             self.__webDownloadFilePath = None
             #
@@ -183,20 +176,18 @@ class SessionDownloadUtils(object):
                 shutil.copyfile(self.__targetFilePath, self.__downloadFilePath)
             self.__webDownloadFilePath = os.path.join(self.__webDownloadDirPath, self.__targetFileName)
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+SessionDownloadUtils.fetchFile() failed for file %s\n" % filePath)
                 traceback.print_exc(file=self.__lfh)
         return False
 
     def getWebPath(self):
-        """
-        """
+        """ """
         return self.__webDownloadFilePath
 
     def getDownloadPath(self):
-        """
-        """
+        """ """
         return self.__downloadFilePath
 
     def getDownloadSubFolderName(self):
@@ -206,9 +197,8 @@ class SessionDownloadUtils(object):
         """
         return self.__downloadDir
 
-    def getAnchorTag(self, label=None, target='_blank'):
-        """ Return the anchor tag corresponding the current download file selection.
-        """
+    def getAnchorTag(self, label=None, target="_blank"):
+        """Return the anchor tag corresponding the current download file selection."""
         if label is not None and len(label) > 0:
             txt = label
         else:

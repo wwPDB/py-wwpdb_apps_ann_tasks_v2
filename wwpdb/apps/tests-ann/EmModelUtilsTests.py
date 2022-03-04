@@ -74,7 +74,7 @@ class EmModelUtilsTests(unittest.TestCase):
                 self.__lfh.write("'%s': %r,\n" % (k, v))
             #
             emmu.updateModelFromHeader(entryId=self.__entryId, outModelFilePath='t-out.cif', mapType='primary map', partition='1')
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=sys.stdout)
             self.fail()
 

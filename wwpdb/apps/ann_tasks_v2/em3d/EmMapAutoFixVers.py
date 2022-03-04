@@ -28,10 +28,9 @@ class EmMapAutoFixVers(object):
         self.__lfh = log
         self.__siteId = siteId
         self.__sessionPath = sessionPath
-        self.__pI = PathInfo(sessionPath=sessionPath,
-                             verbose=self.__verbose, log=self.__lfh)
+        self.__pI = PathInfo(sessionPath=sessionPath, verbose=self.__verbose, log=self.__lfh)
 
-    def autoFixEmMapVersions(self, datasetid, modelin, modelout, location='archive'):
+    def autoFixEmMapVersions(self, datasetid, modelin, modelout, location="archive"):
         """For a given depositions id, takes the em_map category from modelin.  It will scan datasetid in location
         for version numbers corresponding to the filenames and update version number.  If any changes, will write
         modelout.
@@ -55,28 +54,25 @@ class EmMapAutoFixVers(object):
         block0 = c0[0]
 
         # Is there an em_map category?
-        tobj = block0.getObj('em_map')
+        tobj = block0.getObj("em_map")
         if not tobj:
             logger.info("No em_map category - done")
             return False
 
         updated = False
         for row in range(tobj.getRowCount()):
-            fname = tobj.getValue('file', row)
+            fname = tobj.getValue("file", row)
 
             (d_id, ct_type, ct_format, partno, verno) = self.__pI.parseFileName(fname)
             if not d_id:
                 logger.error("Could not parse filename in em_map category %s", fname)
                 continue
 
-            newname = self.__pI.getFileName(datasetid, contentType=ct_type, formatType=ct_format,
-                                            partNumber=partno,
-                                            fileSource=location,
-                                            versionId='latest')
+            newname = self.__pI.getFileName(datasetid, contentType=ct_type, formatType=ct_format, partNumber=partno, fileSource=location, versionId="latest")
             if newname != fname:
                 logger.debug("Updating fname from %s to %s" % (fname, newname))
                 updated = True
-                tobj.setValue(value=newname, attributeName='file', rowIndex=row)
+                tobj.setValue(value=newname, attributeName="file", rowIndex=row)
 
         if updated:
             logger.info("Model file updated")
@@ -90,16 +86,16 @@ class EmMapAutoFixVers(object):
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ch = logging.StreamHandler()
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    pI = PathInfo(sessionPath='/tmp')
+    pI = PathInfo(sessionPath="/tmp")
 
-    dep = 'D_800037'
-    modellocation = 'session'
-    modin = '/tmp/D_800037/D_800037_model_P1.cif.V17'
-    modout = '/tmp/D_800037/D_800037_model_P1.cif.V18'
-    ema = EmMapAutoFixVers(sessionPath='/tmp/D_800037')
-    ema.autoFixEmMapVersions(datasetid=dep, modelin=modin, modelout=modout, location='session')
+    dep = "D_800037"
+    modellocation = "session"
+    modin = "/tmp/D_800037/D_800037_model_P1.cif.V17"
+    modout = "/tmp/D_800037/D_800037_model_P1.cif.V18"
+    ema = EmMapAutoFixVers(sessionPath="/tmp/D_800037")
+    ema.autoFixEmMapVersions(datasetid=dep, modelin=modin, modelout=modout, location="session")

@@ -24,7 +24,7 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
     """
-     NmrChemShiftsMiscChecks class encapsulates miscellaneous checks implemented in the validation pipeline --
+    NmrChemShiftsMiscChecks class encapsulates miscellaneous checks implemented in the validation pipeline --
 
     """
 
@@ -46,8 +46,7 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
         #
 
     def run(self, entryId, csInpFilePath, xyzFilePath):
-        """  Run the NMR specific checks implemented in the validation pipeline -
-        """
+        """Run the NMR specific checks implemented in the validation pipeline -"""
         self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=True)
@@ -76,6 +75,6 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             if self.__cleanUp:
                 dp.cleanup()
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
         return False

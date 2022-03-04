@@ -23,17 +23,13 @@ __version__ = "V0.001"
 import os
 import os.path
 import sys
-import stat
 import traceback
-import datetime
-import time
 from xml.dom import minidom
 
 from wwpdb.io.misc.FormatOut import FormatOut
 
 
 class PisaAssemblyReader(object):
-
     def __init__(self, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
@@ -52,8 +48,8 @@ class PisaAssemblyReader(object):
         return self.__aD
 
     def getAssemblySetCount(self):
-        if ('total_asm' in self.__gD and (self.__gD['total_asm'] is not None)):
-            return int(self.__gD['total_asm'])
+        if "total_asm" in self.__gD and (self.__gD["total_asm"] is not None):
+            return int(self.__gD["total_asm"])
         else:
             return 0
 
@@ -68,45 +64,45 @@ class PisaAssemblyReader(object):
                 return False
             self.__dom = minidom.parse(filePath)
             return self.__getData()
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("+PisaAssemblyReader(read) read failed for file  %s\n" % filePath)
-            if (self.__verbose):
+            if self.__verbose:
                 traceback.print_exc(file=self.__lfh)
             return False
         #
 
     def __getData(self):
-        nodeList = ['name', 'status', 'total_asm', 'multimeric_state', 'all_chains_at_identity']
+        nodeList = ["name", "status", "total_asm", "multimeric_state", "all_chains_at_identity"]
         gD = {}
         sD = {}
         for node in nodeList:
             gD[node] = None
-        els = self.__dom.getElementsByTagName('pisa_results')
+        els = self.__dom.getElementsByTagName("pisa_results")
         for el in els:
             for child in el.childNodes:
-                if (child.nodeType != child.ELEMENT_NODE):
+                if child.nodeType != child.ELEMENT_NODE:
                     continue
-                if (len(child.childNodes) == 0):
+                if len(child.childNodes) == 0:
                     continue
                 node = str(child.nodeName)
-                if (node in nodeList):
+                if node in nodeList:
                     gD[node] = child.childNodes[0].nodeValue
-                if (node == 'asm_set'):
+                if node == "asm_set":
                     tD = self.__getAssemblySet(child)
-                    tId = int(str(tD['ser_no']))
+                    tId = int(str(tD["ser_no"]))
                     sD[tId] = tD
-                if (node == 'asu_complex'):
+                if node == "asu_complex":
                     tD = self.__getAssemblySet(child)
-                    tD['ser_no'] = 0
+                    tD["ser_no"] = 0
                     sD[0] = tD
 
         # make assembly dictionary
         aD = {}
         for k, v in sD.items():
-            for assem in v['assembly_list']:
-                uId = str(assem['serial_no'])
-                assem['set_ser_no'] = int(v['ser_no'])
-                assem['all_chains_at_identity'] = v['all_chains_at_identity']
+            for assem in v["assembly_list"]:
+                uId = str(assem["serial_no"])
+                assem["set_ser_no"] = int(v["ser_no"])
+                assem["all_chains_at_identity"] = v["all_chains_at_identity"]
                 aD[int(uId)] = assem
 
         self.__gD = gD
@@ -118,88 +114,129 @@ class PisaAssemblyReader(object):
         return True
 
     def __getAssemblySet(self, el):
-        nodeList = ['ser_no', 'all_chains_at_identity']
+        nodeList = ["ser_no", "all_chains_at_identity"]
 
         sD = {}
         for node in nodeList:
             sD[node] = None
-        sD['assembly_list'] = []
+        sD["assembly_list"] = []
         for child in el.childNodes:
-            if (child.nodeType != child.ELEMENT_NODE):
+            if child.nodeType != child.ELEMENT_NODE:
                 continue
-            if (len(child.childNodes) == 0):
+            if len(child.childNodes) == 0:
                 continue
-            if (child.nodeName in nodeList):
+            if child.nodeName in nodeList:
                 sD[str(child.nodeName)] = child.childNodes[0].nodeValue
-            elif (child.nodeName == "assembly"):
-                sD['assembly_list'].append(self.__getAssembly(child))
+            elif child.nodeName == "assembly":
+                sD["assembly_list"].append(self.__getAssembly(child))
             else:
                 pass
 
-        return (sD)
+        return sD
 
     def __getAssembly(self, el):
-        nodeList = ['serial_no', 'id', 'size', 'mmsize', 'score', 'diss_energy', 'asa', 'bsa',
-                    'entropy', 'diss_area', 'int_energy', 'n_uc', 'n_diss', 'symNumber', 'formula',
-                    'composition']
+        nodeList = [
+            "serial_no",
+            "id",
+            "size",
+            "mmsize",
+            "score",
+            "diss_energy",
+            "asa",
+            "bsa",
+            "entropy",
+            "diss_area",
+            "int_energy",
+            "n_uc",
+            "n_diss",
+            "symNumber",
+            "formula",
+            "composition",
+        ]
         aD = {}
         for node in nodeList:
             aD[node] = None
-        aD['molecule_list'] = []
+        aD["molecule_list"] = []
 
         for child in el.childNodes:
-            if (child.nodeType != child.ELEMENT_NODE):
+            if child.nodeType != child.ELEMENT_NODE:
                 continue
-            if (len(child.childNodes) == 0):
+            if len(child.childNodes) == 0:
                 continue
-            if (child.nodeName in nodeList):
+            if child.nodeName in nodeList:
                 aD[str(child.nodeName)] = child.childNodes[0].nodeValue
-            elif (child.nodeName == "molecule"):
-                aD['molecule_list'].append(self.__getMolecule(child))
+            elif child.nodeName == "molecule":
+                aD["molecule_list"].append(self.__getMolecule(child))
             else:
                 pass
 
-        return (aD)
+        return aD
 
     def __getMolecule(self, el):
-        nodeList = ['chain_id', 'visual_id', 'rxx', 'rxy', 'rxz', 'tx', 'ryx', 'ryy', 'ryz', 'ty',
-                    'rzx', 'rzy', 'rzz', 'tz', 'rxx-f', 'rxy-f', 'rxz-f', 'tx-f', 'ryx-f', 'ryy-f',
-                    'ryz-f', 'ty-f', 'rzx-f', 'rzy-f', 'rzz-f', 'tz-f', 'symId']
+        nodeList = [
+            "chain_id",
+            "visual_id",
+            "rxx",
+            "rxy",
+            "rxz",
+            "tx",
+            "ryx",
+            "ryy",
+            "ryz",
+            "ty",
+            "rzx",
+            "rzy",
+            "rzz",
+            "tz",
+            "rxx-f",
+            "rxy-f",
+            "rxz-f",
+            "tx-f",
+            "ryx-f",
+            "ryy-f",
+            "ryz-f",
+            "ty-f",
+            "rzx-f",
+            "rzy-f",
+            "rzz-f",
+            "tz-f",
+            "symId",
+        ]
 
         mD = {}
         for node in nodeList:
             mD[node] = None
 
         for child in el.childNodes:
-            if (child.nodeType != child.ELEMENT_NODE):
+            if child.nodeType != child.ELEMENT_NODE:
                 continue
-            if (len(child.childNodes) == 0):
+            if len(child.childNodes) == 0:
                 continue
-            if (child.nodeName in nodeList):
+            if child.nodeName in nodeList:
                 mD[str(child.nodeName)] = child.childNodes[0].nodeValue
             else:
                 pass
-        return (mD)
+        return mD
 
     def __reCalculateCompositions(self):
         chainOrder = self.__getAsuChainOrder()
-        for k,sD in self.__sD.items():
-            for aD in sD['assembly_list']:
-                aD['composition'] = self.__reCalculateComposition(aD['molecule_list'], chainOrder)
+        for k, sD in self.__sD.items():
+            for aD in sD["assembly_list"]:
+                aD["composition"] = self.__reCalculateComposition(aD["molecule_list"], chainOrder)
                 #
             #
         #
 
     def __getAsuChainOrder(self):
-        if not 0 in self.__sD:
+        if 0 not in self.__sD:
             return []
         #
         origChainOrder = []
-        for mD in self.__sD[0]['assembly_list'][0]['molecule_list']:    
-            chain_id = mD['chain_id']
-            idx = chain_id.find(']')
+        for mD in self.__sD[0]["assembly_list"][0]["molecule_list"]:
+            chain_id = mD["chain_id"]
+            idx = chain_id.find("]")
             if idx != -1:
-                chain_id = chain_id[:idx+1]
+                chain_id = chain_id[: idx + 1]
             #
             if chain_id not in origChainOrder:
                 origChainOrder.append(chain_id)
@@ -207,13 +244,13 @@ class PisaAssemblyReader(object):
         #
         sortChainOrder = []
         for chain_id in origChainOrder:
-            if chain_id[0] == '[':
+            if chain_id[0] == "[":
                 continue
             #
             sortChainOrder.append(chain_id)
         #
         for chain_id in origChainOrder:
-            if chain_id[0] != '[':
+            if chain_id[0] != "[":
                 continue
             #
             sortChainOrder.append(chain_id)
@@ -226,10 +263,10 @@ class PisaAssemblyReader(object):
         chnList = []
         myMap = {}
         for mD in molList:
-            chain_id = mD['chain_id']
-            idx = chain_id.find(']')
+            chain_id = mD["chain_id"]
+            idx = chain_id.find("]")
             if idx != -1:
-                chain_id = chain_id[:idx+1]
+                chain_id = chain_id[: idx + 1]
             #
             if chain_id in myMap:
                 myMap[chain_id] += 1
@@ -251,40 +288,40 @@ class PisaAssemblyReader(object):
         #
 
     def __reCalculateCompositionBasedAsuOrder(self, orderList, myMap):
-        orderList.sort(key = lambda data: data[1])
+        orderList.sort(key=lambda data: data[1])
         compList = []
         for tList in orderList:
             if myMap[tList[0]] > 1:
-                compList.append(tList[0] + '(' + str(myMap[tList[0]]) + ')')
+                compList.append(tList[0] + "(" + str(myMap[tList[0]]) + ")")
             else:
                 compList.append(tList[0])
             #
         #
-        return ','.join(compList)
+        return ",".join(compList)
 
     def __reCalculateCompositionBasedCurOrder(self, chnList, myMap):
         compList = []
         for chain_id in chnList:
-            if chain_id[0] == '[':
+            if chain_id[0] == "[":
                 continue
             #
             if myMap[chain_id] > 1:
-                compList.append(chain_id + '(' + str(myMap[chain_id]) + ')')
+                compList.append(chain_id + "(" + str(myMap[chain_id]) + ")")
             else:
                 compList.append(chain_id)
             #
         #
         for chain_id in chnList:
-            if chain_id[0] != '[':
+            if chain_id[0] != "[":
                 continue
             #
             if myMap[chain_id] > 1:
-                compList.append(chain_id + '(' + str(myMap[chain_id]) + ')')
+                compList.append(chain_id + "(" + str(myMap[chain_id]) + ")")
             else:
                 compList.append(chain_id)
             #
         #
-        return ','.join(compList)
+        return ",".join(compList)
 
     def dump(self, fileName):
         out = FormatOut()

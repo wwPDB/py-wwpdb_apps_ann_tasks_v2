@@ -11,3 +11,5 @@ wwpdb.utils.detach
 mmcif.utils
 matplotlib
 pygal
+
+mock; python_version < '3'

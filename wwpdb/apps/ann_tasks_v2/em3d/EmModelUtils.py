@@ -17,14 +17,13 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 import sys
-import os.path
-import os
 import json
 import traceback
 
 from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoUtil
 from mmcif_utils.style.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
 from mmcif.io.IoAdapterCore import IoAdapterCore
+
 #
 
 
@@ -115,124 +114,119 @@ class EmModelUtils(PdbxStyleIoUtil):
         self.__headD = {}
         self.__depHeadD = {}
         self.__mappingD = {
-            'axis_order_fast': '_em_map.axis_order_fast',
-            'axis_order_medium': '_em_map.axis_order_medium',
-            'axis_order_slow': '_em_map.axis_order_slow',
-            'cell_a': '_em_map.cell_a',
-            'cell_alpha': '_em_map.cell_alpha',
-            'cell_b': '_em_map.cell_b',
-            'cell_beta': '_em_map.cell_beta',
-            'cell_c': '_em_map.cell_c',
-            'cell_gamma': '_em_map.cell_gamma',
-            'data_type': '_em_map.data_type',
-            'dimensions_col': '_em_map.dimensions_col',
-            'dimensions_row': '_em_map.dimensions_row',
-            'dimensions_sec': '_em_map.dimensions_sec',
-            'endian_type': '_em_map.endian_type',
-            'format': '_em_map.format',
-            'label': '_em_map.label',
-            'limit_col': '_em_map.limit_col',
-            'limit_row': '_em_map.limit_row',
-            'limit_sec': '_em_map.limit_sec',
-            'origin_col': '_em_map.origin_col',
-            'origin_row': '_em_map.origin_row',
-            'origin_sec': '_em_map.origin_sec',
-            'pixel_spacing_x': '_em_map.pixel_spacing_x',
-            'pixel_spacing_y': '_em_map.pixel_spacing_y',
-            'pixel_spacing_z': '_em_map.pixel_spacing_z',
-            'size_kb': '_em_map.size_kb',
-            'spacing_x': '_em_map.spacing_x',
-            'spacing_y': '_em_map.spacing_y',
-            'spacing_z': '_em_map.spacing_z',
-            'statistics_average': '_em_map.statistics_average',
-            'statistics_maximum': '_em_map.statistics_maximum',
-            'statistics_minimum': '_em_map.statistics_minimum',
-            'statistics_std': '_em_map.statistics_std',
-            'symmetry_space_group': '_em_map.symmetry_space_group',
-            'id': '_em_map.id',
-            'entry_id': '_em_map.entry_id',
-            'file': '_em_map.file',
-            'type': '_em_map.type',
-            'partition': '_em_map.partition',
+            "axis_order_fast": "_em_map.axis_order_fast",
+            "axis_order_medium": "_em_map.axis_order_medium",
+            "axis_order_slow": "_em_map.axis_order_slow",
+            "cell_a": "_em_map.cell_a",
+            "cell_alpha": "_em_map.cell_alpha",
+            "cell_b": "_em_map.cell_b",
+            "cell_beta": "_em_map.cell_beta",
+            "cell_c": "_em_map.cell_c",
+            "cell_gamma": "_em_map.cell_gamma",
+            "data_type": "_em_map.data_type",
+            "dimensions_col": "_em_map.dimensions_col",
+            "dimensions_row": "_em_map.dimensions_row",
+            "dimensions_sec": "_em_map.dimensions_sec",
+            "endian_type": "_em_map.endian_type",
+            "format": "_em_map.format",
+            "label": "_em_map.label",
+            "limit_col": "_em_map.limit_col",
+            "limit_row": "_em_map.limit_row",
+            "limit_sec": "_em_map.limit_sec",
+            "origin_col": "_em_map.origin_col",
+            "origin_row": "_em_map.origin_row",
+            "origin_sec": "_em_map.origin_sec",
+            "pixel_spacing_x": "_em_map.pixel_spacing_x",
+            "pixel_spacing_y": "_em_map.pixel_spacing_y",
+            "pixel_spacing_z": "_em_map.pixel_spacing_z",
+            "size_kb": "_em_map.size_kb",
+            "spacing_x": "_em_map.spacing_x",
+            "spacing_y": "_em_map.spacing_y",
+            "spacing_z": "_em_map.spacing_z",
+            "statistics_average": "_em_map.statistics_average",
+            "statistics_maximum": "_em_map.statistics_maximum",
+            "statistics_minimum": "_em_map.statistics_minimum",
+            "statistics_std": "_em_map.statistics_std",
+            "symmetry_space_group": "_em_map.symmetry_space_group",
+            "id": "_em_map.id",
+            "entry_id": "_em_map.entry_id",
+            "file": "_em_map.file",
+            "type": "_em_map.type",
+            "partition": "_em_map.partition",
             #  depositor provided items --
-            'contour_level': '_em_map.contour_level',
-            'contour_level_source': '_em_map.contour_level_source',
-            'annotation_details': '_em_map.annotation_details'
+            "contour_level": "_em_map.contour_level",
+            "contour_level_source": "_em_map.contour_level_source",
+            "annotation_details": "_em_map.annotation_details",
         }
 
     def setMapType(self, mapType):
-        if mapType in ['primary map', 'mask', 'additional map', 'half map']:
-            self.__headD['type'] = mapType
+        if mapType in ["primary map", "mask", "additional map", "half map"]:
+            self.__headD["type"] = mapType
 
     def setEntryId(self, entryId):
-        self.__headD['entry_id'] = entryId
+        self.__headD["entry_id"] = entryId
 
     def setMapFileName(self, mapFileName):
-        self.__headD['file'] = mapFileName
+        self.__headD["file"] = mapFileName
 
     def setMapHeaderFilePath(self, jsonFilePath):
-        """
-        """
+        """ """
         rD = None
         try:
             with open(jsonFilePath) as ifh:
                 rD = json.load(ifh)
-        except:
-            if (self.__verbose):
+        except:  # noqa: E722 pylint: disable=bare-except
+            if self.__verbose:
                 self.__lfh.write("+EmModelUtils.setMapHeaderFilePath - failed for file %s\n" % jsonFilePath)
                 traceback.print_exc(file=self.__lfh)
             pass
         #
-        for k, v in rD['output_header_long'].items():
+        for k, v in rD["output_header_long"].items():
             self.__headD[k] = v
 
         return rD
 
     def setModelFilePath(self, modelFilePath):
-        """ Specify the mapping file path.
-        """
+        """Specify the mapping file path."""
         try:
             if self.readFile(modelFilePath):
                 return self.setContainer(containerIndex=0)
             else:
                 return False
-        except:
-            if (self.__verbose):
+        except:  # noqa: E722 pylint: disable=bare-except
+            if self.__verbose:
                 self.__lfh.write("+EmModelUtils.setModelHeaderFilePath - failed for file %s\n" % modelFilePath)
                 traceback.print_exc(file=self.__lfh)
 
         return False
 
     def getDepositorMapDetails(self, mapType, partition):
-        """  Fetch depositor map details from the current model file --
+        """Fetch depositor map details from the current model file --
 
-             Return these as a dictionary and store internally for export --
+        Return these as a dictionary and store internally for export --
         """
-        d = {'contour_level': '_em_map.contour_level',
-             'contour_level_source': '_em_map.contour_level_source',
-             'annotation_details': '_em_map.annotation_details'
-             }
+        d = {"contour_level": "_em_map.contour_level", "contour_level_source": "_em_map.contour_level_source", "annotation_details": "_em_map.annotation_details"}
         rD = {}
         for ky in d.keys():
-            rD[ky] = ''
+            rD[ky] = ""
         try:
             curContainer = self.getCurrentContainer()
-            cObj = curContainer.getObj('em_map')
+            cObj = curContainer.getObj("em_map")
             rL = []
-            nRows = self.getRowCount('em_map')
-            if (self.__verbose):
+            nRows = self.getRowCount("em_map")
+            if self.__verbose:
                 self.__lfh.write("+EmModelUtils.getDepositorMapDetails - found %d rows of map data\n" % nRows)
             if nRows > 0:
-                rL = cObj.selectIndicesFromList(attributeValueList=[str(mapType), str(partition)], attributeNameList=['type', 'partition'])
-                if (self.__verbose):
+                rL = cObj.selectIndicesFromList(attributeValueList=[str(mapType), str(partition)], attributeNameList=["type", "partition"])
+                if self.__verbose:
                     self.__lfh.write("+EmModelUtils.getDepositorMapDetails - found matching rows %d \n" % len(rL))
                 if len(rL) > 0:
                     iRow = rL[0]
                     for ky, itemName in d.items():
                         val = cObj.getValue(attributeName=ky, rowIndex=iRow)
                         rD[ky] = val
-        except:
-            if (self.__verbose):
+        except:  # noqa: E722 pylint: disable=bare-except
+            if self.__verbose:
                 self.__lfh.write("+EmModelUtils.getDepositorMapDetails - failed for type %r partition %r\n" % (mapType, partition))
                 traceback.print_exc(file=self.__lfh)
 
@@ -242,35 +236,33 @@ class EmModelUtils(PdbxStyleIoUtil):
         return rD
 
     def updateHeader(self, updD):
-        """  Add content from the input dictionary to current contents of the map header -
-        """
+        """Add content from the input dictionary to current contents of the map header -"""
         try:
             self.__headD.update(updD)
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             pass
         return False
 
-    def updateModelFromHeader(self, entryId, mapType='primary map', partition='1', outModelFilePath=None):
-        """
-        """
+    def updateModelFromHeader(self, entryId, mapType="primary map", partition="1", outModelFilePath=None):
+        """ """
         try:
             curContainer = self.getCurrentContainer()
             # create a stub category if none exists --
-            ok = self.newCategory('em_map', container=None, overWrite=False)
+            ok = self.newCategory("em_map", container=None, overWrite=False)
             if ok:
-                self.__headD['type'] = mapType
-                self.__headD['partition'] = str(partition)
+                self.__headD["type"] = mapType
+                self.__headD["partition"] = str(partition)
                 # ...
-                self.__headD['entry_id'] = entryId
+                self.__headD["entry_id"] = entryId
 
-                nRows = self.getRowCount('em_map')
-                if (self.__debug):
+                nRows = self.getRowCount("em_map")
+                if self.__debug:
                     self.__lfh.write("+EmModelUtils.updateModelFromHeader - em_map category length nRows %d\n" % nRows)
-                cObj = curContainer.getObj('em_map')
+                cObj = curContainer.getObj("em_map")
                 rL = []
                 if nRows > 0:
-                    rL = cObj.selectIndicesFromList(attributeValueList=[str(mapType), str(partition)], attributeNameList=['type', 'partition'])
+                    rL = cObj.selectIndicesFromList(attributeValueList=[str(mapType), str(partition)], attributeNameList=["type", "partition"])
                 if nRows > 0 and len(rL) > 0:
                     # update the first matching row -
                     iRow = rL[0]
@@ -279,12 +271,12 @@ class EmModelUtils(PdbxStyleIoUtil):
                     if nRows > 0:
                         tIdList = []
                         for ii in range(0, nRows):
-                            tId = cObj.getValue(attributeName='id', rowIndex=ii)
+                            tId = cObj.getValue(attributeName="id", rowIndex=ii)
                             tIdList.append(int(tId))
                         nId = sorted(tIdList)[-1]
                     else:
-                        nId = '1'
-                    self. __headD['id'] = nId
+                        nId = "1"
+                    self.__headD["id"] = nId
                     #
                     iRow = nRows
                 #
@@ -296,11 +288,11 @@ class EmModelUtils(PdbxStyleIoUtil):
                 #
                 return self.writeFile(outModelFilePath)
             else:
-                if (self.__verbose):
+                if self.__verbose:
                     self.__lfh.write("+EmModelUtils.updateModelFromHeader - cannot create em_map category for %s\n" % entryId)
                 return False
-        except:
-            if (self.__verbose):
+        except:  # noqa: E722 pylint: disable=bare-except
+            if self.__verbose:
                 self.__lfh.write("+EmModelUtils.updateModelFromHeader - failed for file %s\n" % outModelFilePath)
                 traceback.print_exc(file=self.__lfh)
         return False

@@ -42,7 +42,7 @@ class Check(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
-        self.__debug=False
+        self.__debug = False
         self.__setup()
 
     def __setup(self):
@@ -101,7 +101,7 @@ class Check(SessionWebDownloadUtils):
                 dp.cleanup()
 
             return pdbxPath
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("+%s.%s public cif conversion failed for entryId %s file %s\n" %
                                  (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
@@ -122,7 +122,7 @@ class Check(SessionWebDownloadUtils):
             if self.__debug:
                 dp.setDebugMode(flag=True)
             dp.imp(inpPath)
-            dp.addInput(name = 'destination', value = 'archive_next')
+            dp.addInput(name='destination', value='archive_next')
             dp.op("cif2pdbx-ext")
             dp.exp(pdbxPath)
             dp.expLog(logPath)
@@ -138,7 +138,7 @@ class Check(SessionWebDownloadUtils):
                 dp.cleanup()
 
             return pdbxPath
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("+%s.%s test cif conversion failed for entryId %s file %s\n" %
                                  (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
@@ -150,10 +150,6 @@ class Check(SessionWebDownloadUtils):
         """
         try:
             self.clearFileList()
-
-            #if (self.__verbose):
-            #    self.__lfh.write("+%s.%s for  entryId %s file %s dictionary %s\n" %
-            #                     (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath, self.__dictionaryVersion))
 
             logPath = os.path.join(self.__exportPath, entryId + "_dict-check-report.log")
             self.__reportPath = os.path.join(self.__exportPath, entryId + "_dict-check-report_P1.txt.V1")
@@ -185,7 +181,7 @@ class Check(SessionWebDownloadUtils):
                 else:
                     dp.imp(inpPath)
                 dp.op("check-cif-ext")
-                dp.addInput(name = 'dictionary', value = 'archive_next')
+                dp.addInput(name='dictionary', value='archive_next')
                 logPath = os.path.join(self.__exportPath, entryId + "_dict-check-report-next.log")
                 self.__reportPath = os.path.join(self.__exportPath, entryId + "_dict-check-report-next_P1.txt.V1")
 
@@ -218,7 +214,7 @@ class Check(SessionWebDownloadUtils):
             if (self.__cleanup):
                 dp.cleanup()
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("+%s.%s dictionary check failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
             traceback.print_exc(file=self.__lfh)
@@ -234,5 +230,5 @@ class Check(SessionWebDownloadUtils):
         try:
             statInfo = os.stat(fn)
             return statInfo.st_size
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             return 0

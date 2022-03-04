@@ -3,7 +3,7 @@
 # Date:  11-July-2013
 #
 # Updates:
-# 15-Jun-2014  jdw add accessor methods for struct_title/pdb_id 
+# 15-Jun-2014  jdw add accessor methods for struct_title/pdb_id
 ##
 """
 PDBx general report generator -
@@ -20,11 +20,8 @@ import shutil
 import sys
 import traceback
 
-# from mmcif_utils.pdbx.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
 from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
-# from mmcif_utils.style.PdbxXrayExpReportCategoryStyle          import PdbxXrayExpReportCategoryStyle
-#from mmcif_utils.style.PdbxReportCategoryStyle import PdbxReportCategoryStyle
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReportDepictBootstrap import PdbxReportDepictBootstrap
@@ -33,7 +30,7 @@ from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategory
 
 
 class PdbxReport(object):
-    """PDBx report generator functions. 
+    """PDBx report generator functions.
 
     """
 
@@ -42,14 +39,14 @@ class PdbxReport(object):
 
          :param `verbose`:  boolean flag to activate verbose logging.
          :param `log`:      stream for logging.
-          
+
         """
         self.__verbose = verbose
         self.__lfh = log
         self.__debug = False
         #
         self.__reqObj = reqObj
-        # 
+        #
         self.__sObj = self.__reqObj.newSessionObj()
         self.__sessionPath = self.__sObj.getPath()
         self.__sessionRelativePath = self.__sObj.getRelativePath()
@@ -144,14 +141,13 @@ class PdbxReport(object):
         return self.__filePath
 
     def doReport(self, contentType='model'):
-        """ Return data content required to render report -- 
+        """ Return data content required to render report --
         """
         #
         oD = {}
         oD['dataDict'] = {}
         filePath = self.__filePath
         fileFormat = self.__fileFormat
-        blockId = self.__idCode
         #
         if self.__verbose:
             self.__lfh.write("\n\n+PdbxReport.doReport()  - starting for content type %s \n" % contentType)
@@ -208,7 +204,7 @@ class PdbxReport(object):
 
             if (self.__verbose):
                 self.__lfh.write("+PdbxReport.doReport() - completed  - report object built\n")
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             if (self.__verbose):
                 self.__lfh.write("+PdbxReport.doReport() - report preparation failed for:  %s\n" % fileName)
                 traceback.print_exc(file=self.__lfh)
