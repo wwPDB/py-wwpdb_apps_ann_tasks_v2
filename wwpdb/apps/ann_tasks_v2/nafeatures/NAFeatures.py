@@ -27,9 +27,10 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 class NAFeatures(SessionWebDownloadUtils):
     """
-     The NAFeatures class encapsulates the calculation of geometrical features of nucleic acid polymers.
+    The NAFeatures class encapsulates the calculation of geometrical features of nucleic acid polymers.
 
     """
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(NAFeatures, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
@@ -50,8 +51,7 @@ class NAFeatures(SessionWebDownloadUtils):
         self.__naArgs = naArgs
 
     def run(self, entryId, inpFile, updateInput=True):
-        """  Run the geometrical feature calculation and merge the result with model file.
-        """
+        """Run the geometrical feature calculation and merge the result with model file."""
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-na-anal.log")
@@ -59,7 +59,7 @@ class NAFeatures(SessionWebDownloadUtils):
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
-            if (self.__naArgs is not None):
+            if self.__naArgs is not None:
                 dp.addInput(name="na_arguments", value=self.__naArgs)
             dp.op("annot-base-pair-info")
             dp.expLog(logPath1)
@@ -69,7 +69,7 @@ class NAFeatures(SessionWebDownloadUtils):
             self.addDownloadPath(logPath1)
             if updateInput:
                 dp.exp(inpPath)
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+NAFeatures.run-  completed for entryId %s file %s\n" % (entryId, inpPath))
 
             dp.cleanup()

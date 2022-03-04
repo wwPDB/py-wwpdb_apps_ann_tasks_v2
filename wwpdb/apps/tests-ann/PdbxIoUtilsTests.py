@@ -37,9 +37,9 @@ class PdbxIoUtilsTests(unittest.TestCase):
         self.__verbose = True
         self.__lfh = sys.stdout
         # Old examples -
-        self.__pathExamples = os.path.abspath(os.path.join(HERE, 'tests'))
+        self.__pathExamples = os.path.abspath(os.path.join(HERE, "tests"))
         #
-        self.__examFileList = ['3rer.cif']
+        self.__examFileList = ["3rer.cif"]
 
     def tearDown(self):
         pass
@@ -78,5 +78,5 @@ class PdbxIoUtilsTests(unittest.TestCase):
             self.assertNotEqual(polyEntityList, [])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

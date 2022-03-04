@@ -63,7 +63,7 @@ class UpdateRelated(object):
                 db_id = cobj.getValue("db_id", row)
                 if db_id is not None:
                     db_id = db_id.strip()
-                if db_name in ['PDB', 'BMRB', 'EMDB'] and db_id[:2] == "D_":
+                if db_name in ["PDB", "BMRB", "EMDB"] and db_id[:2] == "D_":
                     dbids = self.__getRelatedIds(db_id)
                     if dbids is None:
                         logf.write("Failed to retrieve database_2 info for %s\n" % db_id)
@@ -91,7 +91,7 @@ class UpdateRelated(object):
 
     def __getOutDir(self, fPath):
         """Attempts to find a writeable place for log file during read"""
-        for dp in [os.path.dirname(fPath), '.', tempfile.gettempdir()]:
+        for dp in [os.path.dirname(fPath), ".", tempfile.gettempdir()]:
             if os.access(dp, os.W_OK):
                 return dp
 

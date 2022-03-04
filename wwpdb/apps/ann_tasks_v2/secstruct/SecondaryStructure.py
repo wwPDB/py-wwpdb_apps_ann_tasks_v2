@@ -27,9 +27,10 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 class SecondaryStructure(SessionWebDownloadUtils):
     """
-     SecondaryStructure class encapsulates calculation of secondary structure.
+    SecondaryStructure class encapsulates calculation of secondary structure.
 
     """
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(SecondaryStructure, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
@@ -44,33 +45,32 @@ class SecondaryStructure(SessionWebDownloadUtils):
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__topFilePath = None
-        self.__status = 'none'
+        self.__status = "none"
         #
 
     def setTopologyFile(self, topFileName):
         tPath = os.path.join(self.__sessionPath, topFileName)
-        if (os.access(tPath, os.F_OK)):
+        if os.access(tPath, os.F_OK):
             self.__topFilePath = tPath
 
     def getLastStatus(self):
         return self.__status
 
     def __checkStatus(self, logFilePath):
-        status = 'ok'
+        status = "ok"
         if os.access(logFilePath, os.R_OK):
-            ifh = open(logFilePath, 'r')
+            ifh = open(logFilePath, "r")
             for line in ifh:
                 if str(line).upper().startswith("++WARN"):
-                    return 'warn'
+                    return "warn"
             ifh.close()
         else:
-            return 'error'
+            return "error"
 
         return status
 
     def run(self, entryId, inpFile, updateInput=True):
-        """  Run the secondary structure calculation and merge the result with model file.
-        """
+        """Run the secondary structure calculation and merge the result with model file."""
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-sec-struct-anal.log")
@@ -78,7 +78,7 @@ class SecondaryStructure(SessionWebDownloadUtils):
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
-            if (self.__topFilePath is not None):
+            if self.__topFilePath is not None:
                 dp.addInput(name="ss_topology_file_path", value=self.__topFilePath)
             dp.op("annot-secondary-structure")
             dp.expLog(logPath1)
@@ -90,7 +90,7 @@ class SecondaryStructure(SessionWebDownloadUtils):
 
             #
             self.__status = self.__checkStatus(logPath1)
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+SecondaryStructure.run-  completed with status %s for entryId %s file %s\n" % (self.__status, entryId, inpPath))
 
             dp.cleanup()

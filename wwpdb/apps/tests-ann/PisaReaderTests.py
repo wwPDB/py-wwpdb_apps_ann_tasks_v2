@@ -34,16 +34,15 @@ from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
 class PisaReaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stdout
-        self.__pisaAssembliesFilePath = os.path.join(HERE, 'tests', 'pisa-assemblies.xml')
-        self.__pisaInterfacesFilePath = os.path.join(HERE, 'tests', 'pisa-interfaces.xml')
-        self.__pisaAssembliesFilePath = os.path.join(HERE, 'tests', '3rer_assembly-report_P1.xml')
+        self.__pisaAssembliesFilePath = os.path.join(HERE, "tests", "pisa-assemblies.xml")
+        self.__pisaInterfacesFilePath = os.path.join(HERE, "tests", "pisa-interfaces.xml")
+        self.__pisaAssembliesFilePath = os.path.join(HERE, "tests", "3rer_assembly-report_P1.xml")
 
     def tearDown(self):
         pass
 
     def testPisaAssemblyReader(self):
-        """Test PISA assembly file reader -
-        """
+        """Test PISA assembly file reader -"""
         try:
             rC = PisaAssemblyReader(verbose=True, log=self.__lfh)
             rC.read(self.__pisaAssembliesFilePath)
@@ -62,7 +61,7 @@ def suitePisaTests():
     return suiteSelect
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     #
     mySuite = suitePisaTests()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

@@ -29,12 +29,13 @@ logger = logging.getLogger()
 
 class EmdXmlCheck(SessionWebDownloadUtils):
     """
-     Encapsulates checking of EMD XML generation
+    Encapsulates checking of EMD XML generation
 
-     Operations are performed in the current session context defined in the input
-     reqObj().
+    Operations are performed in the current session context defined in the input
+    reqObj().
 
     """
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(EmdXmlCheck, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
@@ -54,8 +55,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
         self.__reportPath = None
 
     def setExportPath(self, exportPath):
-        """  Set the path where output files are copyied.
-        """
+        """Set the path where output files are copyied."""
         self.__exportPath = exportPath
 
     def setArguments(self, checkArgs):
@@ -71,8 +71,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
             logger.error("Trying to log %s but reportPath not set!", errstr)
 
     def run(self, entryId, modelInputFile):
-        """  Run the format-level check on the input PDBx/mmCIF data file -
-        """
+        """Run the format-level check on the input PDBx/mmCIF data file -"""
         logger.debug("About to perform emd-xml check")
         try:
             self.clearFileList()
@@ -87,7 +86,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
 
             # Test if em_admin present in model
             ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
-            dIn = ioObj.readFile(inputFilePath=modelInputFile, selectList=['em_admin'])
+            dIn = ioObj.readFile(inputFilePath=modelInputFile, selectList=["em_admin"])
             if not dIn or len(dIn) == 0:
                 return True
 

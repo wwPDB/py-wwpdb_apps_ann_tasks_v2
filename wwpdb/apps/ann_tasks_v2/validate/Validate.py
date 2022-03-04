@@ -34,7 +34,7 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 class Validate(SessionWebDownloadUtils):
     """
-     The Validate class launches the validation processing and recovers reports and logs
+    The Validate class launches the validation processing and recovers reports and logs
 
     """
 
@@ -58,42 +58,52 @@ class Validate(SessionWebDownloadUtils):
         self.__validateArgs = validateArgs
 
     def run(self, entryId, modelInputFile=None, expInputFile=None, updateInput=True):
-        """  Old entry point. Believed not in use...
-        """
+        """Old entry point. Believed not in use..."""
         ret = self.runAll(entryId, modelInputFile=modelInputFile, reflnInputFile=expInputFile, updateInput=updateInput)
         return ret
 
-    def runAll(self, entryId, pdb_id=None, modelInputFile=None, reflnInputFile=None, csInputFile=None, volInputFile=None, authorFscFile=None,
-               restraintInputFile=None, updateInput=True, annotationContext=False, validation_mode="annotate"):
-        """  Run the validation operation for all supported methods
-        """
+    def runAll(
+        self,
+        entryId,
+        pdb_id=None,
+        modelInputFile=None,
+        reflnInputFile=None,
+        csInputFile=None,
+        volInputFile=None,
+        authorFscFile=None,
+        restraintInputFile=None,
+        updateInput=True,
+        annotationContext=False,
+        validation_mode="annotate",
+    ):
+        """Run the validation operation for all supported methods"""
         uploadVersionOp = "none"
         try:
             pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
             if modelInputFile is None:
-                modelFileName = pI.getFileName(entryId, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                modelFileName = pI.getFileName(entryId, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 inpPath = os.path.join(self.__sessionPath, modelFileName)
             else:
                 inpPath = os.path.join(self.__sessionPath, modelInputFile)
 
             if reflnInputFile is None:
-                reflnFileName = pI.getFileName(entryId, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                reflnFileName = pI.getFileName(entryId, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 sfPath = os.path.join(self.__sessionPath, reflnFileName)
             else:
                 sfPath = os.path.join(self.__sessionPath, reflnInputFile)
 
             if csInputFile is None:
-                csFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                csFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 csPath = os.path.join(self.__sessionPath, csFileName)
                 if not os.access(csPath, os.R_OK):
                     # Fallback on cs file
-                    csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                    csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                     csPath = os.path.join(self.__sessionPath, csFileName)
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
             if restraintInputFile is None:
-                restraintFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+                restraintFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 resPath = os.path.join(self.__sessionPath, restraintFileName)
             else:
                 resPath = os.path.join(self.__sessionPath, restraintInputFile)
@@ -103,37 +113,37 @@ class Validate(SessionWebDownloadUtils):
             else:
                 volPath = os.path.join(pI.getArchivePath(entryId), volInputFile)
             if authorFscFile is None or not authorFscFile:
-                authorFscPath = pI.getFileName(entryId, contentType="fsc", formatType="xml", versionId=uploadVersionOp, partNumber='1')
+                authorFscPath = pI.getFileName(entryId, contentType="fsc", formatType="xml", versionId=uploadVersionOp, partNumber="1")
             else:
                 authorFscPath = os.path.join(pI.getArchivePath(entryId), authorFscFile)
             #
             # Will not look for restraint file
             #
-            fName = pI.getFileName(entryId, contentType="validation-report", formatType="pdf", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report", formatType="pdf", versionId=uploadVersionOp, partNumber="1")
             resultPdfPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-full", formatType="pdf", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report-full", formatType="pdf", versionId=uploadVersionOp, partNumber="1")
             resultFullPdfPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-data", formatType="xml", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-data", formatType="xml", versionId=uploadVersionOp, partNumber="1")
             resultXmlPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="png", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="png", versionId=uploadVersionOp, partNumber="1")
             resultPngPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="svg", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="svg", versionId=uploadVersionOp, partNumber="1")
             resultSvgPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-images", formatType="tar", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report-images", formatType="tar", versionId=uploadVersionOp, partNumber="1")
             resultImageTarPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-data", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-data", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
             resultCifPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-2fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report-2fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
             result2FoPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+            fName = pI.getFileName(entryId, contentType="validation-report-fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
             resultFoPath = os.path.join(self.__sessionPath, fName)
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_val-report.log")
@@ -167,11 +177,11 @@ class Validate(SessionWebDownloadUtils):
 
             #
             if annotationContext:
-                dp.addInput(name='request_annotation_context', value="yes")
+                dp.addInput(name="request_annotation_context", value="yes")
             if validation_mode is not None:
-                dp.addInput(name='request_validation_mode', value="annotate")
+                dp.addInput(name="request_validation_mode", value="annotate")
             #
-            if (self.__validateArgs is not None):
+            if self.__validateArgs is not None:
                 dp.addInput(name="validate_arguments", value=self.__validateArgs)
             dp.op("annot-wwpdb-validate-all-sf")
             dp.expLog(logPath)
@@ -188,14 +198,14 @@ class Validate(SessionWebDownloadUtils):
             self.addDownloadPath(result2FoPath)
             self.addDownloadPath(logPath)
             #
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+Validate.runAll-  completed for entryId %s file %s\n" % (entryId, inpPath))
 
-            if (self.__cleanup):
+            if self.__cleanup:
                 dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+Validate.runAll-  failed with exception for entryId %s\n" % entryId)
 
             traceback.print_exc(file=self.__lfh)

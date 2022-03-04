@@ -25,12 +25,13 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 class FormatCheck(SessionWebDownloadUtils):
     """
-     Encapsulates format-level PDBx/mmCIF checking.
+    Encapsulates format-level PDBx/mmCIF checking.
 
-     Operations are performed in the current session context defined in the input
-     reqObj().
+    Operations are performed in the current session context defined in the input
+    reqObj().
 
     """
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(FormatCheck, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
@@ -50,16 +51,14 @@ class FormatCheck(SessionWebDownloadUtils):
         self.__reportPath = None
 
     def setExportPath(self, exportPath):
-        """  Set the path where output files are copyied.
-        """
+        """Set the path where output files are copyied."""
         self.__exportPath = exportPath
 
     def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs
 
     def run(self, entryId, inpPath, updateInput=True):
-        """  Run the format-level check on the input PDBx/mmCIF data file -
-        """
+        """Run the format-level check on the input PDBx/mmCIF data file -"""
         try:
             self.clearFileList()
             logPath = os.path.join(self.__exportPath, entryId + "_format-check-report.log")
@@ -72,7 +71,7 @@ class FormatCheck(SessionWebDownloadUtils):
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
-            if (self.__checkArgs is not None):
+            if self.__checkArgs is not None:
                 dp.addInput(name="check_arguments", value=self.__checkArgs)
             dp.op("annot-format-check-pdbx")
             dp.expLog(logPath)
@@ -83,15 +82,17 @@ class FormatCheck(SessionWebDownloadUtils):
                 self.addDownloadPath(self.__reportPath)
             #
             self.addDownloadPath(logPath)
-            if (self.__verbose):
-                self.__lfh.write("+%s.%s format check completed for entryId %s file %s report size %d\n" %
-                                 (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath, self.__reportFileSize))
+            if self.__verbose:
+                self.__lfh.write(
+                    "+%s.%s format check completed for entryId %s file %s report size %d\n"
+                    % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                )
 
-            if (self.__cleanup):
+            if self.__cleanup:
                 dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+%s.%s format check failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
             traceback.print_exc(file=self.__lfh)
             return False

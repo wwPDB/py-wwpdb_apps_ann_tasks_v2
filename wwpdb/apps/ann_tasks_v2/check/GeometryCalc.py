@@ -26,12 +26,13 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 class GeometryCalc(SessionWebDownloadUtils):
     """
-     Encapsulates geometry calculation updates.
+    Encapsulates geometry calculation updates.
 
-     Operations are performed in the current session context defined in the input
-     reqObj().
+    Operations are performed in the current session context defined in the input
+    reqObj().
 
     """
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(GeometryCalc, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
@@ -51,8 +52,7 @@ class GeometryCalc(SessionWebDownloadUtils):
         self.__checkArgs = checkArgs
 
     def run(self, entryId, inpFile, updateInput=True):
-        """  Run the geometry-level check on the input PDBx/mmCIF data file -
-        """
+        """Run the geometry-level check on the input PDBx/mmCIF data file -"""
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath = os.path.join(self.__sessionPath, entryId + "_geometry-calc-report.log")
@@ -65,7 +65,7 @@ class GeometryCalc(SessionWebDownloadUtils):
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
-            if (self.__checkArgs is not None):
+            if self.__checkArgs is not None:
                 dp.addInput(name="check_arguments", value=self.__checkArgs)
 
             dp.op("annot-validate-geometry")
@@ -76,14 +76,14 @@ class GeometryCalc(SessionWebDownloadUtils):
             if updateInput:
                 dp.exp(inpPath)
             #
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+%s.%s geometry calc completed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile))
 
-            if (self.__cleanup):
+            if self.__cleanup:
                 dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except
-            if (self.__verbose):
+            if self.__verbose:
                 self.__lfh.write("+%s.%s geometry calc failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile))
             traceback.print_exc(file=self.__lfh)
             return False

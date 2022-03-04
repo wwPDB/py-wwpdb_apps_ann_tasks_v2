@@ -24,6 +24,7 @@ import traceback
 import tempfile
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
+
 # from mmcif.api.PdbxContainers import *
 
 

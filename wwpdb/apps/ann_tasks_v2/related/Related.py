@@ -23,9 +23,10 @@ logger = logging.getLogger(__name__)
 
 class Related(SessionWebDownloadUtils):
     """
-     The Related class encapsulates the update of pdbx_database_releated
+    The Related class encapsulates the update of pdbx_database_releated
 
     """
+
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(Related, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
@@ -42,8 +43,7 @@ class Related(SessionWebDownloadUtils):
         #
 
     def run(self, entryId, inpFile, updateInput=True):
-        """  Run the related update
-        """
+        """Run the related update"""
         logger.info("About to update %s %s %s", entryId, inpFile, updateInput)
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
