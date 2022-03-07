@@ -1,4 +1,4 @@
-##
+s##
 #
 # File:    FileInventoryUtils.py
 # Author:  jdw
