@@ -49,6 +49,7 @@ except ImportError:
 import glob
 
 # from json import loads, dumps
+import inspect
 import logging
 import ntpath
 import operator
@@ -159,7 +160,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         super(CommonTasksWebAppWorker, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         #
         self.__debug = False
-        self.__htmlSpacer = "&nbsp;"
 
     ################################################################################################################
     # ------------------------------------------------------------------------------------------------------------
@@ -1365,7 +1365,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pthList = glob.glob(fpattern)
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dirp, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("assemblymodelfiles", fList)
             #
@@ -1374,7 +1374,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pthList = glob.glob(fpattern)
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("genassemblymodelfiles", fList)
             #
@@ -1383,7 +1383,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pthList = glob.glob(fpattern)
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("logfiles", fList)
             #
@@ -1393,7 +1393,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
 
             fpattern = self._sessionPath + "/" + entryId + "_assembly-assign_*"
@@ -1401,7 +1401,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pthList = glob.glob(fpattern)
             #
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("pisareports", fList)
 
@@ -1412,7 +1412,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("dccfiles", fList)
             #
@@ -1425,7 +1425,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # Only list if size is not zero
                 df = DataFile(fPath=pth)
                 if df.srcFileSize() > 0:
-                    (dir, fileName) = os.path.split(pth)
+                    (_dir, fileName) = os.path.split(pth)
                     fList.append(fileName)
             rC.set("emdxmlreportfiles", fList)
 
@@ -1436,7 +1436,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("siteresultfiles", fList)
             #
@@ -1446,7 +1446,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("checkreportfiles", fList)
 
@@ -1456,7 +1456,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("extracheckreportfiles", fList)
 
@@ -1466,7 +1466,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("specialpositionreportfiles", fList)
 
@@ -1479,7 +1479,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("valreportfiles", fList)
 
@@ -1491,7 +1491,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             mapDisplayFlag = False
             omitMapDisplayFlag = False
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 if pth.find("_map-2fofc_") > 0:
                     mapDisplayFlag = True
                 if pth.find("_map-omit-2fofc_") > 0:
@@ -1510,7 +1510,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
             rC.set("correspondencefile", fList)
             #
@@ -1524,7 +1524,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             fList = []
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
 
             fpattern = self._sessionPath + "/" + entryId + "_cs-auth_P*"
@@ -1532,7 +1532,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pthList = glob.glob(fpattern)
             #
             for pth in pthList:
-                (dir, fileName) = os.path.split(pth)
+                (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
 
             rC.set("csfiles", fList)
@@ -1629,38 +1629,38 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         pth = de.copyToSession(contentType="fsc", formatType="xml", version="latest", partitionNumber=1)
         return True
 
-    def _viewOp(self):
-        """Call to display data for given chem component in comparison grid of standalone version of chem comp module.
-        Delegates primary processing to ChemCompView class.
+    # def _viewOp(self):
+    #     """Call to display data for given chem component in comparison grid of standalone version of chem comp module.
+    #     Delegates primary processing to ChemCompView class.
 
-        :Helpers:
-            wwpdb.apps.ccmodule.view.ChemCompView.ChemCompView
+    #     :Helpers:
+    #         wwpdb.apps.ccmodule.view.ChemCompView.ChemCompView
 
-        :Returns:
-            Operation output is packaged in a ResponseContent() object.
-        """
-        if self._verbose:
-            self._lfh.write("--------------------------------------------\n")
-            self._lfh.write("+CommonTasksWebAppWorker._viewOp() starting\n")
-        #
-        self._getSession(useContext=True)
-        sessionId = self._sessionId
-        if self._verbose:
-            self._lfh.write("+CommonTasksWebAppWorker._viewOp() session ID is: %s\n" % sessionId)
-        #
-        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        rC.setReturnFormat("json")
-        #
-        # ccV=ChemCompView(reqObj=self._reqObj,verbose=self._verbose,log=self._lfh)
-        # rtrnCode=ccV.doView()
-        #
-        if self._verbose:
-            self._lfh.write("+CommonTasksWebAppWorker._viewOp() - return code is %s\n" % str(rtrnCode))
+    #     :Returns:
+    #         Operation output is packaged in a ResponseContent() object.
+    #     """
+    #     if self._verbose:
+    #         self._lfh.write("--------------------------------------------\n")
+    #         self._lfh.write("+CommonTasksWebAppWorker._viewOp() starting\n")
+    #     #
+    #     self._getSession(useContext=True)
+    #     sessionId = self._sessionId
+    #     if self._verbose:
+    #         self._lfh.write("+CommonTasksWebAppWorker._viewOp() session ID is: %s\n" % sessionId)
+    #     #
+    #     rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+    #     rC.setReturnFormat("json")
+    #     #
+    #     # ccV=ChemCompView(reqObj=self._reqObj,verbose=self._verbose,log=self._lfh)
+    #     # rtrnCode=ccV.doView()
+    #     #
+    #     if self._verbose:
+    #         self._lfh.write("+CommonTasksWebAppWorker._viewOp() - return code is %s\n" % str(rtrnCode))
 
-        rC.addDictionaryItems({"sessionid": str(sessionId)})
-        rC.setStatusCode(str(rtrnCode))
+    #     rC.addDictionaryItems({"sessionid": str(sessionId)})
+    #     rC.setStatusCode(str(rtrnCode))
 
-        return rC
+    #     return rC
 
     def _getBusterReportOp(self):
         """Getting buster report html context"""
@@ -1828,20 +1828,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         return rC
 
     def __saveEditorValue(self, extension):
-        id = self._reqObj.getValue("id")
+        did = self._reqObj.getValue("id")
         value = self._reqObj.getValue("value")
         entryId = self._reqObj.getValue("entryid")
         pickleFile = os.path.join(self._sessionPath, entryId + extension)
         #
-        map = {}
+        mapping = {}
         if os.access(pickleFile, os.F_OK):
             fb = open(pickleFile, "rb")
-            map = pickle.load(fb)
+            mapping = pickle.load(fb)
             fb.close()
         #
-        map[id] = value
+        mapping[did] = value
         fb = open(pickleFile, "wb")
-        pickle.dump(map, fb)
+        pickle.dump(mapping, fb)
         fb.close()
         #
         return value
@@ -1898,7 +1898,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         fileSource = str(self._reqObj.getValue("filesource")).lower()
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() - filesource is %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource))
+            self._lfh.write("+%s.%s() - filesource is %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource))
         #
         # add wf_archive to fix PDBe wfm issue -- jdw 2011-06-30
         #
@@ -1933,18 +1933,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             wft = WfTracking(verbose=self._verbose, log=self._lfh)
             bSuccess = wft.setInstanceStatus(depId=depId, instId=instId, classId=classId, status=p_status)
             if self._verbose:
-                self._lfh.write("+%s.%s() -TRACKING status updated to '%s' for session %s \n" % (self.__class__.__name__, sys._getframe().f_code.co_name, p_status, sessionId))
+                self._lfh.write(
+                    "+%s.%s() -TRACKING status updated to '%s' for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, p_status, sessionId)
+                )
         except:  # noqa: E722 pylint: disable=bare-except
             bSuccess = False
             if self._verbose:
                 self._lfh.write(
-                    "+%s.%s() - TRACKING status, update to '%s' failed for session %s \n" % (self.__class__.__name__, sys._getframe().f_code.co_name, p_status, sessionId)
+                    "+%s.%s() - TRACKING status, update to '%s' failed for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, p_status, sessionId)
                 )
             traceback.print_exc(file=self._lfh)
         #
         return bSuccess
 
-    def _renderCheckReports(self, entryId, fileSource="archive", instance=None, contentTypeList=[], useModelFileVersion=True):
+    def _renderCheckReports(self, entryId, fileSource="archive", instance=None, contentTypeList=None, useModelFileVersion=True):
         """Prepare HTML rendered reports for existing check report content for input Id code and fileSource.
 
              Rendered content is returned in a dictionary with the following content keys plus a tag list
@@ -1969,7 +1971,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         """
         self._lfh.write("+CommonTasksWebAppWorker._renderCheckReports contentTypeList %s\n" % contentTypeList)
-
+        if contentTypeList is None:
+            contentTypeList = []
         layout = "multiaccordion"
         #
         myD = {}
@@ -2206,9 +2209,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         if myD.get("molStar-display-objects"):
             display_object_str = ",".join(myD.get("molStar-display-objects", []))
-            logging.debug("MOLSTAR COMMAND: {}".format(display_object_str))
+            logging.debug("MOLSTAR COMMAND: %s", display_object_str)
             myD["molStar"] = """onLoad='display_mol_star({})'""".format(display_object_str)
-            myD["molStar-display"] = '<div id="myViewer">display_mol_star()</div>'.format()
+            myD["molStar-display"] = '<div id="myViewer">display_mol_star()</div>'
 
         else:
             myD["molStar"] = ""
@@ -2217,7 +2220,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         return myD
 
-    def _makeCheckReports(self, entryIdList, fileSource="wf-archive", operationList=["check"], useFileVersions=True):
+    def _makeCheckReports(self, entryIdList, fileSource="wf-archive", operationList=None, useFileVersions=True):
         """Create reports from the input operation list, using data files from the input fileSource.
              Copy reports to the session download directory (e.g. output file source = 'session-download')
              and return a list of html anchors tags for the report files.
@@ -2236,6 +2239,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         """
         #
+        if operationList is None:
+            operationList = ["check"]
+
         if useFileVersions:
             versionId = "latest"
         else:
@@ -2329,8 +2335,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     aTagList.append(duL.getAnchorTag())
 
             if "check-emd-xml" in operationList:
-                chk = EmdXmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 try:
+                    chk = EmdXmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                     chk.run(entryId=entryId, modelInputFile=modelFilePath)
                 except Exception as e:
                     logger.error("Error running EmdXmlCheck %s", e)
@@ -2498,7 +2504,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
     # Internal methods for creating json packaged responses to fetch, model-report and check report requests
     # starting from a request containing a data set id code & content type.
 
-    def _makeIdListFetchResponse(self, entryIdList, contentType, formatType="pdbx", fileSource="wf-archive"):
+    def _makeIdListFetchResponse(self, entryIdList, contentType, formatType="pdbx", fileSource="wf-archive"):  # pylint: disable=unused-argument
         """Fetch files of the input content type and present download links."""
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
@@ -2520,7 +2526,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         return rC
 
-    def _makeIdListModelReportResponse(self, entryIdList, contentType="model", formatType="pdbx", fileSource="archive", useFileVersions=True):
+    def _makeIdListModelReportResponse(self, entryIdList, contentType="model", formatType="pdbx", fileSource="archive", useFileVersions=True):  # pylint: disable=unused-argument
         """Prepare JSON response for a report request for the input Id code list."""
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
@@ -2818,7 +2824,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if ok1 and len(htmlText) > 0:
                     myD["map_header_html"] = htmlText
                 if doFigure:
-                    ok2, imgFp, imgTag = emu.plotMapDensity(mapHeaderFilePath, "figure.svg", plotFormat="svg")
+                    ok2, _imgFp, imgTag = emu.plotMapDensity(mapHeaderFilePath, "figure.svg", plotFormat="svg")
                     if ok2:
                         myD["map_density_plot"] = imgTag
 
@@ -2866,7 +2872,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if (len(entryId) > 0) and (len(mapFileName) > 0):
             emu = EmUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             emed = EmEditUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-            ok, nextJsonPath, nextLogPath = emed.updateMapHeader(entryId, mapFileName)
+            _ok, nextJsonPath, nextLogPath = emed.updateMapHeader(entryId, mapFileName)
             duL.copyToDownload(nextLogPath)
             aTagList.append(duL.getAnchorTag())
             duL.copyToDownload(nextJsonPath)
@@ -3065,7 +3071,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # make a session copy using a generated standard file name -
                 formatType = "pdbx"
                 try:
-                    (bN, eN) = os.path.splitext(csAuthFileName)
+                    (_bN, eN) = os.path.splitext(csAuthFileName)
                     fExt = eN[1:]
                     if fExt in ["str"]:
                         formatType = "nmr-star"
@@ -3076,7 +3082,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if self._verbose:
                     self._lfh.write("+CommonTasksWebAppWorker._uploadMultipleFilesOp() csAuthFileName %s session path is %s\n" % (csAuthFileName, tPath))
 
-                dN, fN = os.path.split(tPath)
+                _dN, fN = os.path.split(tPath)
                 csFileName = wuu.copyToSession(fileTag="file", sessionFileName=fN, uncompress=True)
                 fD[csFileName] = {"authName": csAuthName, "fileName": csFileName, "authFileName": csAuthFileName}
                 rC.setHtmlText("Uploaded file %s renamed to standard file name %s" % (csAuthFileName, csFileName))
@@ -3476,7 +3482,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     ##
     ##
-    def __uploadConversion(self, entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName, outContentType, outFormatType, timeOut=0):
+    def __uploadConversion(
+        self, entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName, outContentType, outFormatType, timeOut=0
+    ):  # pylint: disable=unused-argument
         """Worker method supporting the conversion operations for uploaded in current session ..."""
         if self._verbose:
             self._lfh.write(
@@ -3552,7 +3560,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 continue
             #
             statinfo = os.stat(latestFile)
-            head, tail = ntpath.split(latestFile)
+            _head, tail = ntpath.split(latestFile)
             fileTimeList.append([tail, latestFile, statinfo.st_mtime])
             #
             vList = tail.split(".V")
@@ -3568,7 +3576,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     continue
                 #
                 statinfo1 = os.stat(previousFile)
-                head, tail = ntpath.split(previousFile)
+                _head, tail = ntpath.split(previousFile)
                 fileTimeList.append([tail, previousFile, statinfo1.st_mtime])
                 #
         #

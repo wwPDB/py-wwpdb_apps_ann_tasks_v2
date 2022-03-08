@@ -23,6 +23,8 @@ import sys
 import os.path
 import os
 import traceback
+import inspect
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -43,19 +45,20 @@ class Check(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__debug = False
+        self.__reportPath = None
+        self.__dictionaryVersion = "V5"
+        self.__reportFileSize = 0
+        self.__checkArgs = None
+        self.__exportPath = None
+
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__exportPath = self.__sessionPath
-        self.__checkArgs = None
         self.__cleanup = False
-        self.__reportFileSize = 0
-        self.__dictionaryVersion = "V5"
-        self.__reportPath = None
 
     def setDictionaryVersion(self, version):
         if version.upper() in ["V6", "V5", "V4", "DEPOSIT", "ARCHIVE_NEXT", "ARCHIVE_CURRENT"]:
@@ -93,7 +96,7 @@ class Check(SessionWebDownloadUtils):
             self.addDownloadPath(pdbxPath)
 
             if self.__verbose:
-                self.__lfh.write("+%s.%s  creating public cif for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write("+%s.%s  creating public cif for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
 
             if self.__cleanup:
                 dp.cleanup()
@@ -101,7 +104,9 @@ class Check(SessionWebDownloadUtils):
             return pdbxPath
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("+%s.%s public cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write(
+                    "+%s.%s public cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath)
+                )
                 traceback.print_exc(file=self.__lfh)
         return None
 
@@ -128,7 +133,7 @@ class Check(SessionWebDownloadUtils):
             self.addDownloadPath(pdbxPath)
 
             if self.__verbose:
-                self.__lfh.write("+%s.%s  creating test cif for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write("+%s.%s  creating test cif for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
 
             if self.__cleanup:
                 dp.cleanup()
@@ -136,11 +141,11 @@ class Check(SessionWebDownloadUtils):
             return pdbxPath
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("+%s.%s test cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write("+%s.%s test cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
                 traceback.print_exc(file=self.__lfh)
         return None
 
-    def run(self, entryId, inpPath, updateInput=True):
+    def run(self, entryId, inpPath, updateInput=True):  # pylint: disable=unused-argument
         """Run the dictionary-level check on the input PDBx/mmCIF data file -"""
         try:
             self.clearFileList()
@@ -204,7 +209,7 @@ class Check(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s dictionary check version %s completed for entryId %s file %s report %s size %d\n"
-                    % (self.__class__.__name__, sys._getframe().f_code.co_name, self.__dictionaryVersion, entryId, inpPath, self.__reportPath, self.__reportFileSize)
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self.__dictionaryVersion, entryId, inpPath, self.__reportPath, self.__reportFileSize)
                 )
 
             if self.__cleanup:
@@ -212,7 +217,7 @@ class Check(SessionWebDownloadUtils):
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("+%s.%s dictionary check failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write("+%s.%s dictionary check failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
             traceback.print_exc(file=self.__lfh)
             return False
 
@@ -221,10 +226,3 @@ class Check(SessionWebDownloadUtils):
 
     def getReportPath(self):
         return self.__reportPath
-
-    def __getSize(self, fn):
-        try:
-            statInfo = os.stat(fn)
-            return statInfo.st_size
-        except:  # noqa: E722 pylint: disable=bare-except
-            return 0

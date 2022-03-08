@@ -39,4 +39,3 @@ class ImportTests(unittest.TestCase):
         _ctw = CommonTasksWebAppWorker(self.__reqObj)  # noqa: F841
         _atw = AnnTasksWebApp(self.__reqObj)  # noqa: F841
         _emaut = EmAutoFix(os.path.join(TESTOUTPUT, "sess"))  # noqa: F841
-        pass

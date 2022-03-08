@@ -179,7 +179,6 @@ class EmModelUtils(PdbxStyleIoUtil):
             if self.__verbose:
                 self.__lfh.write("+EmModelUtils.setMapHeaderFilePath - failed for file %s\n" % jsonFilePath)
                 traceback.print_exc(file=self.__lfh)
-            pass
         #
         for k, v in rD["output_header_long"].items():
             self.__headD[k] = v
@@ -222,7 +221,7 @@ class EmModelUtils(PdbxStyleIoUtil):
                     self.__lfh.write("+EmModelUtils.getDepositorMapDetails - found matching rows %d \n" % len(rL))
                 if len(rL) > 0:
                     iRow = rL[0]
-                    for ky, itemName in d.items():
+                    for ky, _itemName in d.items():
                         val = cObj.getValue(attributeName=ky, rowIndex=iRow)
                         rD[ky] = val
         except:  # noqa: E722 pylint: disable=bare-except

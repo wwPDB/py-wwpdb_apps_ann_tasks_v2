@@ -29,37 +29,16 @@ class MapDisplay(object):
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         self.__verbose = verbose
-        self.__debug = False
+        # self.__debug = False
         self.__lfh = log
         self.__reqObj = reqObj
         #
-        self.__modelPathRel = ""
         self.__setup()
 
     def __setup(self):
-        self.__entryId = self.__reqObj.getValue("entryid")
-        self.__entryFileName = self.__reqObj.getValue("entryfilename")
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__rltvSessionPath = self.__sObj.getRelativePath()
-        self.__requestUrl = self.__reqObj.getValue("request_host")
-
-        self.__attribNameList = [
-            "id",
-            "residue_name",
-            "chain_id",
-            "dcc_correlation ",
-            "real_space_R",
-            "Biso_mean ",
-            "occupancy_mean",
-            "warning",
-            "file_name_map_html",
-            "file_name_pdb",
-            "file_name_map",
-            "file_name_jmol",
-        ]
 
     def readLocalMapIndex(self, indexPath):
         """-- Set the file path of the index file read any existing file --"""
@@ -158,7 +137,3 @@ class MapDisplay(object):
         oL.append("<br />")
         #
         return oL
-
-    def __chunker(self, l, n):  # noqa:E741
-        """Devide the input list into a list of lists of size n"""
-        return [l[i : i + n] for i in range(0, len(l), n)]

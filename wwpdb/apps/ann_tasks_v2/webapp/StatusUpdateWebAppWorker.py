@@ -41,20 +41,22 @@ import sys
 import traceback
 import shutil
 import logging
-import datetime
-from dateutil.relativedelta import relativedelta, WE, FR
+import inspect
+
+# import datetime
+# from dateutil.relativedelta import relativedelta, WE, FR
 
 #
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
-from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
+
+# from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
 from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
 from wwpdb.apps.ann_tasks_v2.status.StatusUpdate import StatusUpdate
 from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
 from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
-
 from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
 
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+# from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.io.file.DataExchange import DataExchange
@@ -96,7 +98,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             "/service/status_update_tasks_v2/status_code_update": "_statusCodeUpdateOp",
             "/service/status_update_tasks_v2/status_reload": "_statusReloadOp",
             "/service/status_update_tasks_v2/inline_fileops": "_statusInlineFileOps",
-            "/service/status_update_tasks_v2/misc_reports": "_idReportOps",
+            # "/service/status_update_tasks_v2/misc_reports": "_idReportOps",
             "/service/status_update_tasks_v2/create_files": "_createFileOps",
             "/service/status_update_tasks_v2/mergexyzcalc": "_mergeXyzCalcAltOp",
             "/service/status_update_tasks_v2/process_site_update": "_statusProcessSiteUpdateOp",
@@ -163,7 +165,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "\n+%s.%s starting with identifier %s and filesource %s status flag %r \n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, identifier, fileSource, skipStatus)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier, fileSource, skipStatus)
             )
 
         return self.__makeStartOpResponse(identifier, contentType="model", formatType="pdbx")
@@ -201,7 +203,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             if self._verbose:
                 self._lfh.write(
                     "\n+%s.%s starting with identifier %s statusCode %r authRelCode %r annotatorId %r\n"
-                    % (self.__class__.__name__, sys._getframe().f_code.co_name, identifier, statusCode, authRelCode, annotatorId)
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier, statusCode, authRelCode, annotatorId)
                 )
 
         # Prepare the Startup data items
@@ -224,7 +226,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         myD["pdbid"] = pdbId
         # Requested accession codes. Legacy entries do not have this.
         myD["reqacctypes"] = reqAccTypes
-        logger.debug("reqacctypes is %r" % reqAccTypes)
+        logger.debug("reqacctypes is %r", reqAccTypes)
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("html")
@@ -238,7 +240,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         webIncludePath = os.path.join(self._reqObj.getValue("TopPath"), "htdocs")
         rC.setHtmlTextFromTemplate(templateFilePath=templateFilePath, webIncludePath=webIncludePath, parameterDict=myD, insertContext=True)
         if self.__debug:
-            self._lfh.write("\n+%s.%s dump response\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self._lfh.write("\n+%s.%s dump response\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             rC.dump()
         return rC
 
@@ -255,133 +257,133 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         return self._makeIdFetchResponse(idCode, contentType="model", formatType="pdbx")
 
-    def _idReportOps(self):
-        """Operations on data files identified by id and type."""
-        operation = self._reqObj.getValue("operation")
-        if self._verbose:
-            self._lfh.write("+StatusUpdateWebAppWorker._reviewDataInlineIdOps() starting with op %s\n" % operation)
+    # def _idReportOps(self):
+    #     """Operations on data files identified by id and type."""
+    #     operation = self._reqObj.getValue("operation")
+    #     if self._verbose:
+    #         self._lfh.write("+StatusUpdateWebAppWorker._reviewDataInlineIdOps() starting with op %s\n" % operation)
 
-        idCodes = self._reqObj.getValue("idcode")
-        idCodeList = idCodes.split(" ")
-        contentType = self._reqObj.getValue("contentType")
+    #     idCodes = self._reqObj.getValue("idcode")
+    #     idCodeList = idCodes.split(" ")
+    #     contentType = self._reqObj.getValue("contentType")
 
-        if self._verbose:
-            self._lfh.write("+StatusUpdateWebAppWorker._reviewDataInlineIdOps() content %s fetch id(s) %r\n" % (contentType, idCodeList))
-        #
-        if operation == "fetch_entry":
-            return self.__makeIdListFetchResponse(idCodeList, contentType="model", formatType="pdbx")
-        elif operation == "fetch_sf":
-            return self.__makeIdListFetchResponse(idCodeList, contentType="structure-factors", formatType="pdbx")
-        elif operation == "report":
-            return self.__makeIdListReportResponse(idCodeList, contentType)
-        elif operation in ["check", "checkv4", "checkNext"]:
-            return self.__makeIdListCheckResponse(idCodeList, contentType, operation=operation)
-        else:
-            pass
+    #     if self._verbose:
+    #         self._lfh.write("+StatusUpdateWebAppWorker._reviewDataInlineIdOps() content %s fetch id(s) %r\n" % (contentType, idCodeList))
+    #     #
+    #     if operation == "fetch_entry":
+    #         return self.__makeIdListFetchResponse(idCodeList, contentType="model", formatType="pdbx")
+    #     elif operation == "fetch_sf":
+    #         return self.__makeIdListFetchResponse(idCodeList, contentType="structure-factors", formatType="pdbx")
+    #     elif operation == "report":
+    #         return self.__makeIdListReportResponse(idCodeList, contentType)
+    #     elif operation in ["check", "checkv4", "checkNext"]:
+    #         return self.__makeIdListCheckResponse(idCodeList, contentType, operation=operation)
+    #     else:
+    #         pass
 
-    def __makeIdListReportResponse(self, idCodeList, contentType="model", formatType="pdbx"):
-        """Prepare response for a report request for the input Id code list."""
-        self._getSession()
+    # def __makeIdListReportResponse(self, idCodeList, contentType="model", formatType="pdbx"):
+    #     """Prepare response for a report request for the input Id code list."""
+    #     self._getSession()
 
-        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        rC.setReturnFormat("json")
-        #
-        du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
-        aTagList = []
-        htmlList = []
-        # layout='tabs'
-        # layout='accordion'
-        layout = "multiaccordion"
-        pR = PdbxReport(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        for idCode in idCodeList:
-            ok = du.fetchId(idCode, contentType, formatType=formatType)
-            if not ok:
-                continue
-            downloadPath = du.getDownloadPath()
-            aTagList.append(du.getAnchorTag())
-            htmlList.extend(pR.makeTabularReport(filePath=downloadPath, contentType=contentType, idCode=idCode, layout=layout))
+    #     rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+    #     rC.setReturnFormat("json")
+    #     #
+    #     du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+    #     aTagList = []
+    #     htmlList = []
+    #     # layout='tabs'
+    #     # layout='accordion'
+    #     layout = "multiaccordion"
+    #     pR = PdbxReport(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+    #     for idCode in idCodeList:
+    #         ok = du.fetchId(idCode, contentType, formatType=formatType)
+    #         if not ok:
+    #             continue
+    #         downloadPath = du.getDownloadPath()
+    #         aTagList.append(du.getAnchorTag())
+    #         htmlList.extend(pR.makeTabularReport(filePath=downloadPath, contentType=contentType, idCode=idCode, layout=layout))
 
-        if len(aTagList) > 0:
-            rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-            rC.setHtmlList(htmlList)
-            rC.setStatus(statusMsg="Reports completed")
-        else:
-            rC.setError(errMsg="No corresponding data file(s)")
-            # do nothing
+    #     if len(aTagList) > 0:
+    #         rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
+    #         rC.setHtmlList(htmlList)
+    #         rC.setStatus(statusMsg="Reports completed")
+    #     else:
+    #         rC.setError(errMsg="No corresponding data file(s)")
+    #         # do nothing
 
-        return rC
+    #     return rC
 
-    def __makeIdListCheckResponse(self, idCodeList, contentType, operation="check", formatType="pdbx"):
-        """Prepare response for a check request for the input Id code list."""
-        self._getSession()
-        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        rC.setReturnFormat("json")
-        #
-        du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
-        aTagList = []
-        htmlList = []
-        # fileFormat='cif'
-        # layout='tabs'
-        # layout='accordion'
-        # layout='multiaccordion'
+    # def __makeIdListCheckResponse(self, idCodeList, contentType, operation="check", formatType="pdbx"):
+    #     """Prepare response for a check request for the input Id code list."""
+    #     self._getSession()
+    #     rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+    #     rC.setReturnFormat("json")
+    #     #
+    #     du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+    #     aTagList = []
+    #     htmlList = []
+    #     # fileFormat='cif'
+    #     # layout='tabs'
+    #     # layout='accordion'
+    #     # layout='multiaccordion'
 
-        for idCode in idCodeList:
-            ok = du.fetchId(idCode, contentType, formatType=formatType)
-            if not ok:
-                continue
+    #     for idCode in idCodeList:
+    #         ok = du.fetchId(idCode, contentType, formatType=formatType)
+    #         if not ok:
+    #             continue
 
-            if operation in ["check", "checkv4"]:
-                filePath = du.getDownloadPath()
-                if operation in ["checkv4"]:
-                    logPath = os.path.join(self._sessionPath, idCode + "-check-v4.log")
-                else:
-                    logPath = os.path.join(self._sessionPath, idCode + "-check.log")
-                hasDiags = self.__makeCifCheckReport(filePath, logPath, op=operation)
-                if hasDiags:
-                    duL = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
-                    duL.copyToDownload(logPath)
-                    aTagList.append(duL.getAnchorTag())
-                    rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-                    rC.setStatus(statusMsg="Check completed")
-                else:
-                    rC.setStatus(statusMsg="No diagnostics for %s" % idCode)
+    #         if operation in ["check", "checkv4"]:
+    #             filePath = du.getDownloadPath()
+    #             if operation in ["checkv4"]:
+    #                 logPath = os.path.join(self._sessionPath, idCode + "-check-v4.log")
+    #             else:
+    #                 logPath = os.path.join(self._sessionPath, idCode + "-check.log")
+    #             hasDiags = self.__makeCifCheckReport(filePath, logPath, op=operation)
+    #             if hasDiags:
+    #                 duL = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+    #                 duL.copyToDownload(logPath)
+    #                 aTagList.append(duL.getAnchorTag())
+    #                 rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
+    #                 rC.setStatus(statusMsg="Check completed")
+    #             else:
+    #                 rC.setStatus(statusMsg="No diagnostics for %s" % idCode)
 
-        if len(aTagList) > 0:
-            rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-            rC.setHtmlList(htmlList)
-            rC.setStatus(statusMsg="Check report completed")
-        else:
-            rC.setError(errMsg="Check completed - no diagnostics")
-            # do nothing
+    #     if len(aTagList) > 0:
+    #         rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
+    #         rC.setHtmlList(htmlList)
+    #         rC.setStatus(statusMsg="Check report completed")
+    #     else:
+    #         rC.setError(errMsg="Check completed - no diagnostics")
+    #         # do nothing
 
-        return rC
+    #     return rC
 
-    def __makeCifCheckReport(self, filePath, logPath, op="check"):
-        """Create CIF dictionary check on the input file and return diagnostics in logPath.
+    # def __makeCifCheckReport(self, filePath, logPath, op="check"):
+    #     """Create CIF dictionary check on the input file and return diagnostics in logPath.
 
-        Return True if a report is created (logPath exists and has non-zero size)
-            or False otherwise
-        """
-        if self._verbose:
-            self._lfh.write("+StatusUpdateWebAppWorker.__makeCifCheckReport() with site %s for file %s\n" % (self._siteId, filePath))
-        dp = RcsbDpUtility(tmpPath=self._sessionPath, siteId=self._siteId, verbose=self._verbose, log=self._lfh)
-        dp.imp(filePath)
-        if op in ["check", "updatewithcheck"]:
-            dp.op("check-cif")
-        elif op in ["checkv4"]:
-            dp.op("check-cif-v4")
-        else:
-            # do something -
-            dp.opt("check-cif")
+    #     Return True if a report is created (logPath exists and has non-zero size)
+    #         or False otherwise
+    #     """
+    #     if self._verbose:
+    #         self._lfh.write("+StatusUpdateWebAppWorker.__makeCifCheckReport() with site %s for file %s\n" % (self._siteId, filePath))
+    #     dp = RcsbDpUtility(tmpPath=self._sessionPath, siteId=self._siteId, verbose=self._verbose, log=self._lfh)
+    #     dp.imp(filePath)
+    #     if op in ["check", "updatewithcheck"]:
+    #         dp.op("check-cif")
+    #     elif op in ["checkv4"]:
+    #         dp.op("check-cif-v4")
+    #     else:
+    #         # do something -
+    #         dp.op("check-cif")
 
-        dp.exp(logPath)
-        if not self.__debug:
-            dp.cleanup()
-        #
-        if os.access(logPath, os.R_OK) and os.stat(logPath).st_size > 0:
-            return True
-        else:
-            return False
+    #     dp.exp(logPath)
+    #     if not self.__debug:
+    #         dp.cleanup()
+    #     #
+    #     if os.access(logPath, os.R_OK) and os.stat(logPath).st_size > 0:
+    #         return True
+    #     else:
+    #         return False
 
     # --------------------------------------------------------------------------------------------------------------------------------
     #                      File production options implementing JSON responses -
@@ -497,7 +499,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgPostRelRecvdCoordDate = self._reqObj.getValue("postrelrecvdcoorddate")
         #
         # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
-        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s" % (orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode))
+        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s", orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode)
         #
         try:
             #   Update status history - first create a new history file if required.
@@ -732,7 +734,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         # get a copy of the current model -
         de = DataExchange(reqObj=self._reqObj, depDataSetId=entryId, fileSource="wf-archive", verbose=self._verbose, log=self._lfh)
         pth = de.copyToSession(contentType="model", formatType="pdbx", version="latest", partitionNumber=1)
-        (dn, fileName) = os.path.split(pth)
+        (_dn, fileName) = os.path.split(pth)
 
         # merge file format
         xyzFileFormat = self._reqObj.getValue("xyzfileformat")
@@ -841,41 +843,41 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         return self._makeIdFetchResponse(idCode, contentType="model", formatType="pdbx")
 
-    def __getHeaderReleaseDate(self):
-        """
-        Return the date 'yyyy-mm-dd' of the next release date (Wednesday) subject to the policy cutoff date.
+    # def __getHeaderReleaseDate(self):
+    #     """
+    #     Return the date 'yyyy-mm-dd' of the next release date (Wednesday) subject to the policy cutoff date.
 
-        Compute the reference delta - Friday 14:30 GMT to next Wed 00:00 GMT
+    #     Compute the reference delta - Friday 14:30 GMT to next Wed 00:00 GMT
 
-        """
-        #
-        #
-        try:
-            todayUTC = datetime.datetime.utcnow()
-            nxtFriR = todayUTC + relativedelta(days=+1, weekday=FR(+1))
-            nxtWedR = nxtFriR + relativedelta(days=+1, weekday=WE(+1))
-            off1 = datetime.datetime(nxtWedR.year, nxtWedR.month, nxtWedR.day, 0, 0, 1)
-            off2 = datetime.datetime(nxtFriR.year, nxtFriR.month, nxtFriR.day, 14, 30, 0)
-            diffRef = (off1 - off2).total_seconds()
-            # ------------------------------------
-            todayUTC = datetime.datetime.utcnow()
-            nxtWed = todayUTC + relativedelta(days=+1, weekday=WE(+1))
-            nxtWedS = datetime.datetime(nxtWed.year, nxtWed.month, nxtWed.day, 0, 0, 1)
-            #
-            diffTest = (nxtWedS - todayUTC).total_seconds()
-            #
-            if diffTest < diffRef:
-                #
-                trg = todayUTC + relativedelta(days=+1, weekday=WE(+2))
-            else:
-                trg = nxtWed
-            #
-            retDate = trg.strftime("%Y-%m-%d")
-        except:  # noqa: E722 pylint: disable=bare-except
-            traceback.print_exc(file=self._lfh)
-            retDate = None
+    #     """
+    #     #
+    #     #
+    #     try:
+    #         todayUTC = datetime.datetime.utcnow()
+    #         nxtFriR = todayUTC + relativedelta(days=+1, weekday=FR(+1))
+    #         nxtWedR = nxtFriR + relativedelta(days=+1, weekday=WE(+1))
+    #         off1 = datetime.datetime(nxtWedR.year, nxtWedR.month, nxtWedR.day, 0, 0, 1)
+    #         off2 = datetime.datetime(nxtFriR.year, nxtFriR.month, nxtFriR.day, 14, 30, 0)
+    #         diffRef = (off1 - off2).total_seconds()
+    #         # ------------------------------------
+    #         todayUTC = datetime.datetime.utcnow()
+    #         nxtWed = todayUTC + relativedelta(days=+1, weekday=WE(+1))
+    #         nxtWedS = datetime.datetime(nxtWed.year, nxtWed.month, nxtWed.day, 0, 0, 1)
+    #         #
+    #         diffTest = (nxtWedS - todayUTC).total_seconds()
+    #         #
+    #         if diffTest < diffRef:
+    #             #
+    #             trg = todayUTC + relativedelta(days=+1, weekday=WE(+2))
+    #         else:
+    #             trg = nxtWed
+    #         #
+    #         retDate = trg.strftime("%Y-%m-%d")
+    #     except:  # noqa: E722 pylint: disable=bare-except
+    #         traceback.print_exc(file=self._lfh)
+    #         retDate = None
 
-        return retDate
+    #     return retDate
 
     def _statusCodeUpdateEmOp(self):
         """EM Status code updates on data files identified by id.
@@ -1262,7 +1264,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         #
         # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
-        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s" % (orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode))
+        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s", orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode)
 
         if self._verbose:
             self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateV2Op() statusD %r\n" % statusD.items())

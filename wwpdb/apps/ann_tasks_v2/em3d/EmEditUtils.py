@@ -49,7 +49,7 @@ class EmEditUtils(SessionWebDownloadUtils):
         self.__sessionPath = self.__sObj.getPath()
         self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
         self.__cleanup = False
-        self.__currentHeaderFilePath = None
+
         self.__headerKeyList = [
             ("Map title", "label", True),
             ("Pixel sampling on x, y, and z", "voxel", True),

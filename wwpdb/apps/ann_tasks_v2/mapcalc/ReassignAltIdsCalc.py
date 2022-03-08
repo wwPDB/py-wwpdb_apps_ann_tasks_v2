@@ -36,16 +36,15 @@ class ReassignAltIdsCalc(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        self.__dccArgs = None
+        self.__cleanup = False
         #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__dccArgs = None
-        self.__cleanup = False
 
     def setArguments(self, dccArgs):
         self.__dccArgs = dccArgs

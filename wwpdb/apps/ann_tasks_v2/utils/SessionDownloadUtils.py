@@ -21,7 +21,6 @@ import os.path
 import shutil
 import traceback
 
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.io.locator.DataReference import ReferenceFileComponents
 
@@ -39,7 +38,6 @@ class SessionDownloadUtils(object):
         self.__reqObj = reqObj
         #
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI = ConfigInfo(self.__siteId)
         #
         self.__sessionId = self.__reqObj.getSessionId()
         self.__sessionPath = self.__reqObj.getSessionPath()
@@ -73,7 +71,7 @@ class SessionDownloadUtils(object):
 
     def getIdFromFileName(self, filePath):
         try:
-            (pth, fileName) = os.path.split(filePath)
+            (_pth, fileName) = os.path.split(filePath)
             rfc = ReferenceFileComponents(verbose=self.__verbose, log=self.__lfh)
             rfc.set(fileName)
             idCode = rfc.getDepositionDataSetId()
@@ -86,7 +84,7 @@ class SessionDownloadUtils(object):
 
     def getContentTypeFromFileName(self, filePath):
         try:
-            (pth, fileName) = os.path.split(filePath)
+            (_pth, fileName) = os.path.split(filePath)
 
             rfc = ReferenceFileComponents(verbose=self.__verbose, log=self.__lfh)
             rfc.set(fileName)
@@ -102,12 +100,12 @@ class SessionDownloadUtils(object):
 
     def getContentFormatFromFileName(self, filePath):
         try:
-            (pth, fileName) = os.path.split(filePath)
+            (_pth, fileName) = os.path.split(filePath)
 
             rfc = ReferenceFileComponents(verbose=self.__verbose, log=self.__lfh)
             rfc.set(fileName)
-            format = rfc.getContentFormat()
-            return format
+            fmt = rfc.getContentFormat()
+            return fmt
             # fields=fileName.split('.')
             # if fields[1] in ['cif']:
             #    return 'pdbx'
@@ -120,7 +118,7 @@ class SessionDownloadUtils(object):
 
     def getPartitionNumberFromFileName(self, filePath):
         try:
-            (pth, fileName) = os.path.split(filePath)
+            (_pth, fileName) = os.path.split(filePath)
             rfc = ReferenceFileComponents(verbose=self.__verbose, log=self.__lfh)
             rfc.set(fileName)
             partNo = rfc.getPartitionNumber()
@@ -147,7 +145,7 @@ class SessionDownloadUtils(object):
 
     def removeFromDownload(self, filePath):
         """Removes a previously setuop download file"""
-        (pth, targetFileName) = os.path.split(filePath)
+        (_pth, targetFileName) = os.path.split(filePath)
         downloadFilePath = os.path.join(self.__downloadDirPath, targetFileName)
         if os.path.exists(downloadFilePath):
             os.unlink(downloadFilePath)
@@ -170,7 +168,7 @@ class SessionDownloadUtils(object):
             if self.__verbose:
                 self.__lfh.write("+SessionDownloadUtils.fetchFile() copying input path %s\n" % filePath)
             self.__targetFilePath = filePath
-            (pth, self.__targetFileName) = os.path.split(self.__targetFilePath)
+            (_pth, self.__targetFileName) = os.path.split(self.__targetFilePath)
             self.__downloadFilePath = os.path.join(self.__downloadDirPath, self.__targetFileName)
             if self.__targetFilePath != self.__downloadFilePath:
                 shutil.copyfile(self.__targetFilePath, self.__downloadFilePath)

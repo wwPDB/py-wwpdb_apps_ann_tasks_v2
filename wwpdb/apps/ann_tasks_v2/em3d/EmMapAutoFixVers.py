@@ -23,11 +23,11 @@ logger = logging.getLogger()
 
 
 class EmMapAutoFixVers(object):
-    def __init__(self, sessionPath, siteId=None, verbose=True, log=sys.stderr):
+    def __init__(self, sessionPath, siteId=None, verbose=True, log=sys.stderr):  # pylint: disable=unused-argument
         self.__verbose = verbose
         self.__lfh = log
-        self.__siteId = siteId
-        self.__sessionPath = sessionPath
+        # self.__siteId = siteId
+        # self.__sessionPath = sessionPath
         self.__pI = PathInfo(sessionPath=sessionPath, verbose=self.__verbose, log=self.__lfh)
 
     def autoFixEmMapVersions(self, datasetid, modelin, modelout, location="archive"):
@@ -48,7 +48,7 @@ class EmMapAutoFixVers(object):
         ioobj = IoAdapterCore()
         c0 = ioobj.readFile(inputFilePath=modelin)
         if len(c0) == 0:
-            logger.error("Could not read %s" % modelin)
+            logger.error("Could not read %s", modelin)
             return False
 
         block0 = c0[0]
@@ -63,14 +63,14 @@ class EmMapAutoFixVers(object):
         for row in range(tobj.getRowCount()):
             fname = tobj.getValue("file", row)
 
-            (d_id, ct_type, ct_format, partno, verno) = self.__pI.parseFileName(fname)
+            (d_id, ct_type, ct_format, partno, _verno) = self.__pI.parseFileName(fname)
             if not d_id:
                 logger.error("Could not parse filename in em_map category %s", fname)
                 continue
 
             newname = self.__pI.getFileName(datasetid, contentType=ct_type, formatType=ct_format, partNumber=partno, fileSource=location, versionId="latest")
             if newname != fname:
-                logger.debug("Updating fname from %s to %s" % (fname, newname))
+                logger.debug("Updating fname from %s to %s", fname, newname)
                 updated = True
                 tobj.setValue(value=newname, attributeName="file", rowIndex=row)
 
@@ -79,11 +79,10 @@ class EmMapAutoFixVers(object):
 
             # Write model
             ret = ioobj.writeFile(outputFilePath=modelout, containerList=c0)
-            logger.info("Writing file returns %s %s" % (ret, modelout))
+            logger.info("Writing file returns %s %s", ret, modelout)
             return True
 
         return False
-        pass
 
 
 if __name__ == "__main__":

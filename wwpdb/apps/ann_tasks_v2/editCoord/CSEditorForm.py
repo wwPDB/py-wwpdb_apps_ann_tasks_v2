@@ -37,7 +37,6 @@ class CSEditorForm(object):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
         self.__entryFile = self.__reqObj.getValue("entrycsfilename")

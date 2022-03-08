@@ -37,7 +37,6 @@ class GetCloseContact(object):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
 
     def run(self, entryId, inpFile):
@@ -157,7 +156,7 @@ class GetCloseContact(object):
         return htmlTemplate % (str(count), select_green_button, tablerow)
 
 
-if __name__ == "__main__":
+def main():
     from wwpdb.utils.config.ConfigInfo import ConfigInfo
     from wwpdb.utils.session.WebRequest import InputRequest
 
@@ -175,4 +174,7 @@ if __name__ == "__main__":
     retD = calc.run("D_1000001900", "D_1000001900_model_P1.cif")
     for k, v in retD.items():
         print(k + "=" + v)
-    #
+
+
+if __name__ == "__main__":
+    main()

@@ -19,6 +19,7 @@ __version__ = "V0.07"
 import sys
 import os.path
 import os
+import inspect
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
@@ -36,21 +37,21 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        # self.__dccArgs = None
+        self.__reportPath = None
+        self.__reportFileSize = 0
         #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__dccArgs = None
         self.__cleanup = False
-        self.__reportPath = None
-        self.__reportFileSize = 0
 
-    def setArguments(self, dccArgs):
-        self.__dccArgs = dccArgs
+    def setArguments(self, dccArgs):  # pylint: disable=unused-argument
+        # self.__dccArgs = dccArgs
+        pass
 
     def getReportSize(self):
         return self.__reportFileSize
@@ -91,7 +92,7 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s special position check completed for entryId %s file %s report size %d\n"
-                    % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
                 )
 
             if self.__cleanup:

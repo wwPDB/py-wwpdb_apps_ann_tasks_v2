@@ -84,7 +84,6 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
         self.__templatePath = os.path.join(self.__topPath, "htdocs", "review_v2")
         self._reqObj.setValue("TemplatePath", self.__templatePath)
         #
-        self.__debug = True
 
     def _dumpOp(self):
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -119,7 +118,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             self._uploadFile()
             fileName = self._reqObj.getValue("fileName")
             filePath = os.path.join(self._sessionPath, fileName)
-            (rootName, ext) = os.path.splitext(fileName)
+            (_rootName, _ext) = os.path.splitext(fileName)
             isFile = True
             #
             du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -217,7 +216,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
 
         return self._generateModelReportHTML(idCodeList=idCodeList, templateFilePath=templateFilePath, webIncludePath=webIncludePath)
 
-    def _generateModelReportHTML(self, idCodeList, fileSource="wf-archive", instance=None, templateFilePath=None, webIncludePath=None):
+    def _generateModelReportHTML(self, idCodeList, fileSource="wf-archive", instance=None, templateFilePath=None, webIncludePath=None):  # pylint: disable=unused-argument
         """Prepare a response object contaiing a model report rendered in HTML for the entries in input idCodeList.
 
         Returns a full HTML page derived from the input template file -

@@ -25,10 +25,10 @@ class SessionWebDownloadUtils(object):
     """Common methods for managing web download path information and markup."""
 
     #
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         """Input request object is used to determine session context."""
-        self.__verbose = verbose
-        self.__lfh = log
+        # self.__verbose = verbose
+        # self.__lfh = log
         self.__reqObj = reqObj
         #
         #  The default download path is based on the session path --
@@ -38,10 +38,6 @@ class SessionWebDownloadUtils(object):
         self.__downloadDirPath = os.path.join(self.__sessionPath, self.__sessionId)
         self.__webDownloadDirPath = os.path.join("/", self.__sessionDir, self.__sessionId)
         #
-        self.__webDownloadFilePath = None
-        self.__targetFilePath = None
-        self.__targetFileName = None
-        self.__downloadFilePath = None
         self.__downloadFileNameList = []
 
     def clearFileList(self):
@@ -72,7 +68,7 @@ class SessionWebDownloadUtils(object):
         """Add the input filename to the list of download targets."""
         try:
             if os.access(os.path.join(filePath), os.R_OK):
-                (d, fileName) = os.path.split(filePath)
+                (_d, fileName) = os.path.split(filePath)
                 if label is not None:
                     self.__downloadFileNameList.append((fileName, label))
                 else:

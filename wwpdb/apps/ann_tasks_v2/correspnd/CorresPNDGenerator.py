@@ -30,9 +30,9 @@ import sys
 class CorresPNDGenerator(object):
     """Class responsible for parsing submitted form and generating correspondence"""
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        # self.__verbose = verbose
+        # self.__lfh = log
         self.__reqObj = reqObj
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionPath = self.__sObj.getPath()
@@ -52,22 +52,22 @@ class CorresPNDGenerator(object):
         #
         return "No item selected"
 
-    def __parseForm(self):
-        number = int(str(self.__reqObj.getValue("number_question")))
-        count = 0
-        for i in range(number):
-            title = str(self.__reqObj.getValue("question_" + str(i)))
-            if not title:
-                continue
-            #
-            text = str(self.__reqObj.getValue("text_" + str(i)))
-            if not text:
-                continue
-            #
-            count += 1
-            self.__corres_content += "\n" + str(count) + ". "
-            if not title.startswith("Free text question"):
-                self.__corres_content += title + "\n\n"
-            #
-            self.__corres_content += text + "\n\n"
-        #
+    # def __parseForm(self):
+    #     number = int(str(self.__reqObj.getValue("number_question")))
+    #     count = 0
+    #     for i in range(number):
+    #         title = str(self.__reqObj.getValue("question_" + str(i)))
+    #         if not title:
+    #             continue
+    #         #
+    #         text = str(self.__reqObj.getValue("text_" + str(i)))
+    #         if not text:
+    #             continue
+    #         #
+    #         count += 1
+    #         self.__corres_content += "\n" + str(count) + ". "
+    #         if not title.startswith("Free text question"):
+    #             self.__corres_content += title + "\n\n"
+    #         #
+    #         self.__corres_content += text + "\n\n"
+    #     #

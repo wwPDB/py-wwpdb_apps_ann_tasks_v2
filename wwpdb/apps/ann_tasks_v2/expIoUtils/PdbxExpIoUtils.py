@@ -158,7 +158,7 @@ class PdbxExpFileIo(object):
     def updateEntryIds(self, idCode, containerList):
         catNameList = [("cell", "entry_id"), ("entry", "id"), ("symmetry", "entry_id")]
         try:
-            for ii, container in enumerate(containerList):
+            for _ii, container in enumerate(containerList):
                 for catName, attribName in catNameList:
                     catObj = container.getObj(catName)
                     if catObj is not None:
@@ -180,8 +180,8 @@ class PdbxExpFileIo(object):
             dc.appendAttribute("id")
             dc.appendAttribute("wavelength")
             # dc.appendAttribute('wt')
-            for ii, (id, mu, wt) in enumerate(muList):
-                dc.append([id, mu])
+            for _ii, (cid, mu, _wt) in enumerate(muList):
+                dc.append([cid, mu])
             dc.printIt(fh=self.__lfh)
 
             catObj = container.getObj("diffrn_radiation_wavelength")
@@ -312,7 +312,6 @@ class PdbxExpIoUtils(object):
                 muList.append((muId, mu, wt))
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
-            pass
         return muList
 
     def __isEmptyValue(self, val):
@@ -327,19 +326,19 @@ class PdbxExpIoUtils(object):
         else:
             return default
 
-    def __getFirstValueFromList(self, attributeNameList, catObj=None, rowIndex=0):
-        """Return the value from the first non null attribute found in the input attribute list
-        from the input category object/rowIndex.
-        """
-        try:
-            for at in attributeNameList:
-                if catObj.hasAttribute(at):
-                    val = catObj.getValue(at, rowIndex)
-                    if not self.__isEmptyValue(val):
-                        return val
-            return ""
-        except:  # noqa: E722 pylint: disable=bare-except
-            return None
+    # def __getFirstValueFromList(self, attributeNameList, catObj=None, rowIndex=0):
+    #     """Return the value from the first non null attribute found in the input attribute list
+    #     from the input category object/rowIndex.
+    #     """
+    #     try:
+    #         for at in attributeNameList:
+    #             if catObj.hasAttribute(at):
+    #                 val = catObj.getValue(at, rowIndex)
+    #                 if not self.__isEmptyValue(val):
+    #                     return val
+    #         return ""
+    #     except:  # noqa: E722 pylint: disable=bare-except
+    #         return None
 
 
 if __name__ == "__main__":

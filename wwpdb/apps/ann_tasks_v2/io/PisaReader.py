@@ -33,10 +33,10 @@ class PisaAssemblyReader(object):
     def __init__(self, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
-        self.__filePath = None
         self.__aD = {}
         self.__gD = {}
         self.__sD = {}
+        self.__dom = None
 
     def getSummaryDict(self):
         return self.__gD
@@ -98,7 +98,7 @@ class PisaAssemblyReader(object):
 
         # make assembly dictionary
         aD = {}
-        for k, v in sD.items():
+        for _k, v in sD.items():
             for assem in v["assembly_list"]:
                 uId = str(assem["serial_no"])
                 assem["set_ser_no"] = int(v["ser_no"])
@@ -220,7 +220,7 @@ class PisaAssemblyReader(object):
 
     def __reCalculateCompositions(self):
         chainOrder = self.__getAsuChainOrder()
-        for k, sD in self.__sD.items():
+        for _k, sD in self.__sD.items():
             for aD in sD["assembly_list"]:
                 aD["composition"] = self.__reCalculateComposition(aD["molecule_list"], chainOrder)
                 #

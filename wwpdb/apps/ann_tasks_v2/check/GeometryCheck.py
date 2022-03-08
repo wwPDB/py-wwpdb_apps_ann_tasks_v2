@@ -19,6 +19,7 @@ __version__ = "V0.07"
 import sys
 import os.path
 import os
+import inspect
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
@@ -39,18 +40,19 @@ class GeometryCheck(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        self.__exportPath = None
+        self.__checkArgs = None
+        self.__reportFileSize = 0
+        self.__reportPath = None
+        self.__cleanup = False
+
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__exportPath = self.__sessionPath
-        self.__checkArgs = None
-        self.__cleanup = False
-        self.__reportFileSize = 0
-        self.__reportPath = None
 
     def setExportPath(self, exportPath):
         """Set the path where output files are copyied."""
@@ -59,7 +61,7 @@ class GeometryCheck(SessionWebDownloadUtils):
     def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs
 
-    def run(self, entryId, inpPath, updateInput=True):
+    def run(self, entryId, inpPath, updateInput=True):  # pylint: disable=unused-argument
         """Run the geometry-level check on the input PDBx/mmCIF data file -"""
         try:
             logPath = os.path.join(self.__exportPath, entryId + "_geometry-check-report.log")
@@ -86,7 +88,7 @@ class GeometryCheck(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s geometry check completed for entryId %s file %s report size %d\n"
-                    % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
                 )
 
             if self.__cleanup:
@@ -94,7 +96,7 @@ class GeometryCheck(SessionWebDownloadUtils):
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("+%s.%s geometry check failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write("+%s.%s geometry check failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
             traceback.print_exc(file=self.__lfh)
             return False
 
@@ -103,10 +105,3 @@ class GeometryCheck(SessionWebDownloadUtils):
 
     def getReportPath(self):
         return self.__reportPath
-
-    def __getSize(self, fn):
-        try:
-            statInfo = os.stat(fn)
-            return statInfo.st_size
-        except:  # noqa: E722 pylint: disable=bare-except
-            return 0

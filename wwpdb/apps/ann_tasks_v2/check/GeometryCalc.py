@@ -19,7 +19,9 @@ __version__ = "V0.07"
 import sys
 import os.path
 import os
+import inspect
 import traceback
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -38,14 +40,15 @@ class GeometryCalc(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+
+        self.__checkArgs = None
+
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__checkArgs = None
         self.__cleanup = False
 
     def setArguments(self, checkArgs):
@@ -77,13 +80,13 @@ class GeometryCalc(SessionWebDownloadUtils):
                 dp.exp(inpPath)
             #
             if self.__verbose:
-                self.__lfh.write("+%s.%s geometry calc completed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile))
+                self.__lfh.write("+%s.%s geometry calc completed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile))
 
             if self.__cleanup:
                 dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("+%s.%s geometry calc failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile))
+                self.__lfh.write("+%s.%s geometry calc failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile))
             traceback.print_exc(file=self.__lfh)
             return False

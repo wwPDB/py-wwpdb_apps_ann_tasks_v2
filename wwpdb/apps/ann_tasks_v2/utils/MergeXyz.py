@@ -35,19 +35,20 @@ class MergeXyz(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        self.__newXyzFilePath = None
+        self.__xyzFormat = "cif"
+        self.__status = "none"
+
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__newXyzFilePath = None
-        self.__xyzFormat = "cif"
-        self.__status = "none"
         #
 
-    def setReplacementXyzFile(self, newXyzFileName, format="cif"):
+    def setReplacementXyzFile(self, newXyzFileName, format="cif"):  # pylint: disable=redefined-builtin
         tPath = os.path.join(self.__sessionPath, newXyzFileName)
         if os.access(tPath, os.F_OK):
             self.__newXyzFilePath = tPath

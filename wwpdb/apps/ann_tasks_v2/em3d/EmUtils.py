@@ -30,8 +30,8 @@ import os
 import json
 import math
 import traceback
+
 from wwpdb.io.file.DataExchange import DataExchange
-from wwpdb.io.locator.PathInfo import PathInfo
 
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -61,30 +61,10 @@ class EmUtils(SessionWebDownloadUtils):
         self.__setup()
 
     def __setup(self):
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
-        self.__cleanup = False
-        self.__currentHeaderFilePath = None
-        self.__headerKeyList = [
-            ("Map title", "label", True),
-            ("Pixel sampling on x, y, and z", "voxel", True),
-            ("Start points on columns, rows, and sections", "gridstart", True),
-            ("Grid sampling on x, y, and z", "gridsampling", False),
-            ("Cell dimensions (x, y, and z, alpha, beta, gamma)", "cell", False),
-            ("Space group number", "", False),
-            ("Number of columns, rows, and sections", "", False),
-            ("Origin in MRC format", "", False),
-            ("Maximum density", "", False),
-            ("Minimum density", "", False),
-            ("Average density", "", False),
-            ("RMS deviation from mean density", "", False),
-            ("Fast, medium and slow axes", "", False),
-            ("Map mode", "", False),
-            ("Map endianness", "", False),
-        ]
+        # self.__cleanup = False
 
     def renderEmMapFileList(self, entryId, contentType="em-volume", formatType="map", fileSource="archive", colTextHtml="Archive map files"):
         """General listing methods for em data objects --"""
@@ -101,7 +81,7 @@ class EmUtils(SessionWebDownloadUtils):
             oL.append('<table class="table table-bordered table-striped">')
             oL.append("<tr><th>%s</th><th>Modification Time</th><th>Size (KBytes)</th></tr>" % colTextHtml)
             for tup in tupL:
-                (dN, fN) = os.path.split(tup[0])
+                (_dN, fN) = os.path.split(tup[0])
                 oL.append("<tr>")
                 href = self.__makeEditMapHref(entryId, fN)
                 oL.append("<td>%s</td>" % href)
@@ -129,7 +109,7 @@ class EmUtils(SessionWebDownloadUtils):
         oL.append('<table class="table table-bordered table-striped">')
         oL.append("<tr><th>Archive Map Files</th><th>Modification Time</th><th>Size (KBytes)</th></tr>")
         for tup in tupL:
-            (dN, fN) = os.path.split(tup[0])
+            (_dN, fN) = os.path.split(tup[0])
             oL.append("<tr>")
             href = self.__makeEditMapHref(entryId, fN)
             oL.append("<td>%s</td>" % href)
@@ -153,7 +133,7 @@ class EmUtils(SessionWebDownloadUtils):
         oL.append('<table class="table table-bordered table-striped">')
         oL.append("<tr><th>Archive Mask Files</th><th>Modification Time</th><th>Size (KBytes)</th></tr>")
         for tup in tupL:
-            (dN, fN) = os.path.split(tup[0])
+            (_dN, fN) = os.path.split(tup[0])
             oL.append("<tr>")
             href = self.__makeEditMapHref(entryId, fN)
             oL.append("<td>%s</td>" % href)
@@ -176,7 +156,7 @@ class EmUtils(SessionWebDownloadUtils):
         oL.append('<table class="table table-bordered table-striped">')
         oL.append("<tr><th>Archive Additional Map Files</th><th>Modification Time</th><th>Size (KBytes)</th></tr>")
         for tup in tupL:
-            (dN, fN) = os.path.split(tup[0])
+            (_dN, fN) = os.path.split(tup[0])
             oL.append("<tr>")
             href = self.__makeEditMapHref(entryId, fN)
             oL.append("<td>%s</td>" % href)
@@ -199,7 +179,7 @@ class EmUtils(SessionWebDownloadUtils):
                 mapHeaderFilePath = os.path.join(self.__sessionPath, entryId + "_em-volume-header_P1.map")
                 mapDensityPlotFile = entryId + "_em-volume-density_P1.svg"
             #
-            return self.plotMapDensityPygal(mapHeaderFilePath, mapDensityPlotFile, plotFormat="svg")
+            return self.plotMapDensityPygal(mapHeaderFilePath, mapDensityPlotFile)
 
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:

@@ -32,6 +32,7 @@ __version__ = "V0.07"
 import json
 import os
 import sys
+import inspect
 import logging
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
@@ -150,7 +151,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         }
         self.addServices(self.__appPathD)
         #
-        self.__debug = False
+        # self.__debug = False
         self.__doStatusUpdate = True
         if self._siteId in ["WWPDB_DEPLOY_MACOSX"]:
             self.__doStatusUpdate = False
@@ -179,7 +180,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
 
         bSuccess = False
         if self._verbose:
-            self._lfh.write("\n+%s.%s() Starting now\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self._lfh.write("\n+%s.%s() Starting now\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
 
         self._getSession(useContext=True)
         #
@@ -213,7 +214,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() -- fileSource: %s identifier %s instance %s standalonemode %s\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
             )
         if bIsWorkflow:
             # save wf state for status update --
@@ -232,7 +233,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         rC.set("standalonemode", standaloneMode)
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() workflow flag is %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, bIsWorkflow))
+            self._lfh.write("+%s.%s() workflow flag is %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, bIsWorkflow))
 
         if wfStatusUpdate and bIsWorkflow:
             # Update WF status database --
@@ -240,11 +241,11 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             if not bSuccess:
                 rC.setError(errMsg="Workflow database update/initiation failed")
                 self._lfh.write(
-                    "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self._sessionId)
+                    "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
             else:
                 if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             if bSuccess:
                 wfStatus = "completed"
@@ -343,7 +344,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         rC.setHtmlText("\n".join(htmlList))
 
         if self._verbose:
-            self._lfh.write("\n+%s.%s() Completed \n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self._lfh.write("\n+%s.%s() Completed \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
 
         return rC
 
@@ -358,7 +359,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         bSuccess = False
         bIsWorkflow = True
         if self._verbose:
-            self._lfh.write("\n\n+%s.%s() Finishing operation beginning using status update flag %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, wfStatusUpdate))
+            self._lfh.write(
+                "\n\n+%s.%s() Finishing operation beginning using status update flag %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, wfStatusUpdate)
+            )
         #
         self._getSession(useContext=True)
         #
@@ -369,7 +372,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() recovered context fileSource: %s identifier %s instance %s\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, instanceWf)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf)
             )
         #
         entryId = identifier
@@ -399,11 +402,11 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() checking for structure factor log file filesource %s identifier %s path %s\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, tPath)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, tPath)
             )
             self._lfh.write(
                 "+%s.%s() checking for structure factor file filesource %s identifier %s path %s\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, wPath)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, wPath)
             )
 
         if resetFreeR or os.access(tPath, os.F_OK):
@@ -419,7 +422,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         # Generate PDB file
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() creating PDB format file: filesource %s identifier %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier))
+            self._lfh.write(
+                "+%s.%s() creating PDB format file: filesource %s identifier %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier)
+            )
         convertPDB = PdbFile(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = convertPDB.run(entryId, entryFileName)
         if ok:
@@ -431,7 +436,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         # Generate Public pdbx cif file
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() creating PDBx public file: filesource %s identifier %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier))
+            self._lfh.write(
+                "+%s.%s() creating PDBx public file: filesource %s identifier %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier)
+            )
         convertPublicPdbx = PublicPdbxFile(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = convertPublicPdbx.run(entryId, entryFileName)
         if ok:
@@ -444,7 +451,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         if self._verbose:
             self._lfh.write(
-                "+%s.%s() creating correspondence file: filesource %s identifier %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier)
+                "+%s.%s() creating correspondence file: filesource %s identifier %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier)
             )
 
         pdbxPath = os.path.join(self._sessionPath, entryId + "_correspondence-to-depositor_P1.txt")
@@ -453,20 +460,22 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         dE = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource, verbose=self._verbose, log=self._lfh)
         #
-        for list in filelist:
-            pdbxPath = os.path.join(self._sessionPath, list[0])
-            ok = dE.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
+        for flist in filelist:
+            pdbxPath = os.path.join(self._sessionPath, flist[0])
+            ok = dE.export(pdbxPath, contentType=flist[1], formatType=flist[2], version="next")
             if self._verbose:
-                self._lfh.write("+%s.%s() Updating file %s in workflow store with status %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, pdbxPath, ok))
+                self._lfh.write("+%s.%s() Updating file %s in workflow store with status %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, pdbxPath, ok))
         #
         if fileSource not in ["archive", "wf-archive"]:
             dEAr = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, fileSource="archive", verbose=self._verbose, log=self._lfh)
-            for list in filelist:
-                if list[1] in ["structure-factors", "nmr-chemical-shifts", "nmr-data-str"]:
-                    pdbxPath = os.path.join(self._sessionPath, list[0])
-                    ok = dEAr.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
+            for flist in filelist:
+                if flist[1] in ["structure-factors", "nmr-chemical-shifts", "nmr-data-str"]:
+                    pdbxPath = os.path.join(self._sessionPath, flist[0])
+                    ok = dEAr.export(pdbxPath, contentType=flist[1], formatType=flist[2], version="next")
                     if self._verbose:
-                        self._lfh.write("+%s.%s() Updating file %s in archive store with status %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, pdbxPath, ok))
+                        self._lfh.write(
+                            "+%s.%s() Updating file %s in archive store with status %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, pdbxPath, ok)
+                        )
 
         # ---------------------------------------------------------------------------------------------------------------------------------------------------------
         #
@@ -474,7 +483,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         rC.setReturnFormat("json")
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() workflow flag is %r and status update flag is %r \n" % (self.__class__.__name__, sys._getframe().f_code.co_name, bIsWorkflow, wfStatusUpdate))
+            self._lfh.write(
+                "+%s.%s() workflow flag is %r and status update flag is %r \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, bIsWorkflow, wfStatusUpdate)
+            )
 
         if wfStatusUpdate and bIsWorkflow:
             # Update WF status database --
@@ -482,11 +493,11 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             if not bSuccess:
                 rC.setError(errMsg="Workflow database status update has failed")
                 self._lfh.write(
-                    "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self._sessionId)
+                    "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
             else:
                 if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         #
         else:
             bSuccess = True

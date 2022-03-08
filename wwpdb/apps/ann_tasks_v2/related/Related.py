@@ -29,8 +29,6 @@ class Related(SessionWebDownloadUtils):
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(Related, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
-        self.__verbose = verbose
-        self.__lfh = log
         self.__reqObj = reqObj
         #
         self.__setup()
@@ -38,7 +36,6 @@ class Related(SessionWebDownloadUtils):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         #
 

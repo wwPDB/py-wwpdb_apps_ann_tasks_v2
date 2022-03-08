@@ -23,11 +23,11 @@ class TaskSessionState(object):
     """Accessors to encapsulate common task session details --"""
 
     #
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         """Input request object is used to determine session context."""
-        self.__verbose = verbose
+        # self.__verbose = verbose
         self.__lfh = log
-        self.__reqObj = reqObj
+        # self.__reqObj = reqObj
         #
         self.__D = {}
         self.__strKeyList = [

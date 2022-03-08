@@ -29,9 +29,9 @@ import traceback
 class ValidateXml(object):
     """Class responsible for parsing validation XML report"""
 
-    def __init__(self, FileName=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, FileName=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        # self.__verbose = verbose
+        # self.__lfh = log
         self.__xmlFile = FileName
         self.__doc = minidom.parse(self.__xmlFile)
         #
@@ -122,15 +122,15 @@ class ValidateXml(object):
                     if not residueInfo:
                         residueInfo = self.__getMapInfo(node, items)
                     #
-                    dir = self.__getMapInfo(node, self.__outlierMap["torsion-outlier"])
+                    tdir = self.__getMapInfo(node, self.__outlierMap["torsion-outlier"])
                     outlier = residueInfo.copy()
-                    outlier.update(dir)
+                    outlier.update(tdir)
                     if "torsion-outlier" in self.__outlierResult:
                         self.__outlierResult["torsion-outlier"].append(outlier)
                     else:
-                        list = []
-                        list.append(outlier)
-                        self.__outlierResult["torsion-outlier"] = list
+                        tlist = []
+                        tlist.append(outlier)
+                        self.__outlierResult["torsion-outlier"] = tlist
                     #
                 #
             #
@@ -145,9 +145,9 @@ class ValidateXml(object):
                     if "polymer-rsrz-outlier" in self.__outlierResult:
                         self.__outlierResult["polymer-rsrz-outlier"].append(outlier)
                     else:
-                        list = []
-                        list.append(outlier)
-                        self.__outlierResult["polymer-rsrz-outlier"] = list
+                        tlist = []
+                        tlist.append(outlier)
+                        self.__outlierResult["polymer-rsrz-outlier"] = tlist
                     #
                 #
             #
@@ -162,9 +162,9 @@ class ValidateXml(object):
                     if "ligand-rsrz-outlier" in self.__outlierResult:
                         self.__outlierResult["ligand-rsrz-outlier"].append(outlier)
                     else:
-                        list = []
-                        list.append(outlier)
-                        self.__outlierResult["ligand-rsrz-outlier"] = list
+                        tlist = []
+                        tlist.append(outlier)
+                        self.__outlierResult["ligand-rsrz-outlier"] = tlist
                     #
                 #
             #
@@ -179,46 +179,46 @@ class ValidateXml(object):
                 if not residueInfo:
                     residueInfo = self.__getMapInfo(node, items)
                 #
-                dir = self.__getMapInfo(childnode, self.__outlierMap[childnode.tagName])
+                tdir = self.__getMapInfo(childnode, self.__outlierMap[childnode.tagName])
                 # jmb - removed cut off in reporting outliers in standard bond lengths and bond angles. Uses validation XML cut off instead.
                 # if childnode.tagName == 'bond-outlier' or childnode.tagName == 'angle-outlier':
-                #    if abs(float(dir['z'])) <= 10:
+                #    if abs(float(tdir['z'])) <= 10:
                 #        continue
                 #
                 # skip bonds between standard residues in reporting, these are better captured
                 #   in pdbx_validate_polymer_linkage - the validation is limited to a maxiumum distance of 1.999 Angstroms
                 # in the validation report for unusual bonds
                 if childnode.tagName == "bond-outlier":
-                    if dir["atom0"] in ("C", "O3'") and dir["atom1"] in ("N", "P"):
+                    if tdir["atom0"] in ("C", "O3'") and tdir["atom1"] in ("N", "P"):
                         continue
 
                 if childnode.tagName == "mog-angle-outlier" or childnode.tagName == "mog-bond-outlier":
-                    if abs(float(dir["Zscore"])) <= 10:
+                    if abs(float(tdir["Zscore"])) <= 10:
                         continue
                     #
                 #
                 if childnode.tagName == "clash":
                     atom_dict = {
-                        "dist": dir["dist"],
-                        "atom": dir["atom"],
-                        "clashmag": dir["clashmag"],
+                        "dist": tdir["dist"],
+                        "atom": tdir["atom"],
+                        "clashmag": tdir["clashmag"],
                         "chain": node.getAttribute("chain").strip(),
                         "model": node.getAttribute("model").strip(),
                         "altcode": node.getAttribute("altcode").strip(),
                         "resnum": node.getAttribute("resnum").strip(),
                         "resname": node.getAttribute("resname").strip(),
                     }
-                    if float(dir["dist"]) < 2.2:
-                        self.clashMap.setdefault(dir["cid"], []).append(atom_dict)
+                    if float(tdir["dist"]) < 2.2:
+                        self.clashMap.setdefault(tdir["cid"], []).append(atom_dict)
 
                 outlier = residueInfo.copy()
-                outlier.update(dir)
+                outlier.update(tdir)
                 if childnode.tagName in self.__outlierResult:
                     self.__outlierResult[childnode.tagName].append(outlier)
                 else:
-                    list = []
-                    list.append(outlier)
-                    self.__outlierResult[childnode.tagName] = list
+                    tlist = []
+                    tlist.append(outlier)
+                    self.__outlierResult[childnode.tagName] = tlist
                 #
             #
         #
@@ -358,15 +358,15 @@ class ValidateXml(object):
 
     def __getMapInfo(self, node, items):
         """ """
-        map = {}
+        rmap = {}
         for item in items:
             val = ""
             if node.hasAttribute(item):
                 val = node.getAttribute(item).strip()
             #
-            map[item] = val
+            rmap[item] = val
         #
-        return map
+        return rmap
 
 
 if __name__ == "__main__":

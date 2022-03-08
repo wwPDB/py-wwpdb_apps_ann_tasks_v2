@@ -65,7 +65,12 @@ class AssemblySelect(object):
         self.__lfh = log
         self.__reqObj = reqObj
         #
-        self.__modelPathRel = ""
+        self.__assemblyD = {}
+        self.__assemblySetD = {}
+        self.__contextEntryId = None
+        self.__assemblyArgs = None
+
+        # self.__modelPathRel = ""
         self.__setup()
 
     def __setup(self):
@@ -73,14 +78,8 @@ class AssemblySelect(object):
         self.__entryFileName = self.__reqObj.getValue("entryfilename")
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__rltvSessionPath = self.__sObj.getRelativePath()
-        self.__assemblyD = {}
-        self.__assemblySetD = {}
-        self.__contextEntryId = None
-        self.__assemblyArgs = None
-        self.__assemblySelectList = []
         self.__requestUrl = self.__reqObj.getValue("request_host")
         self.__allMonomerFlag = False
         allmonomerflag = self.__reqObj.getValue("allmonomerflag")
@@ -112,7 +111,7 @@ class AssemblySelect(object):
             inpPathDep = os.path.join(self.__sessionPath, entryId + "_model-deposit.cif")
             shutil.copyfile(inpPath, inpPathDep)
             #
-            assemD, assemSetD = self.__readAssemblyReport(reportPath)
+            assemD, _assemSetD = self.__readAssemblyReport(reportPath)
             if len(assemD) > 0:
                 if self.__debug:
                     self.__lfh.write("+AssemblySelect.run - assembly uid list %r\n" % assemD.keys())
@@ -140,7 +139,7 @@ class AssemblySelect(object):
         try:
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
             if os.access(reportPath, os.F_OK):
-                self.__assemD, self.__assemSetD = self.__readAssemblyReport(reportPath)
+                _assemD, _assemSetD = self.__readAssemblyReport(reportPath)
                 self.__contextEntryId = entryId
                 return True
             else:
@@ -352,7 +351,7 @@ class AssemblySelect(object):
         #
 
     def getAssemblyFormDetails(self, entryId):
-        sL, pD, fD, eD = self.__getAssemblySelectionDetails(entryId)
+        _sL, _pD, fD, eD = self.__getAssemblySelectionDetails(entryId)
         return fD, eD
 
     def __getAssemblySelectionDetails(self, entryId):
@@ -386,7 +385,7 @@ class AssemblySelect(object):
         return sL, pD, aD, eD
 
     def getAssemblySelection(self, entryId):
-        sS, pS, aD, eD = self.__readSelection(entryId)
+        sS, _pS, _aD, _eD = self.__readSelection(entryId)
         if sS is not None:
             return sS
         else:
@@ -472,10 +471,6 @@ class AssemblySelect(object):
         #
         return oL
 
-    def __chunker(self, lst, n):
-        """Divide the input list into a list of lists of size n"""
-        return [lst[i : i + n] for i in range(0, len(lst), n)]
-
     def __setAssemblyModelRelativePath(self, assemblyUid, entryId, generated=False):
         if generated:
             modelPathRel = os.path.join(self.__rltvSessionPath, entryId + "_assembly-model_P" + assemblyUid + ".cif.V1")
@@ -554,7 +549,7 @@ class AssemblySelect(object):
             dp.exp(reportPath)
             #
 
-            assemD, assemSetD = self.__readAssemblyReport(reportPath)
+            assemD, _assemSetD = self.__readAssemblyReport(reportPath)
             if self.__verbose:
                 self.__lfh.write("+AssemblySelect.runPdb - assembly uid list %r\n" % assemD.keys())
             for assemblyUid in assemD.keys():
@@ -663,12 +658,12 @@ class AssemblySelect(object):
         #
         c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(modelFilePath)
         sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
-        eD, branchInstList = sdf.getPolymerEntityChainDict()
+        eD, _branchInstList = sdf.getPolymerEntityChainDict()
         #
         assemInstIdList = []
         if not self.__allMonomerFlag:
             instanceIdList = []
-            for eId, instL in eD.items():
+            for _eId, instL in eD.items():
                 for inst in instL:
                     instanceIdList.append(inst)
                 #
@@ -705,7 +700,7 @@ class AssemblySelect(object):
                 #
             #
             linearInstIdList = []
-            for eId, instL in eD.items():
+            for _eId, instL in eD.items():
                 for inst in instL:
                     if inst in branch2LinearMap:
                         continue
@@ -812,7 +807,7 @@ class AssemblySelect(object):
         #     Recover the state of prior selections -
         #
         #
-        selectList, provSelectD, assemFormD, extraD = self.__getAssemblySelectionDetails(entryId)
+        selectList, provSelectD, _assemFormD, _extraD = self.__getAssemblySelectionDetails(entryId)
         provenanceOptList = [("author_defined_assembly", "author"), ("software_defined_assembly", "software"), ("author_and_software_defined_assembly", "author+software")]
         if len(provSelectD) < 1:
             for uid in self.__assemblyD.keys():

@@ -15,12 +15,14 @@ __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
+import inspect
 import os
 import shutil
 import sys
 import time
 import traceback
 import unittest
+
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.session.WebRequest import InputRequest
@@ -45,7 +47,6 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         myReqObj.setValue("WWPDB_SITE_ID", self.__siteId)
         #
         sObj = myReqObj.newSessionObj()
-        self.__sessionId = sObj.getId()
         self.__sessionPath = sObj.getPath()
 
     def __getFiles(self):
@@ -87,7 +88,7 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
     def testUpdateModel(self):
         """Test case -  model file update with map header data"""
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
             util = NmrChemShiftProcessUtils(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             util.setWorkingDirPath(dirPath=self.__sessionPath)
@@ -119,7 +120,7 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
 

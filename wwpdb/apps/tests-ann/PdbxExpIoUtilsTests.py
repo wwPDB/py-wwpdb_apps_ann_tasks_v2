@@ -21,6 +21,7 @@ import traceback
 import time
 import os
 import os.path
+import inspect
 import logging
 
 if __package__ is None or __package__ == "":
@@ -49,7 +50,6 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         #
         self.__verbose = True
         self.__lfh = sys.stdout
-        self.__pathExamplesRel = "./tests"
 
         self.__pathExamples = os.path.join(HERE, "tests")
         self.__pathModelExamples = os.path.join(HERE, "tests")
@@ -61,25 +61,6 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-    @staticmethod
-    def __insertCommentsM(fn):
-        """ """
-        import re
-        import mmap
-
-        pattern = r"""\ndata_"""
-        replacement = r"""\n#END\ndata_"""
-        reObj = re.compile(pattern, re.MULTILINE | re.DOTALL)
-
-        f = open(fn, "a+b")
-        m = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_WRITE)
-        reObj.sub(replacement, m)
-        m.append("\n#END OF REFLECTIONS\n")
-        # Flush changes made to the inmemory copy of the file back to disk
-        m.flush()
-        m.close()
-        f.close()
 
     @staticmethod
     def __insertComments(inpFn, outFn):
@@ -100,7 +81,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         """Read and write operations --"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
             fnInp = self.__examFileRegex
             fnOut = os.path.join(TESTOUTPUT, "test-regex-sf.cif")
@@ -112,14 +93,14 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testReadWriteSF(self):
         """Read and write reflection data files adding comment terminators  ----"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
             pIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
             for ii, f in enumerate(self.__examSFFileList):
@@ -144,7 +125,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testReadExpItems(self):
@@ -154,11 +135,11 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         """
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
             # get model data --
             pIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
-            for ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
+            for _ii, (mFn, _sfFn) in enumerate(self.__examPairFileList):
                 fnInp = os.path.join(self.__pathModelExamples, mFn)
                 containerList = pIo.getContainerList(fnInp)
                 for container in containerList:
@@ -202,7 +183,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testUpdateExpItems(self):
@@ -212,9 +193,9 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         """
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
-            for ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
+            for _ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
                 # First get the get model data --
                 #
                 modelPath = os.path.join(self.__pathModelExamples, mFn)
@@ -281,7 +262,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     updMuList = []
                     for muId, mu, wt in curMuList:
                         if (mu in [None, "", ".", "?", "1.0", "1.00", "1.000", "1.0000"]) and (muId in muD):
-                            (tmuId, tmu, twt) = muD[muId]
+                            (_tmuId, tmu, twt) = muD[muId]
                             updMuList.append((muId, tmu, twt))
                         else:
                             updMuList.append((muId, mu, wt))
@@ -301,7 +282,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
     def testBlockNames(self):
@@ -361,15 +342,14 @@ def suiteNameTests():
 
 if __name__ == "__main__":
 
-    if True:
-        mySuite = suiteReadWriteTests()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+    mySuite = suiteReadWriteTests()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)
 
-        mySuite = suiteRegexTests()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+    mySuite = suiteRegexTests()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)
 
-        mySuite = suiteReadExpItemsTests()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+    mySuite = suiteReadExpItemsTests()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)
 
     mySuite = suiteUpdateExpItemsTests()
     unittest.TextTestRunner(verbosity=2).run(mySuite)

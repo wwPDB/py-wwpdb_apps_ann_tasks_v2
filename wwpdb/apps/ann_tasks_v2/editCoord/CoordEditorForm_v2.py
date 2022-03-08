@@ -37,17 +37,18 @@ class CoordEditorForm(object):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        self.__entryFile = None
         #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
         self.__identifier = self.__reqObj.getValue("display_identifier")
         self.__jsonPath = os.path.join(self.__sessionPath, self.__entryId + "_Json")
+        self.__entryFile = None
         #
         self.__listItemTemplate = (
             '<li><a id="%s" class="discontrol ui-corner-all" href="#">'
@@ -187,11 +188,11 @@ class CoordEditorForm(object):
         #
         return jsonObj
 
-    def __writeJSonFile(self, jsonObj, filename):
-        """Write json file"""
-        with open(filename, "w") as f:
-            json.dump(jsonObj, f)
-        #
+    # def __writeJSonFile(self, jsonObj, filename):
+    #     """Write json file"""
+    #     with open(filename, "w") as f:
+    #         json.dump(jsonObj, f)
+    #     #
 
     def __proessChainJSonObj(self, mol_idx, chainID, jsonObj):
         """Re-organize chain json object and write to chain.json file"""

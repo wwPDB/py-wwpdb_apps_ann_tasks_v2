@@ -36,6 +36,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__htmlText = ""
+        self.__status = None
         #
         self.__setup()
 

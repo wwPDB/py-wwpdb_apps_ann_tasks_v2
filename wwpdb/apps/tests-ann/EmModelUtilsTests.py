@@ -22,6 +22,7 @@ import os
 import sys
 import unittest
 import traceback
+import inspect
 import time
 
 if __package__ is None or __package__ == "":
@@ -50,17 +51,17 @@ class EmModelUtilsTests(unittest.TestCase):
     def testUpdateModel(self):
         """Test case -  model file update with map header data"""
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         try:
             emmu = EmModelUtils(verbose=self.__verbose, log=self.__lfh)
             mD = emmu.setMapHeaderFilePath(self.__pathEmHeaderFile)
             status = emmu.setModelFilePath(self.__pathEmModelFile)
-            pth, fn = os.path.split(self.__pathEmVolumeFile)
+            _pth, fn = os.path.split(self.__pathEmVolumeFile)
             emmu.setMapFileName(fn)
             emmu.setEntryId(self.__entryId)
             emmu.setMapType("primary map")
-            self.__lfh.write("+%s.%s read %s with em_map category status %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self.__pathEmModelFile, status))
-            self.__lfh.write("+%s.%s map header contents\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self.__lfh.write("+%s.%s read %s with em_map category status %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self.__pathEmModelFile, status))
+            self.__lfh.write("+%s.%s map header contents\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             for k, v in mD.items():
                 self.__lfh.write(" map key %s  %r\n" % (k, v))
             for k in sorted(mD["output_header_long"].keys()):
@@ -75,7 +76,7 @@ class EmModelUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
         )
 
 
@@ -86,6 +87,5 @@ def suiteUpdateModelTests():
 
 
 if __name__ == "__main__":
-    if True:
-        mySuite = suiteUpdateModelTests()
-        unittest.TextTestRunner(verbosity=2).run(mySuite)
+    mySuite = suiteUpdateModelTests()
+    unittest.TextTestRunner(verbosity=2).run(mySuite)

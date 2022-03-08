@@ -23,10 +23,7 @@ import time
 import traceback
 import copy
 
-
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from mmcif.io.IoAdapterCore import IoAdapterCore
-
 from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 from wwpdb.utils.wf.dbapi.WfDbApi import WfDbApi
 
@@ -57,11 +54,7 @@ class StatusUpdate(object):
         #
         self.__sObj = self.__reqObj.newSessionObj()
         self.__sessionPath = self.__sObj.getPath()
-        self.__sessionRelativePath = self.__sObj.getRelativePath()
-        self.__sessionId = self.__sObj.getId()
         #
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI = ConfigInfo(self.__siteId)
         self.__savedStatusD = {}
         #
         # Temporary placeholder for annotator initials to assign - process_site - defaults
@@ -586,7 +579,7 @@ class StatusUpdate(object):
     def getV2(self, inpFilePath):
         """Return selected status items from the input model files."""
         #
-        logger.debug("Starting %s" % inpFilePath)
+        logger.debug("Starting %s", inpFilePath)
 
         ret = {}
 
@@ -629,11 +622,11 @@ class StatusUpdate(object):
             dcObj = container.getObj("pdbx_depui_entry_details")
             if dcObj is not None:
                 ret["reqAccTypes"] = dcObj.getValueOrDefault(attributeName="requested_accession_types", rowIndex=0, defaultValue="")
-                logger.debug("requested_accession_Types %r" % ret["reqAccTypes"])
+                logger.debug("requested_accession_Types %r", ret["reqAccTypes"])
 
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                logger.error("Failed file %s\n" % inpFilePath)
+                logger.error("Failed file %s", inpFilePath)
             if self.__debug:
                 logger.exception("In retrieving data from model")
 

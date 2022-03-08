@@ -25,10 +25,9 @@ class ModelViewer3D(object):
 
     """
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         self.__verbose = verbose
         self.__lfh = log
-        self.__reqObj = reqObj
         #
         self.__modelPathRel = ""
         self.__mapPathRel = ""

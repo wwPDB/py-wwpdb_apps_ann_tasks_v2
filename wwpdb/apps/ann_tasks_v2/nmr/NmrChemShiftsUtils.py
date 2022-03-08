@@ -18,7 +18,9 @@ __version__ = "V0.07"
 import sys
 import os.path
 import os
+import inspect
 import traceback
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 from wwpdb.utils.dp.PdbxChemShiftReport import PdbxChemShiftReport
@@ -37,13 +39,6 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         #
-        self.__setup()
-
-    def __setup(self):
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
-        self.__sessionPath = self.__sObj.getPath()
         #
         self.__authFilePathList = []
         self.__authNameList = []
@@ -51,6 +46,14 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
         self.__warnings = ""
         self.__errors = ""
         self.__cleanUp = True
+        self.__sessionPath = None
+        #
+        self.__setup()
+
+    def __setup(self):
+        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
+        self.__sObj = self.__reqObj.getSessionObj()
+        self.__sessionPath = self.__sObj.getPath()
         #
 
     def getLastStatus(self):
@@ -67,7 +70,7 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
 
         'nmr-chemical-shifts-upload-report'
         """
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=True)
             dp.setDebugMode(flag=True)
@@ -109,7 +112,7 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
 
         A report with content type 'nmr-chemical-shifts-atom-name-report' is created and parsed.
         """
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=True)
             dp.setDebugMode(flag=True)
@@ -150,7 +153,7 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
         preprocessed with to contain original atom nomenclature details.
 
         """
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=True)
             dp.setDebugMode(flag=True)

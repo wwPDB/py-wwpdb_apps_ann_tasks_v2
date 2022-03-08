@@ -35,7 +35,7 @@ class PisaReaderTests(unittest.TestCase):
     def setUp(self):
         self.__lfh = sys.stdout
         self.__pisaAssembliesFilePath = os.path.join(HERE, "tests", "pisa-assemblies.xml")
-        self.__pisaInterfacesFilePath = os.path.join(HERE, "tests", "pisa-interfaces.xml")
+        # self.__pisaInterfacesFilePath = os.path.join(HERE, "tests", "pisa-interfaces.xml")
         self.__pisaAssembliesFilePath = os.path.join(HERE, "tests", "3rer_assembly-report_P1.xml")
 
     def tearDown(self):

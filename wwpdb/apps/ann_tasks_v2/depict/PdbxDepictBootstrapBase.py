@@ -28,7 +28,7 @@ class PdbxDepictBootstrapBase(object):
 
     """
 
-    def __init__(self, includePath=None, verbose=False, log=sys.stderr):
+    def __init__(self, includePath=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
         """
 
         :param `verbose`:  boolean flag to activate verbose logging.
@@ -36,9 +36,9 @@ class PdbxDepictBootstrapBase(object):
 
         """
         self.__includePath = includePath
-        self.__verbose = verbose
-        self.__lfh = log
-        self.__debug = True
+        # self.__verbose = verbose
+        # self.__lfh = log
+        # self.__debug = True
         #
         # Within the <head></head> section
         self.__includeHeadList = ["head_common_bs.html"]
@@ -59,7 +59,7 @@ class PdbxDepictBootstrapBase(object):
         return "<!DOCTYPE html>"
 
     def appMetaTags(self):
-        return self._meta
+        return self.__meta
 
     def appPageTop(self, title=None):
         """Return the application specific top of page boiler plate -"""

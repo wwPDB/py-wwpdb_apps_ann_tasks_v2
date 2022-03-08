@@ -22,7 +22,6 @@ import traceback
 
 from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReportDepictBootstrap import PdbxReportDepictBootstrap
 from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCategoryStyle
@@ -49,10 +48,6 @@ class PdbxReport(object):
         self.__sessionPath = self.__sObj.getPath()
         self.__sessionRelativePath = self.__sObj.getRelativePath()
         self.__sessionId = self.__sObj.getId()
-        #
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI = ConfigInfo(self.__siteId)
-
         #
         self.__idCode = None
         self.__filePath = None
@@ -149,7 +144,7 @@ class PdbxReport(object):
         #
         # make a local copy of the file (if required)
         #
-        (pth, fileName) = os.path.split(filePath)
+        (_pth, fileName) = os.path.split(filePath)
         dirPath = os.path.join(self.__sessionPath, "report")
         localPath = os.path.join(dirPath, fileName)
         localRelativePath = os.path.join(self.__sessionRelativePath, "report", fileName)

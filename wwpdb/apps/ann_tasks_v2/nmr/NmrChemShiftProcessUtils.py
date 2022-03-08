@@ -17,7 +17,9 @@ import json
 import os
 import sys
 import time
+import inspect
 import traceback
+
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
@@ -113,10 +115,12 @@ class NmrChemShiftProcessUtils(object):
         """Set output chemical shift atom name report file name"""
         self.__outReportFilePath = fileName
 
-    def setOutputValidationFileList(self, dstPathList=[]):
+    def setOutputValidationFileList(self, dstPathList=None):
         """Set output validation result files list.
         The order should be [validationReportPath, xmlReportPath, validationFullReportPath, pngReportPath, svgReportPath]
         """
+        if dstPathList is None:
+            dstPathList = []
         self.__validationResultPath = dstPathList
 
     def run(self):
@@ -141,7 +145,7 @@ class NmrChemShiftProcessUtils(object):
                 self.__insertSystemLogMessage("Model file '" + self.__inModelFilePath + "' does not exist.")
                 return
             #
-            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(self.__inModelFilePath)
@@ -184,7 +188,7 @@ class NmrChemShiftProcessUtils(object):
             if self.__outModelFilePath and os.access(self.__outModelFilePath, os.R_OK):
                 xyzFilePath = self.__outModelFilePath
             #
-            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             self.__checkReportFilePath = os.path.join(self.__workingDirPath, "chem-shifts-update-checking-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif")
             #
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=True)
@@ -231,7 +235,7 @@ class NmrChemShiftProcessUtils(object):
             if self.__outModelFilePath and os.access(self.__outModelFilePath, os.R_OK):
                 xyzFilePath = self.__outModelFilePath
             #
-            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             self.__checkReportFilePath = os.path.join(self.__workingDirPath, "nef-update-checking-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif")
             #
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=True)
@@ -279,7 +283,7 @@ class NmrChemShiftProcessUtils(object):
             if self.__outCsFilePath and os.access(self.__outCsFilePath, os.R_OK):
                 csFilePath = self.__outCsFilePath
             #
-            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.addInput(name="request_annotation_context", value="yes")

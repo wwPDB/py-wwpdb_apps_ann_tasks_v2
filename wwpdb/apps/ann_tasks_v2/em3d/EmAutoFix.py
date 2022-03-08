@@ -81,7 +81,7 @@ class EmAutoFix(object):
         Returns False if not adjustment made to model file
         """
 
-        logger.info("Checking for map updates to %r" % modelin)
+        logger.info("Checking for map updates to %r", modelin)
 
         # Parse model file
         ioobj = IoAdapterCore()
@@ -114,19 +114,19 @@ class EmAutoFix(object):
             if emdbid in label:
                 continue
 
-            logger.info("Updating %r part %r label %r" % (map_type, partition, label))
+            logger.info("Updating %r part %r label %r", map_type, partition, label)
             ctxtype = self.__mD.get(map_type, None)
             if not ctxtype:
-                logger.error("Unknown map type %s" % map_type)
+                logger.error("Unknown map type %s", map_type)
                 continue
 
             volin = self.__pI.getFilePath(dataSetId=datasetid, contentType=ctxtype, formatType="map", fileSource=vollocation, partNumber=partition, versionId="latest")
             volout = self.__pI.getFilePath(dataSetId=datasetid, contentType=ctxtype, formatType="map", fileSource=vollocation, partNumber=partition, versionId="next")
-            logger.debug("Updating %s to %s" % (volin, volout))
+            logger.debug("Updating %s to %s", volin, volout)
             ####
             rep = self.__mapfix(datasetid, emdbid, volin, volout, "{} {} {}".format(pixel_x, pixel_y, pixel_z))
             if not os.path.exists(volout):
-                logger.error("Output path %s does not exist" % volout)
+                logger.error("Output path %s does not exist", volout)
                 continue
             # Get label from report
             with open(rep, "r") as fin:
@@ -144,7 +144,7 @@ class EmAutoFix(object):
 
             # Write model
             ret = ioobj.writeFile(outputFilePath=modelout, containerList=c0)
-            logger.info("Writing file returns %s %s" % (ret, modelout))
+            logger.info("Writing file returns %s %s", ret, modelout)
             return True
 
         return False

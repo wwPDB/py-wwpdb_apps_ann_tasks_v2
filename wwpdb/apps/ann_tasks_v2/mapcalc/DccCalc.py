@@ -36,18 +36,18 @@ class DccCalc(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        self.__dccArgs = None
+        self.__cleanup = False
+        self.__exportPath = None
+        self.__reportPath = None
         #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__exportPath = self.__sessionPath
-        self.__dccArgs = None
-        self.__cleanup = False
-        self.__reportFilePath = None
 
     def getReportPath(self):
         return self.__reportPath
@@ -58,7 +58,7 @@ class DccCalc(SessionWebDownloadUtils):
     def setArguments(self, dccArgs):
         self.__dccArgs = dccArgs
 
-    def run(self, entryId, modelInputPath=None, expInputPath=None, updateInput=True):
+    def run(self, entryId, modelInputPath=None, expInputPath=None, updateInput=True):  # pylint: disable=unused-argument
         """Run the dcc calculation -"""
         try:
             if self.__verbose:

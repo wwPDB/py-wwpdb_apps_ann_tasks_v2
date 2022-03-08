@@ -19,6 +19,8 @@ import sys
 import os.path
 import os
 import traceback
+import inspect
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -37,18 +39,20 @@ class FormatCheck(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+
+        self.__exportPath = None
+        self.__checkArgs = None
+        self.__cleanup = False
+        self.__reportFileSize = 0
+        self.__reportPath = None
+
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__exportPath = self.__sessionPath
-        self.__checkArgs = None
-        self.__cleanup = False
-        self.__reportFileSize = 0
-        self.__reportPath = None
 
     def setExportPath(self, exportPath):
         """Set the path where output files are copyied."""
@@ -57,7 +61,7 @@ class FormatCheck(SessionWebDownloadUtils):
     def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs
 
-    def run(self, entryId, inpPath, updateInput=True):
+    def run(self, entryId, inpPath, updateInput=True):  # pylint: disable=unused-argument
         """Run the format-level check on the input PDBx/mmCIF data file -"""
         try:
             self.clearFileList()
@@ -85,7 +89,7 @@ class FormatCheck(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s format check completed for entryId %s file %s report size %d\n"
-                    % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
                 )
 
             if self.__cleanup:
@@ -93,7 +97,7 @@ class FormatCheck(SessionWebDownloadUtils):
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
-                self.__lfh.write("+%s.%s format check failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpPath))
+                self.__lfh.write("+%s.%s format check failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
             traceback.print_exc(file=self.__lfh)
             return False
 
@@ -102,10 +106,3 @@ class FormatCheck(SessionWebDownloadUtils):
 
     def getReportPath(self):
         return self.__reportPath
-
-    def __getSize(self, fn):
-        try:
-            statInfo = os.stat(fn)
-            return statInfo.st_size
-        except:  # noqa: E722 pylint: disable=bare-except
-            return 0

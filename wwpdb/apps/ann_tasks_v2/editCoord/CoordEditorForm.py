@@ -26,18 +26,17 @@ class CoordEditorForm(object):
 
     """
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        # self.__verbose = verbose
+        # self.__lfh = log
         self.__reqObj = reqObj
         #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cICommon = ConfigInfoAppCommon(self._siteId)
+        self.__cICommon = ConfigInfoAppCommon(self.__siteId)
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
         self.__entryFile = self.__reqObj.getValue("entryfilename")
@@ -73,8 +72,8 @@ class CoordEditorForm(object):
         f = open(script, "w")
         f.write("#!/bin/tcsh -f\n")
         f.write("#\n")
-        f.write("setenv RCSBROOT   " + self._cICommon.get_site_annot_tools_path() + "\n")
-        f.write("setenv COMP_PATH  " + self._cICommon.get_site_cc_cvs_path() + "\n")
+        f.write("setenv RCSBROOT   " + self.__cICommon.get_site_annot_tools_path() + "\n")
+        f.write("setenv COMP_PATH  " + self.__cICommon.get_site_cc_cvs_path() + "\n")
         f.write("setenv BINPATH  ${RCSBROOT}/bin\n")
         f.write("#\n")
         f.write(
@@ -118,12 +117,12 @@ class CoordEditorForm(object):
             f.close()
             #
             chainids = chainids.strip()
-            list = chainids.split(",")
-            for id in list:
+            clist = chainids.split(",")
+            for cid in clist:
                 if select:
                     select += ","
                 #
-                select += "'" + id + "': '" + id + "'"
+                select += "'" + cid + "': '" + cid + "'"
             #
         #
         select = "{ " + select + " }"

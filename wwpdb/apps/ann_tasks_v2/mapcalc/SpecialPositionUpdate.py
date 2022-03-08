@@ -18,6 +18,7 @@ __version__ = "V0.01"
 import sys
 import os.path
 import os
+import inspect
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
@@ -38,19 +39,20 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
+        # self.__checkArgs = None
+        self.__cleanup = False
+        self.__modelUpdated = False
+        #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__checkArgs = None
-        self.__cleanup = False
-        self.__modelUpdated = False
 
-    def setArguments(self, checkArgs):
-        self.__checkArgs = checkArgs
+    def setArguments(self, checkArgs):  # pylint: disable=unused-argument
+        # self.__checkArgs = checkArgs
+        pass
 
     def modelUpdated(self):
         """Returns True if the model was updated in the last run"""
@@ -59,7 +61,9 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
     def run(self, entryId, inpFile, updateInput=True):
         """Updates the occupancy of special positions in model file"""
         if self.__verbose:
-            self.__lfh.write("+%s.%s special position update calc entering for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile))
+            self.__lfh.write(
+                "+%s.%s special position update calc entering for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile)
+            )
 
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
@@ -82,7 +86,7 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
             #
             if self.__verbose:
                 self.__lfh.write(
-                    "+%s.%s special position update calc completed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile)
+                    "+%s.%s special position update calc completed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile)
                 )
 
             if self.__cleanup:
@@ -91,7 +95,7 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write(
-                    "+%s.%s special position update calc failed for entryId %s file %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, entryId, inpFile)
+                    "+%s.%s special position update calc failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile)
                 )
             traceback.print_exc(file=self.__lfh)
             return False

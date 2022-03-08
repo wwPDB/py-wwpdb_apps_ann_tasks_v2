@@ -26,6 +26,7 @@ __version__ = "V0.07"
 
 import os
 import sys
+import inspect
 
 from wwpdb.utils.session.WebRequest import InputRequest
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
@@ -39,7 +40,7 @@ from wwpdb.apps.ann_tasks_v2.webapp.ValidationTasksWebAppWorker import Validatio
 class AnnTasksWebApp(object):
     """Handle request and response object processing for miscellaneous annotation tasks."""
 
-    def __init__(self, parameterDict={}, verbose=False, log=sys.stderr, siteId="WWPDB_DEV"):
+    def __init__(self, parameterDict=None, verbose=False, log=sys.stderr, siteId="WWPDB_DEV"):
         """
         Create an instance of the appropriate worker class to manage input task web request.
 
@@ -50,6 +51,8 @@ class AnnTasksWebApp(object):
          :param `siteId`:      site identifier.
 
         """
+        if parameterDict is None:
+            parameterDict = {}
         self.__verbose = verbose
         self.__lfh = log
         self.__siteId = siteId
@@ -106,18 +109,18 @@ class AnnTasksWebApp(object):
 
         return rC.get()
 
-    def __dumpResponse(self, rC):
-        """Utility method to format the contents of the response object.
+    # def __dumpResponse(self, rC):
+    #     """Utility method to format the contents of the response object.
 
-        :Returns: None
-        """
-        self.__lfh.write("+-----------------------------------------------------------------------------------------\n\n")
-        self.__lfh.write("+%s.%s completed request  %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self.__requestPath))
-        if rC is not None:
-            self.__lfh.write("%s" % ("".join(rC.dump())))
-        else:
-            self.__lfh.write("+%s.%s response content object empty.\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
-        self.__lfh.flush()
+    #     :Returns: None
+    #     """
+    #     self.__lfh.write("+-----------------------------------------------------------------------------------------\n\n")
+    #     self.__lfh.write("+%s.%s completed request  %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self.__requestPath))
+    #     if rC is not None:
+    #         self.__lfh.write("%s" % ("".join(rC.dump())))
+    #     else:
+    #         self.__lfh.write("+%s.%s response content object empty.\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
+    #     self.__lfh.flush()
 
     def __dumpRequest(self):
         """Utility method to format the contents of the internal parameter dictionary
@@ -127,6 +130,6 @@ class AnnTasksWebApp(object):
 
         """
         self.__lfh.write("\n\n\n+------------------------------ NEW REQUEST - NEW REQUEST - NEW REQUEST ---------------------------------------------------------\n")
-        self.__lfh.write("+%s.%s starting a new request:  %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self.__requestPath))
+        self.__lfh.write("+%s.%s starting a new request:  %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self.__requestPath))
         self.__reqObj.printIt(self.__lfh)
         self.__lfh.flush()

@@ -19,11 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class UpdateRelated(object):
-    def __init__(self, siteId=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        # self.__verbose = verbose
+        # self.__lfh = log
         self.__siteId = siteId
-        self.__debug = False
         self.__ioObj = IoAdapterCore()
 
     def updateRelatedEntries(self, fPathIn, fPathOut, logPath):
@@ -99,8 +98,8 @@ class UpdateRelated(object):
         outDirPath = self.__getOutDir(fPath)
         try:
             return self.__ioObj.readFile(fPath, outDirPath=outDirPath)
-        except Exception as e:  # noqa: F841
-            logger.exception("Failed to parse", fPath)
+        except Exception as _e:  # noqa: F841
+            logger.exception("Failed to parse %s", fPath)
             return None
 
     def __writeContainerList(self, fPath, containerList):

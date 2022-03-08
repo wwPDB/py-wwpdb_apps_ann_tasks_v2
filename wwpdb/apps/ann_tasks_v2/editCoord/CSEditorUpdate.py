@@ -45,7 +45,6 @@ class CSEditorUpdate(object):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
         self.__entryFile = self.__reqObj.getValue("entrycsfilename")
@@ -53,38 +52,38 @@ class CSEditorUpdate(object):
 
     def run(self):
         """Run update"""
-        map = {}
+        cmap = {}
         #
         pickleFile = os.path.join(self.__sessionPath, self.__entryId + "_cs_pickle.db")
         if os.access(pickleFile, os.F_OK):
             fb = open(pickleFile, "rb")
-            map = pickle.load(fb)
+            cmap = pickle.load(fb)
             fb.close()
         #
-        dir = self.__reqObj.getDictionary()
-        for key, value in dir.items():
+        ddir = self.__reqObj.getDictionary()
+        for key, value in ddir.items():
             if key.startswith("RangeNum") or key.startswith("RangeCID"):
                 if value and value[0]:
-                    map[key] = value[0]
+                    cmap[key] = value[0]
                 #
             #
         #
-        if not map:
+        if not cmap:
             return "No option selected."
         #
-        self.__writeSelectInfo(map)
+        self.__writeSelectInfo(cmap)
         text = self.__runUpdateScript()
         if text:
             return text
         #
         return "OK"
 
-    def __writeSelectInfo(self, map):
+    def __writeSelectInfo(self, cmap):
         category = DataCategory("update_info")
         category.appendAttribute("key")
         category.appendAttribute("value")
         row = 0
-        for key, v in map.items():
+        for key, v in cmap.items():
             category.setValue(key, "key", row)
             category.setValue(v, "value", row)
             row += 1
@@ -130,8 +129,8 @@ class CSEditorUpdate(object):
                 return default_message + "\n\n" + content
             #
             error = ""
-            list = content.split("\n")
-            for line in list:
+            clist = content.split("\n")
+            for line in clist:
                 if not line:
                     continue
                 #

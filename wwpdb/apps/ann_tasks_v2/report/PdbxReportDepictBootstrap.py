@@ -38,7 +38,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
 
         """
         super(PdbxReportDepictBootstrap, self).__init__(includePath=includePath, verbose=verbose, log=log)
-        self.__verbose = verbose
         self.__lfh = log
         self.__debug = False
         #
@@ -388,7 +387,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         #
         #
 
-    def __renderRow(self, catName, row, iRow, oL, insertDefault=False, insertCode="", opNum=0):
+    def __renderRow(self, catName, row, iRow, oL, insertDefault=False, insertCode="", opNum=0):  # pylint: disable=unused-argument
         """Render a row in a multirow table."""
         oL.append("<tr>")
         #
@@ -404,12 +403,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             oL.append("<td>%s</td>" % (itemValue))
         oL.append("</tr>")
         #
-
-    def __rowClass(self, iRow, insertDefault=False):
-        if insertDefault:
-            return "rs1-insert"
-        else:
-            return iRow % 2 and "rs1-odd" or "rs1-even"
 
     def __markupRow(self, catName, rD):
         """Markup a row (row dictionary) in the input category."""
@@ -533,19 +526,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                         itemValue,
                         itemValue,
                     )
-
-    def __categoryPart(self, name):
-        tname = ""
-        if name.startswith("_"):
-            tname = name[1:]
-        else:
-            tname = name
-
-        i = tname.find(".")
-        if i == -1:
-            return tname
-        else:
-            return tname[:i]
 
     def __attributePart(self, name):
         i = name.find(".")

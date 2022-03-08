@@ -14,10 +14,12 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
 import sys
 import os.path
 import os
 import traceback
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -30,7 +32,7 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(NmrChemShiftsMiscChecks, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
-        self.__verbose = verbose
+        self.__verbose = verbose  # pylint: disable=unused-private-member
         self.__lfh = log
         self.__reqObj = reqObj
         #
@@ -39,7 +41,6 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         #
         self.__cleanUp = True
@@ -47,7 +48,7 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
 
     def run(self, entryId, csInpFilePath, xyzFilePath):
         """Run the NMR specific checks implemented in the validation pipeline -"""
-        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=True)
             dp.setDebugMode(flag=True)

@@ -48,7 +48,6 @@ class CoordEditorUpdate(object):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
         self.__entryFile = self.__reqObj.getValue("entryfilename")
@@ -56,26 +55,26 @@ class CoordEditorUpdate(object):
 
     def run(self):
         """Run update"""
-        map = {}
+        cmap = {}
         #
         pickleFile = os.path.join(self.__sessionPath, self.__entryId + "_coord_pickle.db")
         if os.access(pickleFile, os.F_OK):
             fb = open(pickleFile, "rb")
-            map = pickle.load(fb)
+            cmap = pickle.load(fb)
             fb.close()
         #
-        dir = self.__reqObj.getDictionary()
-        for key, value in dir.items():
+        ddir = self.__reqObj.getDictionary()
+        for key, value in ddir.items():
             if key.startswith("chainId") or key.startswith("chainNum") or key.startswith("chainRangeNum"):
                 if value and value[0]:
-                    map[key] = value[0]
+                    cmap[key] = value[0]
                 #
             #
         #
-        if not map:
+        if not cmap:
             return "No option selected."
         #
-        text = self.__checkUniqueNumbering(map)
+        text = self.__checkUniqueNumbering(cmap)
         if text:
             return text
         #
@@ -86,16 +85,16 @@ class CoordEditorUpdate(object):
         # return 'Entry ' + self.__entryId + ' updated.'
         return "OK"
 
-    def __checkUniqueNumbering(self, map):
-        self.__writeSelectInfo(map)
+    def __checkUniqueNumbering(self, smap):
+        self.__writeSelectInfo(smap)
         return self.__runCheckScript()
 
-    def __writeSelectInfo(self, map):
+    def __writeSelectInfo(self, smap):
         category = DataCategory("update_info")
         category.appendAttribute("key")
         category.appendAttribute("value")
         row = 0
-        for key, v in map.items():
+        for key, v in smap.items():
             category.setValue(key, "key", row)
             category.setValue(v, "value", row)
             row += 1
@@ -158,8 +157,8 @@ class CoordEditorUpdate(object):
                 return default_message + "\n\n" + content
             #
             error = ""
-            list = content.split("\n")
-            for line in list:
+            clist = content.split("\n")
+            for line in clist:
                 if not line:
                     continue
                 #

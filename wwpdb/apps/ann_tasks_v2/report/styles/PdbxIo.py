@@ -54,11 +54,10 @@ class PdbxReportIo(PdbxStyleIoUtil):
     def __init__(self, verbose=True, log=sys.stderr):
         super(PdbxReportIo, self).__init__(styleObject=PdbxReportCategoryStyle(), verbose=verbose, log=log)
 
-        self.__verbose = verbose
-        self.__debug = False
+        # self.__verbose = verbose
+        # self.__debug = False
         self.__lfh = log
         #
-        self.__topCachePath = None
         self.__filePath = None
 
         self.__idCode = None
@@ -140,11 +139,10 @@ class PdbxGeometryReportIo(PdbxStyleIoUtil):
     def __init__(self, verbose=True, log=sys.stderr):
         super(PdbxGeometryReportIo, self).__init__(styleObject=PdbxGeometryReportCategoryStyle(), verbose=verbose, log=log)
 
-        self.__verbose = verbose
-        self.__debug = False
+        # self.__verbose = verbose
+        # self.__debug = False
         self.__lfh = log
         #
-        self.__topCachePath = None
         self.__filePath = None
 
         self.__idCode = None
@@ -196,11 +194,10 @@ class PdbxXrayExpReportIo(PdbxStyleIoUtil):
     def __init__(self, verbose=True, log=sys.stderr):
         super(PdbxXrayExpReportIo, self).__init__(styleObject=PdbxXrayExpReportCategoryStyle(), verbose=verbose, log=log)
 
-        self.__verbose = verbose
-        self.__debug = False
+        # self.__verbose = verbose
+        # self.__debug = False
         self.__lfh = log
         #
-        self.__topCachePath = None
         self.__filePath = None
 
         self.__idCode = None
@@ -252,11 +249,10 @@ class PdbxStatusHistoryIo(PdbxStyleIoUtil):
     def __init__(self, verbose=True, log=sys.stderr):
         super(PdbxStatusHistoryIo, self).__init__(styleObject=PdbxStatusHistoryCategoryStyle(), verbose=verbose, log=log)
 
-        self.__verbose = verbose
-        self.__debug = False
+        # self.__verbose = verbose
+        # self.__debug = False
         self.__lfh = log
         #
-        self.__topCachePath = None
         self.__filePath = None
 
         self.__idCode = None
@@ -313,7 +309,6 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
         self.__debug = False
         self.__lfh = log
         #
-        self.__topCachePath = None
         self.__filePath = None
 
         self.__idCode = None
@@ -436,9 +431,9 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                     oD[emKy] = catObj.getValueOrDefault(attributeName=ky, rowIndex=0, defaultValue="")
         except Exception as e:
             if self.__verbose:
-                logger.info("+PdbxEntryInfoIo.getEmStatusDetails() failed for file %s\n" % self.__filePath)
+                logger.info("+PdbxEntryInfoIo.getEmStatusDetails() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s" % str(e))
+                logger.exception("Failing with %s", str(e))
 
         return oD
 
@@ -466,9 +461,9 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
             return True
         except Exception as e:
             if self.__verbose:
-                logger.info("+PdbxEntryInfoIo.setEmStatusDetails() failed for file %s\n" % self.__filePath)
+                logger.info("+PdbxEntryInfoIo.setEmStatusDetails() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s" % str(e))
+                logger.exception("Failing with %s", str(e))
         return False
 
     def __getStatusDetails(self):
@@ -505,9 +500,9 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                 return oD
         except Exception as e:
             if self.__verbose:
-                logger.info("+PdbxEntryInfoIo.getStatusDetails() failed for file %s\n" % self.__filePath)
+                logger.info("+PdbxEntryInfoIo.getStatusDetails() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s" % str(e))
+                logger.exception("Failing with %s", str(e))
 
         return oD
 
@@ -521,7 +516,7 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                 return catObj.getValueOrDefault(attributeName="requested_accession_types", rowIndex=0, defaultValue="")
         except Exception as _e:  # noqa: F841
             if self.__verbose:
-                logger.info("failed for file %s\n" % self.__filePath)
+                logger.info("failed for file %s", self.__filePath)
             if self.__debug:
                 logger.exception("In retriving accesssion type")
 
@@ -581,9 +576,9 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                 return False
         except Exception as e:
             if self.__verbose:
-                logger.info("+PdbxEntryInfo.setStatusDetails() failed for status code %s approval type %s initials %s\n" % (statusCode, approvalType, annotatorInitials))
+                logger.info("+PdbxEntryInfo.setStatusDetails() failed for status code %s approval type %s initials %s", statusCode, approvalType, annotatorInitials)
             if self.__debug:
-                logger.exception("Failing with %s" % str(e))
+                logger.exception("Failing with %s", str(e))
         return False
 
     def getCurrentStatusDetails(self):
@@ -658,9 +653,9 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
 
         except Exception as e:
             if self.__verbose:
-                logger.info("+PdbxEntryInfoIo.__getInfoGeneral() failed for file %s\n" % self.__filePath)
+                logger.info("+PdbxEntryInfoIo.__getInfoGeneral() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s" % str(e))
+                logger.exception("Failing with %s", str(e))
         return oD
 
     def __getInfoHistory(self):
@@ -775,9 +770,9 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                 oD["deposit_site"] = depositSite
         except Exception as e:
             if self.__verbose:
-                logger.info("+PdbxEntryInfoIo.__getInfoHistory() failed for file %s\n" % self.__filePath)
+                logger.info("+PdbxEntryInfoIo.__getInfoHistory() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s" % str(e))
+                logger.exception("Failing with %s", str(e))
         return oD
 
 
@@ -787,11 +782,10 @@ class PdbxLocalMapIndexIo(PdbxStyleIoUtil):
     def __init__(self, verbose=True, log=sys.stderr):
         super(PdbxLocalMapIndexIo, self).__init__(styleObject=PdbxLocalMapIndexCategoryStyle(), verbose=verbose, log=log)
 
-        self.__verbose = verbose
-        self.__debug = False
+        # self.__verbose = verbose
+        # self.__debug = False
         self.__lfh = log
         #
-        self.__topCachePath = None
         self.__filePath = None
 
     def getCategory(self, catName="dcc_ligand"):

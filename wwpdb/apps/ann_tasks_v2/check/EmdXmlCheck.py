@@ -42,24 +42,23 @@ class EmdXmlCheck(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__setup()
+        self.__exportPath = None
+        self.__checkArgs = None  # pylint: disable=unused-private-member
+        self.__reportFileSize = 0
+        self.__reportPath = None
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__exportPath = self.__sessionPath
-        self.__checkArgs = None
-        self.__cleanup = False
-        self.__reportFileSize = 0
-        self.__reportPath = None
 
     def setExportPath(self, exportPath):
         """Set the path where output files are copyied."""
         self.__exportPath = exportPath
 
     def setArguments(self, checkArgs):
-        self.__checkArgs = checkArgs
+        self.__checkArgs = checkArgs  # pylint: disable=unused-private-member
 
     def __logerr(self, errstr):
         """Writes to the report log"""
@@ -116,7 +115,7 @@ class EmdXmlCheck(SessionWebDownloadUtils):
                 os.remove(emdXmlPath)
 
             status = emh.transHeader(emdModelPath, emdXmlPath, self.__reportPath, validateXml=True)
-            logger.debug("Status of translation %s" % status)
+            logger.debug("Status of translation %s", status)
 
             if self.__getSize(emdXmlPath):
                 self.addDownloadPath(emdXmlPath)

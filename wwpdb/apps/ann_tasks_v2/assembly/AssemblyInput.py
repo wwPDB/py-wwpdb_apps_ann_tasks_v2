@@ -52,7 +52,6 @@ class AssemblyInput(object):
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__rltvSessionPath = self.__sObj.getRelativePath()
         self.__formDefList = [
             ("assem_id", "a_id_", self.__placeHolderValue),
             ("provenance", "a_prov_", self.__placeHolderValue),
@@ -65,17 +64,17 @@ class AssemblyInput(object):
     def getAssemblyFormDef(self):
         return self.__formDefList
 
-    def __fetchMolecularDetails(self, entryFileName=None):
-        """Return a dictionary containing the auth_asym_ids for each polymer entity."""
-        fN = os.path.join(self.__sessionPath, entryFileName)
-        c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(fN)
-        sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
-        ed, bList = sdf.getPolymerEntityChainDict()
-        if self.__debug:
-            for eId, iList in ed.items():
-                self.__lfh.write("+AssemblyInput.__fetchMolecularDetails() entity %s  instance list = %r\n" % (eId, iList))
+    # def __fetchMolecularDetails(self, entryFileName=None):
+    #     """Return a dictionary containing the auth_asym_ids for each polymer entity."""
+    #     fN = os.path.join(self.__sessionPath, entryFileName)
+    #     c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(fN)
+    #     sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
+    #     ed, bList = sdf.getPolymerEntityChainDict()
+    #     if self.__debug:
+    #         for eId, iList in ed.items():
+    #             self.__lfh.write("+AssemblyInput.__fetchMolecularDetails() entity %s  instance list = %r\n" % (eId, iList))
 
-        return ed
+    #     return ed
 
     def __fetchAssemblyDepositorDetails(self, entryFileName=None):
         """Return a list of dictionaries containing depositor provided details about molecular assemblies."""
@@ -85,17 +84,18 @@ class AssemblyInput(object):
         assemOper = []
         assemEvidence = []
         assemClassification = []
+        branchInstList = []
         ed = {}
         #
         if self.__verbose:
             self.__lfh.write("+AssemblyInput.__fetchAssemblyDepositorDetails() entryFileName %r\n" % entryFileName)
         #
         if entryFileName is None or len(entryFileName) < 1:
-            return assemL, assemRcsbL, ed, assemGen, assemOper, assemEvidence, assemClassification
+            return assemL, assemRcsbL, ed, assemGen, assemOper, assemEvidence, assemClassification, branchInstList
 
         fN = os.path.join(self.__sessionPath, entryFileName)
         if fN is not None and not os.access(fN, os.R_OK):
-            return assemL, assemRcsbL, ed, assemGen, assemOper, assemEvidence, assemClassification
+            return assemL, assemRcsbL, ed, assemGen, assemOper, assemEvidence, assemClassification, branchInstList
         #
         c0 = PdbxFileIo(ioObj=IoAdapterCore(), verbose=self.__verbose, log=self.__lfh).getContainer(fN)
         sdf = ModelFileIo(dataContainer=c0, verbose=self.__verbose, log=self.__lfh)
@@ -420,10 +420,10 @@ class AssemblyInput(object):
         ]
 
         aS = AssemblySelect(reqObj=self.__reqObj, verbose=self.__verbose, log=self.__lfh)
-        tfD, extraD = aS.getAssemblyFormDetails(entryId)
+        _tfD, extraD = aS.getAssemblyFormDetails(entryId)
         if self.__verbose:
             self.__lfh.write("+AssemblyInput.makeDepositorAssemblyDetailsTable() updated description saved in extraD %r\n" % extraD.items())
-        assemL, assemRcsbL, eD, assemGen, assemOper, assemEvidence, assemClassification, branchInstList = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
+        assemL, assemRcsbL, eD, assemGen, _assemOper, assemEvidence, assemClassification, _branchInstList = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
 
         #
         if (extraD is not None) and (len(extraD) > 0):
@@ -444,7 +444,7 @@ class AssemblyInput(object):
         #    return '\n'.join(oL)
         #
         instanceIdList = []
-        for eId, instL in eD.items():
+        for _eId, instL in eD.items():
             for inst in instL:
                 instanceIdList.append(inst)
             #
@@ -605,7 +605,7 @@ class AssemblyInput(object):
             self.__lfh.write("AssemblyInput.makeAssemblyEditForm() prior form content %r extra %r\n" % (fD.items(), extraD.items()))
 
         # eD = self.__fetchMolecularDetails(entryFileName=entryFileName)
-        assemL, assemRcsbL, eD, assemGen, assemOper, assemEvidence, assemClassification, branchInstList = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
+        _assemL, assemRcsbL, eD, _assemGen, _assemOper, _assemEvidence, _assemClassification, _branchInstList = self.__fetchAssemblyDepositorDetails(entryFileName=entryFileName)
         #
         #
         tS = ""
@@ -687,7 +687,7 @@ class AssemblyInput(object):
         #
         instanceIdList = []
         allInstanceIdList = []
-        for eId, instL in eD.items():
+        for _eId, instL in eD.items():
             for inst in instL:
                 allInstanceIdList.append(inst)
                 if inst in branch2LinearMap:

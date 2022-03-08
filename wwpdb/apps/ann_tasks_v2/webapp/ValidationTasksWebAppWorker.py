@@ -27,6 +27,7 @@ __version__ = "V0.07"
 
 import os
 import sys
+import inspect
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
@@ -89,7 +90,6 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         self.addServices(self.__appPathD)
 
         #
-        self.__debug = False
         self.__doStatusUpdate = True
         if self._siteId in ["WWPDB_DEPLOY_MACOSX"]:
             self.__doStatusUpdate = False
@@ -118,7 +118,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
 
         bSuccess = False
         if self._verbose:
-            self._lfh.write("\n+%s.%s() Starting now\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+            self._lfh.write("\n+%s.%s() Starting now\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
 
         self._getSession(useContext=True)
         #
@@ -152,7 +152,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() -- fileSource: %s identifier %s instance %s standalonemode %s\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
             )
         if bIsWorkflow:
             # save wf state for status update --
@@ -171,7 +171,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         rC.set("standalonemode", standaloneMode)
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() workflow flag is %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, bIsWorkflow))
+            self._lfh.write("+%s.%s() workflow flag is %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, bIsWorkflow))
 
         if wfStatusUpdate and bIsWorkflow:
             # Update WF status database --
@@ -179,11 +179,11 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             if not bSuccess:
                 rC.setError(errMsg="Workflow database update/initiation failed")
                 self._lfh.write(
-                    "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self._sessionId)
+                    "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
             else:
                 if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             if bSuccess:
                 wfStatus = "completed"
@@ -212,7 +212,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         entryVolFilePath = pI.getEmVolumeFilePath(entryId, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
         self._lfh.write("entryVolFilePath {}".format(entryVolFilePath))
-        dd, entryVolFileName = os.path.split(entryVolFilePath)
+        _dd, entryVolFileName = os.path.split(entryVolFilePath)
         #
         sfOk = False
         entryExpFilePath = os.path.join(self._sessionPath, entryExpFileName)
@@ -248,7 +248,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         htmlList.append("<head>")
         htmlList.append("<title>Validation Tasks Module</title>")
 
-        list = [
+        plist = [
             "sessionid={}".format(sessionId),
             "entryid={}".format(entryId),
             "entryfilename={}".format(entryFileName),
@@ -256,15 +256,15 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             "standalonemode={}".format(standaloneMode),
         ]
         if sfOk:
-            list.append("entryexpfilename={}".format(entryExpFileName))
+            plist.append("entryexpfilename={}".format(entryExpFileName))
         if csOk:
-            list.append("entrycsfilename={}".format(entryCsFileName))
+            plist.append("entrycsfilename={}".format(entryCsFileName))
         if fscOk:
-            list.append("entryfscfilename={}".format(entryFscFileName))
+            plist.append("entryfscfilename={}".format(entryFscFileName))
         if volOk:
-            list.append("entryvolfilename={}".format(entryVolFileName))
+            plist.append("entryvolfilename={}".format(entryVolFileName))
 
-        query = "&".join(list)
+        query = "&".join(plist)
 
         htmlList.append('<meta http-equiv="REFRESH" content="0;url=/validation_tasks_v2/wf-startup-template.html?{}"></head>'.format(query))
 
@@ -282,7 +282,9 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         bSuccess = False
         bIsWorkflow = True
         if self._verbose:
-            self._lfh.write("\n\n+%s.%s() Finishing operation starting with status update flag %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, wfStatusUpdate))
+            self._lfh.write(
+                "\n\n+%s.%s() Finishing operation starting with status update flag %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, wfStatusUpdate)
+            )
         #
         self._getSession(useContext=True)
         #
@@ -293,7 +295,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() recovered context fileSource: %s identifier %s instance %s\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, instanceWf)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf)
             )
         #
         # sessionId = self._sessionId
@@ -332,11 +334,11 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         dE = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource, verbose=self._verbose, log=self._lfh)
         #
-        for list in filelist:
-            pdbxPath = os.path.join(self._sessionPath, list[0])
-            ok = dE.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
+        for flist in filelist:
+            pdbxPath = os.path.join(self._sessionPath, flist[0])
+            ok = dE.export(pdbxPath, contentType=flist[1], formatType=flist[2], version="next")
             if self._verbose:
-                self._lfh.write("+%s.%s() Updating file %s in archive store with status %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, pdbxPath, ok))
+                self._lfh.write("+%s.%s() Updating file %s in archive store with status %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, pdbxPath, ok))
         #
         # ---------------------------------------------------------------------------------------------------------------------------------------------------------
         #
@@ -344,7 +346,9 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         rC.setReturnFormat("json")
         #
         if self._verbose:
-            self._lfh.write("+%s.%s() workflow flag is %r and status update flag is %r \n" % (self.__class__.__name__, sys._getframe().f_code.co_name, bIsWorkflow, wfStatusUpdate))
+            self._lfh.write(
+                "+%s.%s() workflow flag is %r and status update flag is %r \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, bIsWorkflow, wfStatusUpdate)
+            )
 
         if wfStatusUpdate and bIsWorkflow:
             # Update WF status database --
@@ -352,11 +356,11 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             if not bSuccess:
                 rC.setError(errMsg="Workflow database status update has failed")
                 self._lfh.write(
-                    "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, self._sessionId)
+                    "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
             else:
                 if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         #
         else:
             bSuccess = True

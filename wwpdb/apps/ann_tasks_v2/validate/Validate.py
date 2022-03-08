@@ -44,15 +44,15 @@ class Validate(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         #
+        self.__validateArgs = None
+        self.__cleanup = False
+        #
         self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
-        self.__validateArgs = None
-        self.__cleanup = False
 
     def setArguments(self, validateArgs):
         self.__validateArgs = validateArgs
@@ -75,7 +75,7 @@ class Validate(SessionWebDownloadUtils):
         updateInput=True,
         annotationContext=False,
         validation_mode="annotate",
-    ):
+    ):  # pylint: disable=unused-argument
         """Run the validation operation for all supported methods"""
         uploadVersionOp = "none"
         try:

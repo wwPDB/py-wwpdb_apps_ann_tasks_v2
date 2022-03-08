@@ -15,11 +15,13 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 
+import inspect
 import os
 import sys
 import time
 import re
 import traceback
+
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -44,9 +46,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         self.__getUInputWValues()
 
     def __setup(self):
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__tempFilePath = os.path.join(self.__sessionPath, "temp-exp-file-1.cif")
         self.__logFilePath = os.path.join(self.__sessionPath, "update-reflection-file.log")
@@ -108,7 +108,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         startTime = time.time()
         if self.__verbose:
             self.__lfh.write("\n\n========================================================================================================\n")
-            self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+            self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
         #
         returnFlag = True
         try:
@@ -191,7 +191,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                     if (dId not in modelWavelengthD) or (not modelWavelengthD[dId]):
                         continue
                     #
-                    for muId, mu, wt in modelWavelengthD[dId]:
+                    for _muId, mu, wt in modelWavelengthD[dId]:
                         if (mu in [None, "", ".", "?"]) or (mu in modelWvList):
                             continue
                         #
@@ -224,7 +224,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                     expMuList = self.__inputExpMuMap[curContainerName]
                     cleanFlag = True
                 elif len(curMuList) > 0:
-                    for muId, mu, wt in curMuList:
+                    for _muId, mu, wt in curMuList:
                         if (mu in [None, "", ".", "?"]) or (mu in expWvList):
                             cleanFlag = True
                             continue
@@ -359,7 +359,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             endTime = time.time()
             self.__lfh.write(
                 "\nCompleted %s %s at %s (%.2f seconds)\n"
-                % (self.__class__.__name__, sys._getframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
             )
         #
         return returnFlag
