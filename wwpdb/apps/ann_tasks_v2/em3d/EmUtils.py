@@ -261,12 +261,9 @@ class EmUtils(SessionWebDownloadUtils):
             # bar_chart = pygal.Bar(show_minor_x_labels=False,style=LightGreenStyle)
 
             bar_chart.title = "Map density distribution"
-            #
-            bar_chart.x_labels = map(str, [int(t) for t in x])
-            bar_chart.x_labels_major = map(str, [int(t) for t in x[::nL]])
-            #
-            bar_chart.x_labels = map(str, x)
-            bar_chart.x_labels_major = map(str, [t for t in x[::nL]])
+
+            bar_chart.x_labels = list(map(str, x))
+            bar_chart.x_labels_major = list(map(str, [t for t in x[::nL]]))
 
             bar_chart.add("Voxels (log(10)", logy)
 
