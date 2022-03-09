@@ -41,11 +41,12 @@ class EmdXmlCheck(SessionWebDownloadUtils):
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
-        self.__setup()
         self.__exportPath = None
         self.__checkArgs = None  # pylint: disable=unused-private-member
         self.__reportFileSize = 0
         self.__reportPath = None
+        #
+        self.__setup()
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
