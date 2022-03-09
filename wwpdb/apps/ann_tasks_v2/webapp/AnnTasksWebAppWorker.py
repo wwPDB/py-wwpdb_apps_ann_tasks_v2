@@ -29,7 +29,10 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import json,os,sys,traceback
+import json
+import os
+import sys
+import inspect
 import logging
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
@@ -52,103 +55,103 @@ from wwpdb.io.locator.PathInfo import PathInfo
 
 logger = logging.getLogger(__name__)
 
-class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
 
+class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         """
-         Worker methods for annotation tasks.
+        Worker methods for annotation tasks.
 
-         Performs URL - application mapping and application launching
-         for annotation tasks module.
+        Performs URL - application mapping and application launching
+        for annotation tasks module.
 
         """
         super(AnnTasksWebAppWorker, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         #
         #  URL to method mapping -----  the service names are case insensitive --
         #
-        self.__appPathD = {'/service/ann_tasks_v2/env': '_dumpOp',
-                           '/service/ann_tasks_v2/entryinfo': '_entryInfoOp',
-                           '/service/ann_tasks_v2/uploadfromid': '_launchFromIdcodeOp',
-                           '/service/ann_tasks_v2/upload': '_uploadFileOp',
-                           '/service/ann_tasks_v2/uploadmulti': '_uploadMultipleFilesOp',
-                           '/service/ann_tasks_v2/nmr_cs_update': '_nmrCsUpdateOp',
-                           '/service/ann_tasks_v2/nmr_cs_upload_check': '_nmrCsUploadCheckOp',
-                           '/service/ann_tasks_v2/nmr_cs_atom_name_check': '_nmrCsAtomNameCheckOp',
-                           '/service/ann_tasks_v2/nmr_cs_misc_checks': '_nmrCsMiscChecksOp',
-                           '/service/ann_tasks_v2/nmr_rep_model_update': '_nmrRepresentativeModelUpdateOp',
-                           '/service/ann_tasks_v2/nmr_cs_archive_update': '_nmrCsArchiveUpdateOp',
-                           '/service/ann_tasks_v2/nmr_cs_auto_processing': '_nmrCsAutoProcessingOp',
-                           '/service/ann_tasks_v2/get_nmr_processing_message': '_getNmrCsAutoProcessingMessageOp',
-                           '/service/ann_tasks_v2/newsession': '_newSessionOp',
-                           '/service/ann_tasks_v2/launchjmol': '_launchJmolViewerOp',
-                           '/service/ann_tasks_v2/launchjmolwithmap': '_launchJmolViewerWithMapOp',
-                           '/service/ann_tasks_v2/assemblycalc': '_assemblyCalcOp',
-                           '/service/ann_tasks_v2/assemblyrestart': '_assemblyRestartOp',
-                           '/service/ann_tasks_v2/assemblyview': '_assemblyViewOp',
-                           '/service/ann_tasks_v2/genassemblyview': '_genAssemblyViewOp',
-                           '/service/ann_tasks_v2/assemblyselect': '_assemblySelectOp',
-                           # '/service/ann_tasks_v2/sitecalc': '_siteCalcOp',
-                           '/service/ann_tasks_v2/dictcheck': '_dictCheckOp',
-                           '/service/ann_tasks_v2/extracheck': '_extraCheckOp',
-                           '/service/ann_tasks_v2/valreport': '_valReportOp',
-                           '/service/ann_tasks_v2/mapcalc': '_mapCalcOp',
-                           '/service/ann_tasks_v2/npccmapcalc': '_npCcMapCalcOp',
-                           '/service/ann_tasks_v2/localmapinfo': '_mapDisplayOp',
-                           '/service/ann_tasks_v2/dcccalc': '_dccCalcOp',
-                           '/service/ann_tasks_v2/dccrefinecalc': '_dccRefineCalcOp',
-                           '/service/ann_tasks_v2/specialpositioncalc': '_specialPositionCalcOp',
-                           '/service/ann_tasks_v2/specialpositionupdate': '_specialPositionUpdateOp',
-                           '/service/ann_tasks_v2/tlsrangecorrection': '_tlsRangeCorrectionOp',
-                           '/service/ann_tasks_v2/mtz_mmcif_conversion': '_mtzCifConversionOp',
-                           '/service/ann_tasks_v2/correcting_sf_free_r_set': '_sfFreeRCorrectionOp',
-                           '/service/ann_tasks_v2/correcting_database_releated': '_relatedCorrectionOp',
-                           '/service/ann_tasks_v2/reassignaltidscalc': '_reassignAltIdsCalcOp',
-                           '/service/ann_tasks_v2/bisofullcalc': '_bisoFullCalcOp',
-                           '/service/ann_tasks_v2/linkcalc': '_linkCalcOp',
-                           '/service/ann_tasks_v2/solventcalc': '_solventCalcOp',
-                           '/service/ann_tasks_v2/nafeaturescalc': '_naFeaturesCalcOp',
-                           '/service/ann_tasks_v2/secstructcalc': '_secondaryStructureCalcOp',
-                           '/service/ann_tasks_v2/transformcoordcalc': '_transformCoordCalcOp',
-                           #
-                           '/service/ann_tasks_v2/mergexyzcalc': '_mergeXyzCalcOp',
-                           '/service/ann_tasks_v2/terminalatomscalc': '_terminalAtomsCalcOp',
-                           '/service/ann_tasks_v2/geomvalidcalc': '_geometryValidationCalcOp',
-                           '/service/ann_tasks_v2/getsessioninfo': '_getSessionInfoOp',
-                           '/service/ann_tasks_v2/start': '_launchOp',
-                           '/service/ann_tasks_v2/new_session/wf': '_launchOp',
-                           '/service/ann_tasks_v2/finish': '_finishOp',
-                           '/service/ann_tasks_v2/wfadmin_upload': '_uploadFileOp',
-                           '/service/ann_tasks_v2/wfadmin_new_entry': '_newEntryWfOp',
-                           '/service/ann_tasks_v2/wfadmin_reset_entry': '_resetEntryWfOp',
-                           '/service/ann_tasks_v2/wfadmin_reassign_entry': '_reassignEntryWfOp',
-                           '/service/ann_tasks_v2/assemblyloadform': '_loadAssemblyFormOp',
-                           '/service/ann_tasks_v2/assemblysaveform': '_saveAssemblyFormOp',
-                           '/service/ann_tasks_v2/assemblysavedefaultinfo': '_saveDefaultAssemblyOp',
-                           '/service/ann_tasks_v2/assemblyloaddepinfo': '_loadAssemblyDepInfoOp',
-                           '/service/ann_tasks_v2/entityloadinfo': '_loadEntityInfoOp',
-                           '/service/ann_tasks_v2/symoploadinfo':  '_loadSymopInfoOp',
-                           '/service/ann_tasks_v2/getcorrespondencetemplate': '_getCorresPNDTemplateOp',
-                           '/service/ann_tasks_v2/generatecorrespondence': '_generateCorresPNDOp',
-                           '/service/ann_tasks_v2/manualcoordeditorform': '_getCoordEditorFormOp',
-                           '/service/ann_tasks_v2/manualcoordeditorsave': '_saveCoordEditorOp',
-                           '/service/ann_tasks_v2/manualcoordeditorupdate': '_updateCoordEditorOp',
-                           '/service/ann_tasks_v2/cs_editor': '_launchCSEditorFormOp',
-                           '/service/ann_tasks_v2/manualcseditorform': '_getCSEditorFormOp',
-                           '/service/ann_tasks_v2/manualcseditorsave': '_saveCSEditorOp',
-                           '/service/ann_tasks_v2/manualcseditorupdate': '_updateCSEditorOp',
-                           '/service/ann_tasks_v2/checkreports': '_fetchAndReportIdOps',
-                           '/service/ann_tasks_v2/update_reflection_file': '_updateRefelectionFileOp',
-
-                           '/service/ann_tasks_v2/list_em_maps': '_listEmMapsOp',
-                           '/service/ann_tasks_v2/edit_em_map_header': '_editEmMapHeaderOp',
-                           '/service/ann_tasks_v2/edit_em_map_header_responder': '_editEmMapHeaderResponderOp',
-                           '/service/ann_tasks_v2/get_close_contact_content': '_getCloseContactContentOp',
-                           '/service/ann_tasks_v2/update_close_contact_content': '_updateCloseContactContentOp',
-                           'placeholder': '_dumpOp'
-                           }
+        self.__appPathD = {
+            "/service/ann_tasks_v2/env": "_dumpOp",
+            "/service/ann_tasks_v2/entryinfo": "_entryInfoOp",
+            "/service/ann_tasks_v2/uploadfromid": "_launchFromIdcodeOp",
+            "/service/ann_tasks_v2/upload": "_uploadFileOp",
+            "/service/ann_tasks_v2/uploadmulti": "_uploadMultipleFilesOp",
+            "/service/ann_tasks_v2/nmr_cs_update": "_nmrCsUpdateOp",
+            "/service/ann_tasks_v2/nmr_cs_upload_check": "_nmrCsUploadCheckOp",
+            "/service/ann_tasks_v2/nmr_cs_atom_name_check": "_nmrCsAtomNameCheckOp",
+            "/service/ann_tasks_v2/nmr_cs_misc_checks": "_nmrCsMiscChecksOp",
+            "/service/ann_tasks_v2/nmr_rep_model_update": "_nmrRepresentativeModelUpdateOp",
+            "/service/ann_tasks_v2/nmr_cs_archive_update": "_nmrCsArchiveUpdateOp",
+            "/service/ann_tasks_v2/nmr_cs_auto_processing": "_nmrCsAutoProcessingOp",
+            "/service/ann_tasks_v2/get_nmr_processing_message": "_getNmrCsAutoProcessingMessageOp",
+            "/service/ann_tasks_v2/newsession": "_newSessionOp",
+            "/service/ann_tasks_v2/launchjmol": "_launchJmolViewerOp",
+            "/service/ann_tasks_v2/launchjmolwithmap": "_launchJmolViewerWithMapOp",
+            "/service/ann_tasks_v2/assemblycalc": "_assemblyCalcOp",
+            "/service/ann_tasks_v2/assemblyrestart": "_assemblyRestartOp",
+            "/service/ann_tasks_v2/assemblyview": "_assemblyViewOp",
+            "/service/ann_tasks_v2/genassemblyview": "_genAssemblyViewOp",
+            "/service/ann_tasks_v2/assemblyselect": "_assemblySelectOp",
+            # '/service/ann_tasks_v2/sitecalc': '_siteCalcOp',
+            "/service/ann_tasks_v2/dictcheck": "_dictCheckOp",
+            "/service/ann_tasks_v2/extracheck": "_extraCheckOp",
+            "/service/ann_tasks_v2/valreport": "_valReportOp",
+            "/service/ann_tasks_v2/mapcalc": "_mapCalcOp",
+            "/service/ann_tasks_v2/npccmapcalc": "_npCcMapCalcOp",
+            "/service/ann_tasks_v2/localmapinfo": "_mapDisplayOp",
+            "/service/ann_tasks_v2/dcccalc": "_dccCalcOp",
+            "/service/ann_tasks_v2/dccrefinecalc": "_dccRefineCalcOp",
+            "/service/ann_tasks_v2/specialpositioncalc": "_specialPositionCalcOp",
+            "/service/ann_tasks_v2/specialpositionupdate": "_specialPositionUpdateOp",
+            "/service/ann_tasks_v2/tlsrangecorrection": "_tlsRangeCorrectionOp",
+            "/service/ann_tasks_v2/mtz_mmcif_conversion": "_mtzCifConversionOp",
+            "/service/ann_tasks_v2/correcting_sf_free_r_set": "_sfFreeRCorrectionOp",
+            "/service/ann_tasks_v2/correcting_database_releated": "_relatedCorrectionOp",
+            "/service/ann_tasks_v2/reassignaltidscalc": "_reassignAltIdsCalcOp",
+            "/service/ann_tasks_v2/bisofullcalc": "_bisoFullCalcOp",
+            "/service/ann_tasks_v2/linkcalc": "_linkCalcOp",
+            "/service/ann_tasks_v2/solventcalc": "_solventCalcOp",
+            "/service/ann_tasks_v2/nafeaturescalc": "_naFeaturesCalcOp",
+            "/service/ann_tasks_v2/secstructcalc": "_secondaryStructureCalcOp",
+            "/service/ann_tasks_v2/transformcoordcalc": "_transformCoordCalcOp",
+            #
+            "/service/ann_tasks_v2/mergexyzcalc": "_mergeXyzCalcOp",
+            "/service/ann_tasks_v2/terminalatomscalc": "_terminalAtomsCalcOp",
+            "/service/ann_tasks_v2/geomvalidcalc": "_geometryValidationCalcOp",
+            "/service/ann_tasks_v2/getsessioninfo": "_getSessionInfoOp",
+            "/service/ann_tasks_v2/start": "_launchOp",
+            "/service/ann_tasks_v2/new_session/wf": "_launchOp",
+            "/service/ann_tasks_v2/finish": "_finishOp",
+            "/service/ann_tasks_v2/wfadmin_upload": "_uploadFileOp",
+            "/service/ann_tasks_v2/wfadmin_new_entry": "_newEntryWfOp",
+            "/service/ann_tasks_v2/wfadmin_reset_entry": "_resetEntryWfOp",
+            "/service/ann_tasks_v2/wfadmin_reassign_entry": "_reassignEntryWfOp",
+            "/service/ann_tasks_v2/assemblyloadform": "_loadAssemblyFormOp",
+            "/service/ann_tasks_v2/assemblysaveform": "_saveAssemblyFormOp",
+            "/service/ann_tasks_v2/assemblysavedefaultinfo": "_saveDefaultAssemblyOp",
+            "/service/ann_tasks_v2/assemblyloaddepinfo": "_loadAssemblyDepInfoOp",
+            "/service/ann_tasks_v2/entityloadinfo": "_loadEntityInfoOp",
+            "/service/ann_tasks_v2/symoploadinfo": "_loadSymopInfoOp",
+            "/service/ann_tasks_v2/getcorrespondencetemplate": "_getCorresPNDTemplateOp",
+            "/service/ann_tasks_v2/generatecorrespondence": "_generateCorresPNDOp",
+            "/service/ann_tasks_v2/manualcoordeditorform": "_getCoordEditorFormOp",
+            "/service/ann_tasks_v2/manualcoordeditorsave": "_saveCoordEditorOp",
+            "/service/ann_tasks_v2/manualcoordeditorupdate": "_updateCoordEditorOp",
+            "/service/ann_tasks_v2/cs_editor": "_launchCSEditorFormOp",
+            "/service/ann_tasks_v2/manualcseditorform": "_getCSEditorFormOp",
+            "/service/ann_tasks_v2/manualcseditorsave": "_saveCSEditorOp",
+            "/service/ann_tasks_v2/manualcseditorupdate": "_updateCSEditorOp",
+            "/service/ann_tasks_v2/checkreports": "_fetchAndReportIdOps",
+            "/service/ann_tasks_v2/update_reflection_file": "_updateRefelectionFileOp",
+            "/service/ann_tasks_v2/list_em_maps": "_listEmMapsOp",
+            "/service/ann_tasks_v2/edit_em_map_header": "_editEmMapHeaderOp",
+            "/service/ann_tasks_v2/edit_em_map_header_responder": "_editEmMapHeaderResponderOp",
+            "/service/ann_tasks_v2/get_close_contact_content": "_getCloseContactContentOp",
+            "/service/ann_tasks_v2/update_close_contact_content": "_updateCloseContactContentOp",
+            "placeholder": "_dumpOp",
+        }
         self.addServices(self.__appPathD)
         #
-        self.__debug = False
+        # self.__debug = False
         self.__doStatusUpdate = True
         if self._siteId in ["WWPDB_DEPLOY_MACOSX"]:
             self.__doStatusUpdate = False
@@ -158,43 +161,43 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         self._reqObj.setValue("TemplatePath", self.__templatePath)
 
     def _launchOp(self):
-        """ Launch annotation tasks module interface
+        """Launch annotation tasks module interface
 
-            :Helpers:
-                wwpdb.apps.ann_tasks_v2.XXXXXXX
+        :Helpers:
+            wwpdb.apps.ann_tasks_v2.XXXXXXX
 
-            :Returns:
-                Operation output is packaged in a ResponseContent() object.
+        :Returns:
+            Operation output is packaged in a ResponseContent() object.
 
 
-                /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_1000000001&filesource=wf-archive&instance=W_000
+            /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_1000000001&filesource=wf-archive&instance=W_000
 
-                /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_082583&filesource=wf-archive&instance=W_000
-                /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_1100201006&filesource=wf-archive&skipstatus=y
+            /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_082583&filesource=wf-archive&instance=W_000
+            /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_1100201006&filesource=wf-archive&skipstatus=y
 
-                /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_1000000000&filesource=wf-archive
+            /service/ann_tasks_v2/start?classID=AnnMod&identifier=D_1000000000&filesource=wf-archive
         """
 
         bSuccess = False
-        if (self._verbose):
-            self._lfh.write("\n+%s.%s() Starting now\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        if self._verbose:
+            self._lfh.write("\n+%s.%s() Starting now\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
 
         self._getSession(useContext=True)
         #
         # determine if currently operating in Workflow Managed environment
         #
         standaloneMode = str(self._reqObj.getValue("standalonemode")).strip().lower()
-        if (standaloneMode not in ['y', 'n']):
-            standaloneMode = 'n'
+        if standaloneMode not in ["y", "n"]:
+            standaloneMode = "n"
         #
-        if standaloneMode == 'n':
+        if standaloneMode == "n":
             bIsWorkflow = self._isWorkflow()
         else:
             bIsWorkflow = False
 
         wfStatusUpdate = self.__doStatusUpdate
 
-        if standaloneMode in ['y']:
+        if standaloneMode in ["y"]:
             wfStatusUpdate = False
         else:
             skipStatus = str(self._reqObj.getValue("skipstatus")).strip()
@@ -208,53 +211,55 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         identifier = str(self._reqObj.getValue("identifier")).strip()
         instanceWf = str(self._reqObj.getValue("instance")).strip()
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() -- fileSource: %s identifier %s instance %s standalonemode %s\n" % (self.__class__.__name__,
-                                                                                                          sys._getframe().f_code.co_name,
-                                                                                                          fileSource, identifier, instanceWf, standaloneMode))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() -- fileSource: %s identifier %s instance %s standalonemode %s\n"
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
+            )
         if bIsWorkflow:
             # save wf state for status update --
             d = {}
-            d['classID'] = self._reqObj.getValue("classID")
-            d['filesource'] = fileSource
-            d['identifier'] = identifier
-            d['instance'] = instanceWf
-            d['standalonemode'] = standaloneMode
+            d["classID"] = self._reqObj.getValue("classID")
+            d["filesource"] = fileSource
+            d["identifier"] = identifier
+            d["instance"] = instanceWf
+            d["standalonemode"] = standaloneMode
             self._saveSessionParameter(pvD=d, prefix=None)
 
         #
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        rC.setReturnFormat('html')
+        rC.setReturnFormat("html")
 
-        rC.set('standalonemode', standaloneMode)
+        rC.set("standalonemode", standaloneMode)
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() workflow flag is %r\n" % (self.__class__.__name__, sys._getframe().f_code.co_name, bIsWorkflow))
+        if self._verbose:
+            self._lfh.write("+%s.%s() workflow flag is %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, bIsWorkflow))
 
-        if (wfStatusUpdate and bIsWorkflow):
+        if wfStatusUpdate and bIsWorkflow:
             # Update WF status database --
             bSuccess = self._updateWfTrackingDb("open")
-            if(not bSuccess):
+            if not bSuccess:
                 rC.setError(errMsg="Workflow database update/initiation failed")
-                self._lfh.write("+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" %
-                                (self.__class__.__name__, sys._getframe().f_code.co_name, self._sessionId))
+                self._lfh.write(
+                    "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
+                )
             else:
-                if (self._verbose):
-                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+                if self._verbose:
+                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             if bSuccess:
-                wfStatus = 'completed'
+                wfStatus = "completed"
             else:
-                wfStatus = 'failed'
+                wfStatus = "failed"
         else:
             bSuccess = True
-            wfStatus = 'none'
+            wfStatus = "none"
         #
         rC.setStatusCode(wfStatus)
         #
         #  Transfer files to the session directory using archive file naming semantics -
         #
-        ok = self._importFromWF(identifier, fileSource=fileSource, instanceWf=instanceWf, getMaps=True)
+        _ok = self._importFromWF(identifier, fileSource=fileSource, instanceWf=instanceWf, getMaps=True)  # noqa: F841
         #
         # Get the sessionId, entryId and entryFileName  (identifier here is the archive data set id)
         #
@@ -263,16 +268,16 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         uploadVersionOp = "none"
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        entryFileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        entryFileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
 
         sfOk = False
-        entryExpFileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        entryExpFileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         filePath = os.path.join(self._sessionPath, entryExpFileName)
         if os.access(filePath, os.R_OK):
             sfOk = True
         #
         csOk = False
-        entryCsFileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        entryCsFileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         entryCsFilePath = os.path.join(self._sessionPath, entryCsFileName)
         if os.access(entryCsFilePath, os.R_OK):
             csOk = True
@@ -284,9 +289,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                 auto_assembly_status = "existed"
             method = str(self._reqObj.getValue("method")).strip().upper()
             auto_methods = [
-                'SOLUTION NMR',
-                'SOLID-STATE NMR',
-                'NMR',
+                "SOLUTION NMR",
+                "SOLID-STATE NMR",
+                "NMR",
                 # 'ELECTRON MICROSCOPY',
             ]
             if method in auto_methods:
@@ -314,42 +319,49 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             auto_assembly_status_url = "&assemblystatus=" + auto_assembly_status
         #
         htmlList = []
-        htmlList.append('<!DOCTYPE html>')
+        htmlList.append("<!DOCTYPE html>")
         htmlList.append('<html lang="en">')
-        htmlList.append('<head>')
-        htmlList.append('<title>Annotation Tasks Module</title>')
+        htmlList.append("<head>")
+        htmlList.append("<title>Annotation Tasks Module</title>")
         if sfOk:
-            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
-                            (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, auto_assembly_status_url))
+            htmlList.append(
+                '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
+                % (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+            )
         elif csOk:
-            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrycsfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
-                            (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode, auto_assembly_status_url))
+            htmlList.append(
+                '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrycsfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
+                % (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+            )
         else:
-            htmlList.append('<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>' %
-                            (sessionId, entryId, entryFileName, wfStatus, standaloneMode, auto_assembly_status_url))
+            htmlList.append(
+                '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'
+                % (sessionId, entryId, entryFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+            )
         # htmlList.append('<body>')
         # htmlList.append('</body>')
         # htmlList.append('</html>')
-        rC.setHtmlText('\n'.join(htmlList))
+        rC.setHtmlText("\n".join(htmlList))
 
-        if (self._verbose):
-            self._lfh.write("\n+%s.%s() Completed \n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+        if self._verbose:
+            self._lfh.write("\n+%s.%s() Completed \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
 
         return rC
 
     def _finishOp(self):
-        """ Finish up annotation tasks --
+        """Finish up annotation tasks --
 
-            :Returns:
-                Operation output is packaged in a ResponseContent() object.
+        :Returns:
+            Operation output is packaged in a ResponseContent() object.
 
         """
         wfStatusUpdate = self.__doStatusUpdate
         bSuccess = False
         bIsWorkflow = True
-        if (self._verbose):
-            self._lfh.write("\n\n+%s.%s() Finishing operation beginning using status update flag %r\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, wfStatusUpdate))
+        if self._verbose:
+            self._lfh.write(
+                "\n\n+%s.%s() Finishing operation beginning using status update flag %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, wfStatusUpdate)
+            )
         #
         self._getSession(useContext=True)
         #
@@ -357,16 +369,17 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         identifier = str(self._reqObj.getValue("identifier")).strip()
         instanceWf = str(self._reqObj.getValue("instance")).strip()
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() recovered context fileSource: %s identifier %s instance %s\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, instanceWf))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() recovered context fileSource: %s identifier %s instance %s\n"
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf)
+            )
         #
-        sessionId = self._sessionId
         entryId = identifier
         uploadVersionOp = "none"
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        entryFileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
-        expFileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber='1')
+        entryFileName = pI.getFileName(identifier, contentType="model", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+        expFileName = pI.getFileName(identifier, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         nefFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         #
@@ -375,22 +388,26 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         # copy reflection file if updated
         resetFreeR = False
-        rPath = os.path.join(self._sessionPath, identifier + '-reset_freer.log')
+        rPath = os.path.join(self._sessionPath, identifier + "-reset_freer.log")
         if os.access(rPath, os.F_OK):
-            ifh = open(rPath, 'r')
+            ifh = open(rPath, "r")
             data = ifh.read()
             ifh.close()
             if data.find("Free R set was successfully relabeled.") > 0:
                 resetFreeR = True
             #
         #
-        tPath = os.path.join(self._sessionPath, 'update-reflection-file.log')
+        tPath = os.path.join(self._sessionPath, "update-reflection-file.log")
         wPath = os.path.join(self._sessionPath, expFileName)
-        if (self._verbose):
-            self._lfh.write("+%s.%s() checking for structure factor log file filesource %s identifier %s path %s\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, tPath))
-            self._lfh.write("+%s.%s() checking for structure factor file filesource %s identifier %s path %s\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier, wPath))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() checking for structure factor log file filesource %s identifier %s path %s\n"
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, tPath)
+            )
+            self._lfh.write(
+                "+%s.%s() checking for structure factor file filesource %s identifier %s path %s\n"
+                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, wPath)
+            )
 
         if resetFreeR or os.access(tPath, os.F_OK):
             filelist.append([expFileName, "structure-factors", "pdbx"])
@@ -404,9 +421,10 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         # ----------
         # Generate PDB file
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() creating PDB format file: filesource %s identifier %s\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() creating PDB format file: filesource %s identifier %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier)
+            )
         convertPDB = PdbFile(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = convertPDB.run(entryId, entryFileName)
         if ok:
@@ -417,9 +435,10 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         # ------------
         # Generate Public pdbx cif file
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() creating PDBx public file: filesource %s identifier %s\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() creating PDBx public file: filesource %s identifier %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier)
+            )
         convertPublicPdbx = PublicPdbxFile(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = convertPublicPdbx.run(entryId, entryFileName)
         if ok:
@@ -430,70 +449,71 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         # Add correspondence-to-depositor file
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() creating correspondence file: filesource %s identifier %s\n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, fileSource, identifier))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() creating correspondence file: filesource %s identifier %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier)
+            )
 
         pdbxPath = os.path.join(self._sessionPath, entryId + "_correspondence-to-depositor_P1.txt")
         if os.access(pdbxPath, os.F_OK):
             filelist.append([entryId + "_correspondence-to-depositor_P1.txt", "correspondence-to-depositor", "txt"])
         #
-        dE = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource,
-                          verbose=self._verbose, log=self._lfh)
+        dE = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource, verbose=self._verbose, log=self._lfh)
         #
-        for list in filelist:
-            pdbxPath = os.path.join(self._sessionPath, list[0])
-            ok = dE.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
-            if (self._verbose):
-                self._lfh.write("+%s.%s() Updating file %s in workflow store with status %r\n" %
-                                (self.__class__.__name__, sys._getframe().f_code.co_name, pdbxPath, ok))
+        for flist in filelist:
+            pdbxPath = os.path.join(self._sessionPath, flist[0])
+            ok = dE.export(pdbxPath, contentType=flist[1], formatType=flist[2], version="next")
+            if self._verbose:
+                self._lfh.write("+%s.%s() Updating file %s in workflow store with status %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, pdbxPath, ok))
         #
-        if fileSource not in ['archive', 'wf-archive']:
-            dEAr = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, fileSource='archive', verbose=self._verbose, log=self._lfh)
-            for list in filelist:
-                if list[1] in ["structure-factors", "nmr-chemical-shifts", "nmr-data-str"]:
-                    pdbxPath = os.path.join(self._sessionPath, list[0])
-                    ok = dEAr.export(pdbxPath, contentType=list[1], formatType=list[2], version="next")
-                    if (self._verbose):
-                        self._lfh.write("+%s.%s() Updating file %s in archive store with status %r\n" %
-                                        (self.__class__.__name__, sys._getframe().f_code.co_name, pdbxPath, ok))
+        if fileSource not in ["archive", "wf-archive"]:
+            dEAr = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, fileSource="archive", verbose=self._verbose, log=self._lfh)
+            for flist in filelist:
+                if flist[1] in ["structure-factors", "nmr-chemical-shifts", "nmr-data-str"]:
+                    pdbxPath = os.path.join(self._sessionPath, flist[0])
+                    ok = dEAr.export(pdbxPath, contentType=flist[1], formatType=flist[2], version="next")
+                    if self._verbose:
+                        self._lfh.write(
+                            "+%s.%s() Updating file %s in archive store with status %r\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, pdbxPath, ok)
+                        )
 
         # ---------------------------------------------------------------------------------------------------------------------------------------------------------
         #
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         #
-        if (self._verbose):
-            self._lfh.write("+%s.%s() workflow flag is %r and status update flag is %r \n" %
-                            (self.__class__.__name__, sys._getframe().f_code.co_name, bIsWorkflow, wfStatusUpdate))
+        if self._verbose:
+            self._lfh.write(
+                "+%s.%s() workflow flag is %r and status update flag is %r \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, bIsWorkflow, wfStatusUpdate)
+            )
 
-        if (wfStatusUpdate and bIsWorkflow):
+        if wfStatusUpdate and bIsWorkflow:
             # Update WF status database --
             bSuccess = self._updateWfTrackingDb("closed(0)")
-            if(not bSuccess):
+            if not bSuccess:
                 rC.setError(errMsg="Workflow database status update has failed")
-                self._lfh.write("+%s.%s() - updating tracking status to closed(0) failed for session %s\n" %
-                                (self.__class__.__name__, sys._getframe().f_code.co_name, self._sessionId))
+                self._lfh.write(
+                    "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
+                )
             else:
-                if (self._verbose):
-                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, sys._getframe().f_code.co_name))
+                if self._verbose:
+                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         #
         else:
             bSuccess = True
         #
         if bSuccess:
-            rC.setStatusCode('completed')
+            rC.setStatusCode("completed")
         else:
-            rC.setStatusCode('failed')
+            rC.setStatusCode("failed")
 
         #
         rC.setHtmlText("Module completed successfully")
         return rC
 
     def _tlsRangeCorrectionOp(self):
-        """ Run TLS range correction procedure
-        """
-        if (self._verbose):
+        """Run TLS range correction procedure"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._tlsRangeCorrectionOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -506,7 +526,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         calc = TlsRange(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = calc.run(entryId, depFileName, fileName)
 
-        if (self._verbose):
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._tlsRangeCorrectionOp() status %r\n" % ok)
 
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
@@ -518,9 +538,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return rC
 
     def _mtzCifConversionOp(self):
-        """ Run mtz to mmCIF conversion
-        """
-        if (self._verbose):
+        """Run mtz to mmCIF conversion"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._mtzCifConversionOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -542,7 +561,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             #
         #
 
-        if (self._verbose):
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._mtzCifConversionOp() status %r\n" % ok)
 
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
@@ -551,20 +570,19 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         tss.assign(name=displayName, formId=displayTaskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryExpFileName=expFileName)
         rC = self._makeTaskResponse(tssObj=tss)
         if ok:
-             html = calc.getHtmlText()
-             if html:
-                 rC.set("mtzinfo", html)
-             #
+            html = calc.getHtmlText()
+            if html:
+                rC.set("mtzinfo", html)
+            #
         else:
-             rC.set("errorflag", True)
+            rC.set("errorflag", True)
         #
 
         return rC
 
     def _sfFreeRCorrectionOp(self):
-        """ Correcting free R set of SF file
-        """
-        if (self._verbose):
+        """Correcting free R set of SF file"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._sfFreeRCorrectionOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -576,7 +594,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         calc = ReSetFreeRinSFmmCIF(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = calc.run()
         #
-        if (self._verbose):
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._sfFreeRCorrectionOp() status %r\n" % ok)
         #
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
@@ -588,9 +606,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return rC
 
     def _relatedCorrectionOp(self):
-        """ Correcting pdbx_database_related OneDep Refereces
-        """
-        if (self._verbose):
+        """Correcting pdbx_database_related OneDep Refereces"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._relatedCorrectionOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -601,7 +618,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         calc = Related(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = calc.run(entryId, fileName, updateInput=True)
         #
-        if (self._verbose):
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._reltaedCorrectionOp() status %r\n" % ok)
         #
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
@@ -613,9 +630,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return rC
 
     def _nmrCsAutoProcessingOp(self):
-        """ Run automatic chemical shift processing
-        """
-        if (self._verbose):
+        """Run automatic chemical shift processing"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._nmrCsAutoProcessingOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -626,11 +642,11 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         tagL = []
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-        for contentType in ( "model", "nmr-chemical-shifts" ):
+        for contentType in ("model", "nmr-chemical-shifts"):
             fileName = pI.getFileName(entryId, contentType=contentType, formatType="pdbx", versionId="none", partNumber="1")
             filePath = os.path.join(self._sessionPath, fileName)
             if os.access(filePath, os.R_OK):
-                tagL.append('<a class="" href="/sessions/' + self._sessionId + '/' + fileName + '" target="_blank">' + fileName + '</a>')
+                tagL.append('<a class="" href="/sessions/' + self._sessionId + "/" + fileName + '" target="_blank">' + fileName + "</a>")
             #
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -641,9 +657,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return rC
 
     def _getNmrCsAutoProcessingMessageOp(self):
-        """ Read automatic chemical shift processing result messages and return to NMR tab page
-        """
-        if (self._verbose):
+        """Read automatic chemical shift processing result messages and return to NMR tab page"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._nmrCsAutoProcessingOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -656,9 +671,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return rC
 
     def _getCloseContactContentOp(self):
-        """ Read close contact information from coordinate model file
-        """
-        if (self._verbose):
+        """Read close contact information from coordinate model file"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._getCloseContactContentOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -675,9 +689,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return rC
 
     def _updateCloseContactContentOp(self):
-        """ Update selected close contact(s) as linkage(s) in coordinate model file
-        """
-        if (self._verbose):
+        """Update selected close contact(s) as linkage(s) in coordinate model file"""
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._updateCloseContactContentOp() starting\n")
         #
         self._getSession(useContext=True)
@@ -703,21 +716,19 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         calc = UpdateCloseContact(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         ok = calc.run(entryId, fileName, close_contact_list)
 
-        if (self._verbose):
+        if self._verbose:
             self._lfh.write("+AnnTasksWebAppWorker._updateCloseContactContentOp() status %r\n" % ok)
 
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Update link from close contact", formId="#review-close-contact-form", args="", completionFlag=ok, tagList=tagL, \
-                   entryId=entryId, entryFileName=fileName)
+        tss.assign(name="Update link from close contact", formId="#review-close-contact-form", args="", completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
 
     def __checkAssemblyInfo(self, modelFile):
-        """ Check if model file already has assembly information
-        """
+        """Check if model file already has assembly information"""
         if not os.access(modelFile, os.F_OK):
             return False
         #
@@ -731,8 +742,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         return False
 
     def __getNmrDiagnosticsHtmlText(self, entryId):
-        """ Get diagnostics from validation xml and nmr-shift-error-report json files
-        """
+        """Get diagnostics from validation xml and nmr-shift-error-report json files"""
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         #
         csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId="none", partNumber="1")
@@ -747,8 +757,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(diagFilePath, os.R_OK):
             with open(diagFilePath, "r") as infile:
                 jsonObj = json.load(infile)
-                for msgType in ( "system_msg", "error_msg" ):
-                    if (not msgType in jsonObj) or (not jsonObj[msgType]):
+                for msgType in ("system_msg", "error_msg"):
+                    if (msgType not in jsonObj) or (not jsonObj[msgType]):
                         continue
                     #
                     if diagText:
@@ -785,11 +795,11 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                     htmlText += '<th class="th_css_class" colspan="3">Shift Data</th></tr><tr><th class="th_css_class">Value</th>'
                     htmlText += '<th class="th_css_class">Uncertainty</th><th class="th_css_class">Ambiguity</th></tr>'
                     for recordList in notFoundCsList:
-                        htmlText += '<tr>'
+                        htmlText += "<tr>"
                         for record in recordList:
-                            htmlText += '<td class="td_css_class">' + record + '</td>'
+                            htmlText += '<td class="td_css_class">' + record + "</td>"
                         #
-                        htmlText += '</tr>'
+                        htmlText += "</tr>"
                     #
                     htmlText += "</table></li>"
                 #

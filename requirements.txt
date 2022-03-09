@@ -1,0 +1,15 @@
+wwpdb.utils.config
+wwpdb.apps.wf_engine
+wwpdb.io
+wwpdb.utils.db
+wwpdb.utils.emdb
+wwpdb.utils.wf
+wwpdb.utils.session
+mmcif
+wwpdb.utils.dp
+wwpdb.utils.detach
+mmcif.utils
+matplotlib
+pygal
+
+mock; python_version < '3'

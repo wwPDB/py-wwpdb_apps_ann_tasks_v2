@@ -6,58 +6,71 @@
 #
 ##
 """
-Accessors to encapsulate common task session details -- 
+Accessors to encapsulate common task session details --
 
 """
 __docformat__ = "restructuredtext en"
-__author__    = "John Westbrook"
-__email__     = "jwest@rcsb.rutgers.edu"
-__license__   = "Creative Commons Attribution 3.0 Unported"
-__version__   = "V0.07"
+__author__ = "John Westbrook"
+__email__ = "jwest@rcsb.rutgers.edu"
+__license__ = "Creative Commons Attribution 3.0 Unported"
+__version__ = "V0.07"
 
-import sys, os, traceback
+import sys
+import traceback
+
 
 class TaskSessionState(object):
-    """Accessors to encapsulate common task session details -- 
-    """    
+    """Accessors to encapsulate common task session details --"""
+
     #
-    def __init__(self,reqObj=None, verbose=False, log=sys.stderr):
-        """ Input request object is used to determine session context.
-        """
-        self.__verbose=verbose
-        self.__lfh=log
-        self.__reqObj=reqObj
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        """Input request object is used to determine session context."""
+        # self.__verbose = verbose
+        self.__lfh = log
+        # self.__reqObj = reqObj
         #
-        self.__D={}
-        self.__strKeyList=['taskname','entryid','entryfilename','entryexpfilename','taskargs','links','statustext',
-                           'taskformid','auxilaryfilename','auxilaryfiletype','errormessage','warningmessage']
-        self.__boolKeyList=['errorflag','warningflag']
+        self.__D = {}
+        self.__strKeyList = [
+            "taskname",
+            "entryid",
+            "entryfilename",
+            "entryexpfilename",
+            "taskargs",
+            "links",
+            "statustext",
+            "taskformid",
+            "auxilaryfilename",
+            "auxilaryfiletype",
+            "errormessage",
+            "warningmessage",
+        ]
+        self.__boolKeyList = ["errorflag", "warningflag"]
         self.clear()
         #
 
     def clear(self):
-        self.__D={}
+        self.__D = {}
         for ky in self.__strKeyList:
-            self.__D[ky]=''
+            self.__D[ky] = ""
         for ky in self.__boolKeyList:
-            self.__D[ky]=False
+            self.__D[ky] = False
 
-    def set(self,dictval):
+    def set(self, dictval):
         try:
-            for k,v in dictval.items():
-                self.__D[k]=v
+            for k, v in dictval.items():
+                self.__D[k] = v
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             return False
 
     def get(self):
         return self.__D
 
-    def assign(self,name,formId=None,args=None,completionFlag=None,tagList=None,entryId=None,entryFileName=None,entryExpFileName=None):
+    def assign(self, name, formId=None, args=None, completionFlag=None, tagList=None, entryId=None, entryFileName=None, entryExpFileName=None):
         try:
-            if name is not None: 
+            if name is not None:
                 self.setTaskName(name)
-            if formId is not None: 
+            if formId is not None:
                 self.setFormId(formId)
             if args is not None:
                 self.setTaskArgs(args)
@@ -72,94 +85,93 @@ class TaskSessionState(object):
             if entryExpFileName is not None:
                 self.setEntryExpFileName(entryExpFileName)
             return True
-        except:
-            traceback.print_exc(file=self.__lfh)                    
+        except:  # noqa: E722 pylint: disable=bare-except
+            traceback.print_exc(file=self.__lfh)
             return False
 
-    def setTaskName(self,val):
-        self.__D['taskname']=val
+    def setTaskName(self, val):
+        self.__D["taskname"] = val
 
     def getTaskName(self):
-        return self.__D['taskname']
+        return self.__D["taskname"]
 
-    def setEntryId(self,val):
-        self.__D['entryid']=val
+    def setEntryId(self, val):
+        self.__D["entryid"] = val
 
     def getEntryId(self):
-        return self.__D['entryid']
+        return self.__D["entryid"]
 
-    def setEntryFileName(self,val):
-        self.__D['entryfilename']=val
+    def setEntryFileName(self, val):
+        self.__D["entryfilename"] = val
 
     def getEntryFileName(self):
-        return self.__D['entryfilename']
+        return self.__D["entryfilename"]
 
-    def setEntryExpFileName(self,val):
-        self.__D['entryexpfilename']=val
+    def setEntryExpFileName(self, val):
+        self.__D["entryexpfilename"] = val
 
     def getEntryExpFileName(self):
-        return self.__D['entryexpfilename']
+        return self.__D["entryexpfilename"]
 
-    def setTaskArgs(self,val):
-        self.__D['taskargs']=val
+    def setTaskArgs(self, val):
+        self.__D["taskargs"] = val
 
     def getTaskArgs(self):
-        return self.__D['taskargs']
+        return self.__D["taskargs"]
 
-    def setTaskLinks(self,val):
-        self.__D['links']=val
+    def setTaskLinks(self, val):
+        self.__D["links"] = val
 
     def getTaskLinks(self):
-        return self.__D['links']
+        return self.__D["links"]
 
-    def setTaskStatusText(self,val):
-        self.__D['statustext']=val
+    def setTaskStatusText(self, val):
+        self.__D["statustext"] = val
 
     def getTaskStatusText(self):
-        return self.__D['statustext']
+        return self.__D["statustext"]
 
-    def setTaskCompletionFlag(self,val):
-        self.__D['errorflag']=not val
+    def setTaskCompletionFlag(self, val):
+        self.__D["errorflag"] = not val
 
-    def setTaskErrorFlag(self,val):
-        self.__D['errorflag']=val
+    def setTaskErrorFlag(self, val):
+        self.__D["errorflag"] = val
 
     def getTaskErrorFlag(self):
-        return self.__D['errorflag']
+        return self.__D["errorflag"]
 
-    def setFormId(self,val):
-        self.__D['taskformid']=val
+    def setFormId(self, val):
+        self.__D["taskformid"] = val
 
     def getFormId(self):
-        return self.__D['taskformid']
+        return self.__D["taskformid"]
 
-    def setTaskWarningFlag(self,val):
-        self.__D['warningflag']=val
+    def setTaskWarningFlag(self, val):
+        self.__D["warningflag"] = val
 
     def getTaskWarningFlag(self):
-        return self.__D['warningflag']
+        return self.__D["warningflag"]
 
-    def setAuxilaryFileName(self,val):
-        self.__D['auxilaryfilename']=val
+    def setAuxilaryFileName(self, val):
+        self.__D["auxilaryfilename"] = val
 
     def getAuxilaryFileName(self):
-        return self.__D['auxilaryfilename']
+        return self.__D["auxilaryfilename"]
 
-    def setAuxilaryFileType(self,val):
-        self.__D['auxilaryfilename']=val
+    def setAuxilaryFileType(self, val):
+        self.__D["auxilaryfilename"] = val
 
     def getAuxilaryFileType(self):
-        return self.__D['auxilaryfilename']
+        return self.__D["auxilaryfilename"]
 
-    def setTaskErrorMessage(self,val):
-        self.__D['errormessage']=val
+    def setTaskErrorMessage(self, val):
+        self.__D["errormessage"] = val
 
     def getTaskErrorMessage(self):
-        return self.__D['errormessage']
+        return self.__D["errormessage"]
 
-    def setTaskWarningMessage(self,val):
-        self.__D['warningmessage']=val
+    def setTaskWarningMessage(self, val):
+        self.__D["warningmessage"] = val
 
     def getTaskWarningMessage(self):
-        return self.__D['warningmessage']
-
+        return self.__D["warningmessage"]

@@ -19,11 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class UpdateRelated(object):
-    def __init__(self, siteId=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
+    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+        # self.__verbose = verbose
+        # self.__lfh = log
         self.__siteId = siteId
-        self.__debug = False
         self.__ioObj = IoAdapterCore()
 
     def updateRelatedEntries(self, fPathIn, fPathOut, logPath):
@@ -63,7 +62,7 @@ class UpdateRelated(object):
                 db_id = cobj.getValue("db_id", row)
                 if db_id is not None:
                     db_id = db_id.strip()
-                if db_name in ['PDB', 'BMRB', 'EMDB'] and db_id[:2] == "D_":
+                if db_name in ["PDB", "BMRB", "EMDB"] and db_id[:2] == "D_":
                     dbids = self.__getRelatedIds(db_id)
                     if dbids is None:
                         logf.write("Failed to retrieve database_2 info for %s\n" % db_id)
@@ -91,7 +90,7 @@ class UpdateRelated(object):
 
     def __getOutDir(self, fPath):
         """Attempts to find a writeable place for log file during read"""
-        for dp in [os.path.dirname(fPath), '.', tempfile.gettempdir()]:
+        for dp in [os.path.dirname(fPath), ".", tempfile.gettempdir()]:
             if os.access(dp, os.W_OK):
                 return dp
 
@@ -99,8 +98,8 @@ class UpdateRelated(object):
         outDirPath = self.__getOutDir(fPath)
         try:
             return self.__ioObj.readFile(fPath, outDirPath=outDirPath)
-        except Exception as e:  # noqa: F841
-            logger.exception("Failed to parse", fPath)
+        except Exception as _e:  # noqa: F841
+            logger.exception("Failed to parse %s", fPath)
             return None
 
     def __writeContainerList(self, fPath, containerList):

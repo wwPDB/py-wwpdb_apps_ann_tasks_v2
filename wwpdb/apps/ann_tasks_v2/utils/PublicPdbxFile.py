@@ -3,7 +3,7 @@
 # Date:  14-Oct-2013
 #
 # Update:
-# 28-Feb -2014  jdw Add base class 
+# 28-Feb -2014  jdw Add base class
 # 4-Jun-2014    jdw Added V4 dictionary argument --
 ##
 """
@@ -27,8 +27,7 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 
 class PublicPdbxFile(SessionWebDownloadUtils):
-    """ The PublicPdbxFile class encapsulates conversion internal pdbx cif to public pdbx cif file.
-    """
+    """The PublicPdbxFile class encapsulates conversion internal pdbx cif to public pdbx cif file."""
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(PublicPdbxFile, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
@@ -40,13 +39,11 @@ class PublicPdbxFile(SessionWebDownloadUtils):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         #
 
     def run(self, entryId, inpFile):
-        """  Run conversion.
-        """
+        """Run conversion."""
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath = os.path.join(self.__sessionPath, entryId + "-public_cif.log")
@@ -65,6 +62,6 @@ class PublicPdbxFile(SessionWebDownloadUtils):
             dp.cleanup()
             #
             return True
-        except:
+        except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             return False

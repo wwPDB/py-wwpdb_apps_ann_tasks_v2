@@ -12,53 +12,30 @@ __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import platform
-import os
 import unittest
-
-#####################  setup DepUi test environment here from emdb translator############
-HERE = os.path.abspath(os.path.dirname(__file__))
-TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
-TESTOUTPUT = os.path.join(HERE, 'test-output', platform.python_version())
-if not os.path.exists(TESTOUTPUT):
-    os.makedirs(TESTOUTPUT)
-mockTopPath = os.path.join(TOPDIR, 'wwpdb', 'mock-data')
-rwMockTopPath = os.path.join(TESTOUTPUT)
-
-# Must create config file before importing ConfigInfo
-from wwpdb.utils.testing.SiteConfigSetup  import SiteConfigSetup
-from wwpdb.utils.testing.CreateRWTree import CreateRWTree
-# Copy site-config and selected items
-crw = CreateRWTree(mockTopPath, TESTOUTPUT)
-crw.createtree(['site-config', 'depuiresources', 'emdresources'])
-# Use populate r/w site-config using top mock site-config
-SiteConfigSetup().setupEnvironment(rwMockTopPath, rwMockTopPath)
-
-# Setup DepUI specific directories
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 import os
-import os.path
-cI = ConfigInfo()
-FILE_UPLOAD_TEMP_DIR = os.path.join(
-    cI.get("SITE_ARCHIVE_STORAGE_PATH"),
-    "deposit",
-    "temp_files")
-if not os.path.exists(FILE_UPLOAD_TEMP_DIR):
-    os.makedirs(FILE_UPLOAD_TEMP_DIR)
+import sys
 
-# Django envivonment setup
-#os.environ['DJANGO_SETTINGS_MODULE'] = "wwpdb.apps.deposit.settings"
-os.environ['IN_ANNOTATION'] = "no"
-##################################################
+if __package__ is None or __package__ == "":
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from commonsetup import TESTOUTPUT  # noqa:  F401 pylint: disable=import-error,unused-import
+else:
+    from .commonsetup import TESTOUTPUT  # noqa: F401 pylint: disable=relative-beyond-top-level
+
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
-from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebApp import AnnTasksWebApp
-from wwpdb.apps.ann_tasks_v2.em3d.EmAutoFix import EmAutoFix
+from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebApp import AnnTasksWebApp  # noqa: F401 pylint: disable=unused-import
+from wwpdb.apps.ann_tasks_v2.em3d.EmAutoFix import EmAutoFix  # noqa: F401 pylint: disable=unused-import
+from wwpdb.utils.session.WebRequest import InputRequest
+
 
 class ImportTests(unittest.TestCase):
     def setUp(self):
-        pass
+        self.__reqObj = InputRequest(paramDict={})
 
     def testInstantiate(self):
         """Tests simple instantiation"""
-        pass
+        # Needs a reqobj
+        _ctw = CommonTasksWebAppWorker(self.__reqObj)  # noqa: F841
+        _atw = AnnTasksWebApp(self.__reqObj)  # noqa: F841
+        _emaut = EmAutoFix(os.path.join(TESTOUTPUT, "sess"))  # noqa: F841
