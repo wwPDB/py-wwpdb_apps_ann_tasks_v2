@@ -41,6 +41,8 @@ __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import json
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -2274,6 +2276,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
                     data_files.append((mapContentType, 'bcif', mapPartitionNumber, mapContour))
 
+
+
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                     instance=instance, partNumber=data_file[2])
@@ -2282,14 +2286,21 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 logging.info(downloadPath)
                 downloadPath = du.getWebPath()
                 url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
-                myD.setdefault('molStar-display-objects', []).append('{}:"{}"'.format(url_name, downloadPath))
+                #myD.setdefault('molStar-display-objects', []).append('{}:"{}"'.format(url_name, downloadPath))
+
+                mapInfoDictionary = {
+                    "url_name" : downloadPath,
+                    "displayName" : "{}{}".format(data_file[0], data_file[2])
+                }
 
                 #This if statement is horrible, fix it at some point
                 if len(data_file) == 4:
                     contourMap = '{}_{}_contourLevel'.format(data_file[0].replace('-', '_'), data_file[2])
-                    myD.setdefault('molStar-display-objects', []).append(
-                        '{}:{}'.format(contourMap, float(data_file[3])))
+                    #myD.setdefault('molStar-display-objects', []).append(
+                        #'{}:{}'.format(contourMap, float(data_file[3])))
+                    mapInfoDictionary["contourLevel"] = float(data_file[3])
 
+                myD.setdefault('molStar-maps', []).append(mapInfoDictionary)
 
         # EM image
 
@@ -2341,7 +2352,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD['aTagList'] = aTagList
 
         if myD.get('molStar-display-objects'):
-            display_object_str = ','.join(myD.get('molStar-display-objects', []))
+            molStarMapsJson = json.dumps(myD.get('molStar-maps', []))
+            display_object_str = ','.join(myD.get('molStar-display-objects', []).append(molStarMapsJson))
             logging.debug('MOLSTAR COMMAND: {}'.format(display_object_str))
             myD['molStar'] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
             myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'.format()
