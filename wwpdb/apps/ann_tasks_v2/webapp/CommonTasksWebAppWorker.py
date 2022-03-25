@@ -2301,7 +2301,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
                 if data_file[0] == 'em-volume':
-                    mapColour = '#999999'
+                    mapColour = '#0000FF'
                     mapInfoDictionary["mapColour"] = mapColour
                 elif data_file[0] == 'em-half-volume':
                     mapColour = '#50D218'
