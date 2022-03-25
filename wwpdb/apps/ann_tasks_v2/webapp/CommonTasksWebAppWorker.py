@@ -2301,16 +2301,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
                 if data_file[0] == 'em-volume':
-                    mapColour = '#0000FF'
+                    mapColour = '0x666666'
                     mapInfoDictionary["mapColour"] = mapColour
                 elif data_file[0] == 'em-half-volume':
-                    mapColour = '#50D218'
+                    mapColour = '0x50D218'
                     mapInfoDictionary["mapColour"] = mapColour
                 elif data_file[0] == 'em-mask-volume':
-                    mapColour = '#0000FF'
+                    mapColour = '0x0000FF'
                     mapInfoDictionary["mapColour"] = mapColour
                 else:
-                    mapColour = '#FF9900'
+                    mapColour = '0xFF9900'
                     mapInfoDictionary["mapColour"] = mapColour
 
                 myD.setdefault('molStar-maps', []).append(mapInfoDictionary)
