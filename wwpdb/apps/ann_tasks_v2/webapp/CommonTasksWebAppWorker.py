@@ -2276,43 +2276,41 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
                     data_files.append((mapContentType, 'bcif', mapPartitionNumber, mapContour))
 
-
-
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                     instance=instance, partNumber=data_file[2])
             if ok:
+                #Get download path and populate dictionary with information
                 downloadPath = du.getDownloadPath()
                 logging.info(downloadPath)
                 downloadPath = du.getWebPath()
-                url_name = '{}_{}_url'.format(data_file[0].replace('-', '_'), data_file[2])
-                #myD.setdefault('molStar-display-objects', []).append('{}:"{}"'.format(url_name, downloadPath))
 
                 mapInfoDictionary = {
                     "url_name" : downloadPath,
-                    "displayName" : "{}{}".format(data_file[0], data_file[2])
+                    "displayName" : "{}-{}".format(data_file[0], data_file[2])
                 }
-
-                #This if statement is horrible, fix it at some point
+                #If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
+                #Add to dictionary if present
                 if len(data_file) == 4:
-                    contourMap = '{}_{}_contourLevel'.format(data_file[0].replace('-', '_'), data_file[2])
-                    #myD.setdefault('molStar-display-objects', []).append(
-                        #'{}:{}'.format(contourMap, float(data_file[3])))
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
+                #Assign colours to different map types and add to dictionary
                 if data_file[0] == 'em-volume':
                     mapColour = '0x666666'
-                    mapInfoDictionary["mapColour"] = mapColour
-                elif data_file[0] == 'em-half-volume':
-                    mapColour = '0x50D218'
-                    mapInfoDictionary["mapColour"] = mapColour
+                    mapInfoDictionary["mapColor"] = mapColour
+                elif data_file[0] == 'em-half-volume' and data_file[2] == '1':
+                    mapColour = '0x8FCE00'
+                    mapInfoDictionary["mapColor"] = mapColour
+                elif data_file[0] == 'em-half-volume' and data_file[2] == '2':
+                    mapColour = '0x38761D'
+                    mapInfoDictionary["mapColor"] = mapColour
                 elif data_file[0] == 'em-mask-volume':
-                    mapColour = '0x0000FF'
-                    mapInfoDictionary["mapColour"] = mapColour
+                    mapColour = '0x3D85C6'
+                    mapInfoDictionary["mapColor"] = mapColour
                 else:
                     mapColour = '0xFF9900'
-                    mapInfoDictionary["mapColour"] = mapColour
-
+                    mapInfoDictionary["mapColor"] = mapColour
+                #append myD with dictionary populated above
                 myD.setdefault('molStar-maps', []).append(mapInfoDictionary)
 
         # EM image
