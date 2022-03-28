@@ -2298,10 +2298,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if data_file[0] == 'em-volume':
                     mapColour = '0x666666'
                     mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == 'em-half-volume' and data_file[2] == 1:
+                elif data_file[0] == 'em-half-volume' and int(data_file[2]) == 1:
                     mapColour = '0x8FCE00'
                     mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == 'em-half-volume' and data_file[2] == 2:
+                elif data_file[0] == 'em-half-volume' and int(data_file[2]) == 2:
                     mapColour = '0x38761D'
                     mapInfoDictionary["mapColor"] = mapColour
                 elif data_file[0] == 'em-mask-volume':
