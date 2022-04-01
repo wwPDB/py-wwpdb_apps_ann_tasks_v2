@@ -19,7 +19,6 @@ class DaInternalDb(object):
         self.__mydb = None
         self.__siteId = siteId
         self.__open()
-        pass
 
     def __del__(self):
         self.__close()
@@ -30,7 +29,7 @@ class DaInternalDb(object):
         self.__mydb.setResource(resourceName=resource)
         ok = self.__mydb.openConnection()
         if not ok:
-            logger.error("Could not open resourve %s" % resource)
+            logger.error("Could not open resourve %s", resource)
             self.__mydb = None
             return False
 
