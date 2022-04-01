@@ -107,3 +107,7 @@ test-output
 
 # emacs 
 *~
+
+#Ignoring idea files
+*.iml
+.idea

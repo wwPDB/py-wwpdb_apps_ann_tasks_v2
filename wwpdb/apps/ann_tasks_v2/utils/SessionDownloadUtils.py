@@ -128,11 +128,18 @@ class SessionDownloadUtils(object):
                 self.__lfh.write("+SessionDownloadUtils.getContetFormatFromFileName() + failed for file %s\n" % filePath)
             return 1
 
-    def fetchId(self, idCode, contentType="model", formatType="pdbx", fileSource="archive", instance=None, mileStone=None, versionId="latest"):
-        """Copy the file with the input signature from the fileSource directory to the session download directory."""
+    def fetchId(self, idCode, contentType='model', formatType='pdbx', fileSource='archive', instance=None, mileStone=None, versionId='latest', partNumber="1"):
+        """ Copy the file with the input signature from the fileSource directory to the session download directory.
+        """
         filePath = self.__pI.getFilePath(
-            idCode, contentType=contentType, formatType=formatType, fileSource=fileSource, wfInstanceId=instance, mileStone=mileStone, versionId=versionId
-        )
+            idCode,
+            contentType=contentType,
+            formatType=formatType,
+            fileSource=fileSource,
+            wfInstanceId=instance,
+            mileStone=mileStone,
+            versionId=versionId,
+            partNumber=partNumber)
         if self.__verbose:
             self.__lfh.write(
                 "+SessionDownloadUtils.fetchId() id %s contentType %s format %s file source %s mileStone %s \n                       path %s\n"
