@@ -2036,10 +2036,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
                                      'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'
                                      }
-                #contour_level = pR.getPrimaryContourlevel()
-                #if contour_level:
-                    #myD.setdefault('molStar-display-objects', []).append('primary_contour_level={}'.format(float(contour_level)))
-                #self._saveSessionParameter(pvD=myD['entry-info'], prefix=self._udsPrefix)
 
             elif cT == "model-pdb":
                 ok = du.fetchId(entryId, contentType="model", formatType="pdb", fileSource=fileSource, instance=instance, versionId="none")
@@ -2171,7 +2167,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         ok = du.getFilePath(entryId)
         ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
         dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
-        #initiate data_files with map-xray to be appended with em files
+        # initiate data_files with map-xray to be appended with em files
         data_files = [('map-xray', 'bcif', '1')]
         if dIn and len(dIn) != 0:
             cObj = dIn[0].getObj("em_map")
@@ -2188,21 +2184,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
                     instance=instance, partNumber=data_file[2])
             if ok:
-                #Get download path and populate dictionary with information
-                downloadPath = du.getDownloadPath()
-                logging.info(downloadPath)
+                # Get download path and populate dictionary with information
                 downloadPath = du.getWebPath()
+                logging.info(downloadPath)
 
                 mapInfoDictionary = {
                     "url_name" : downloadPath,
                     "displayName" : "{}-{}".format(data_file[0], data_file[2])
-                }
-                #If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
-                #Add to dictionary if present
+                    }
+                # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
+                # Add to dictionary if present
                 if len(data_file) == 4:
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
-                #Assign colours to different map types and add to dictionary
+                # Assign colours to different map types and add to dictionary
                 if data_file[0] == 'em-volume':
                     mapColour = '0x666666'
                     mapInfoDictionary["mapColor"] = mapColour
@@ -2218,7 +2213,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 else:
                     mapColour = '0xFF9900'
                     mapInfoDictionary["mapColor"] = mapColour
-                #append myD with dictionary populated above
+                # append myD with dictionary populated above
                 myD.setdefault('molStar-maps', []).append(mapInfoDictionary)
 
         # EM image
