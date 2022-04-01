@@ -2255,7 +2255,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if myD.get('molStar-display-objects'):
             molStarMapsJson = 'mapsList:{}'.format(json.dumps(myD.get('molStar-maps', [])))
             display_object_str = ','.join(myD.get('molStar-display-objects', []) + [molStarMapsJson])
-            logging.debug('MOLSTAR COMMAND: {}'.format(display_object_str))
+            logging.debug('MOLSTAR COMMAND: %s', display_object_str)
             myD['molStar'] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
             myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'
 
