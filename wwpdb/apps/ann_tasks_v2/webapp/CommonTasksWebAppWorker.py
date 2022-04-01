@@ -2182,7 +2182,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-                    instance=instance, partNumber=data_file[2])
+                            instance=instance, partNumber=data_file[2])
             if ok:
                 # Get download path and populate dictionary with information
                 downloadPath = du.getWebPath()
@@ -2191,7 +2191,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 mapInfoDictionary = {
                     "url_name" : downloadPath,
                     "displayName" : "{}-{}".format(data_file[0], data_file[2])
-                    }
+                }
                 # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
                 # Add to dictionary if present
                 if len(data_file) == 4:
