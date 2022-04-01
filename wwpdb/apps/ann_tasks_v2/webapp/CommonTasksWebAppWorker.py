@@ -2027,15 +2027,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     # pdb_id = pR.getPdbIdCode()
                     # if pdb_id:
                     #    pass
-                    myD.setdefault('molStar-display-objects', []).append('molecule_url:"{}"'.format(downloadWebPath))
+                    myD.setdefault("molStar-display-objects", []).append('molecule_url:"{}"'.format(downloadWebPath))
 
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup("No model data file.")
                     myD["model-session"] = ""
 
-                myD['entry-info'] = {'pdb_id': pR.getPdbIdCode(), 'struct_title': pR.getStructTitle(),
-                                     'my_entry_id': entryId, 'useversion': '1', 'usesaved': 'yes'
-                                     }
+                myD["entry-info"] = {"pdb_id": pR.getPdbIdCode(), "struct_title": pR.getStructTitle(), "my_entry_id": entryId, "useversion": "1", "usesaved": "yes"}
 
             elif cT == "model-pdb":
                 ok = du.fetchId(entryId, contentType="model", formatType="pdb", fileSource=fileSource, instance=instance, versionId="none")
@@ -2168,53 +2166,49 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
         dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
         # initiate data_files with map-xray to be appended with em files
-        data_files = [('map-xray', 'bcif', '1')]
+        data_files = [("map-xray", "bcif", "1")]
         if dIn and len(dIn) != 0:
             cObj = dIn[0].getObj("em_map")
             if cObj:
                 # loop through all the map file names in the mmcif file, get content type partition num and contour
                 for mapNumber in range(0, len(cObj)):
-                    mapLocation = cObj.getValue('file', mapNumber)
-                    mapContour = cObj.getValue('contour_level', mapNumber)
+                    mapLocation = cObj.getValue("file", mapNumber)
+                    mapContour = cObj.getValue("contour_level", mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
-                    data_files.append((mapContentType, 'bcif', mapPartitionNumber, mapContour))
+                    data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
 
         for data_file in data_files:
-            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-                            instance=instance, partNumber=data_file[2])
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource, instance=instance, partNumber=data_file[2])
             if ok:
                 # Get download path and populate dictionary with information
                 downloadPath = du.getWebPath()
                 logging.info(downloadPath)
 
-                mapInfoDictionary = {
-                    "url_name" : downloadPath,
-                    "displayName" : "{}-{}".format(data_file[0], data_file[2])
-                }
+                mapInfoDictionary = {"url_name": downloadPath, "displayName": "{}-{}".format(data_file[0], data_file[2])}
                 # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
                 # Add to dictionary if present
                 if len(data_file) == 4:
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
                 # Assign colours to different map types and add to dictionary
-                if data_file[0] == 'em-volume':
-                    mapColour = '0x666666'
+                if data_file[0] == "em-volume":
+                    mapColour = "0x666666"
                     mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == 'em-half-volume' and int(data_file[2]) == 1:
-                    mapColour = '0x8FCE00'
+                elif data_file[0] == "em-half-volume" and int(data_file[2]) == 1:
+                    mapColour = "0x8FCE00"
                     mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == 'em-half-volume' and int(data_file[2]) == 2:
-                    mapColour = '0x38761D'
+                elif data_file[0] == "em-half-volume" and int(data_file[2]) == 2:
+                    mapColour = "0x38761D"
                     mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == 'em-mask-volume':
-                    mapColour = '0x3D85C6'
+                elif data_file[0] == "em-mask-volume":
+                    mapColour = "0x3D85C6"
                     mapInfoDictionary["mapColor"] = mapColour
                 else:
-                    mapColour = '0xFF9900'
+                    mapColour = "0xFF9900"
                     mapInfoDictionary["mapColor"] = mapColour
                 # append myD with dictionary populated above
-                myD.setdefault('molStar-maps', []).append(mapInfoDictionary)
+                myD.setdefault("molStar-maps", []).append(mapInfoDictionary)
 
         # EM image
 
@@ -2252,12 +2246,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["identifier"] = entryId
         myD["aTagList"] = aTagList
 
-        if myD.get('molStar-display-objects'):
-            molStarMapsJson = 'mapsList:{}'.format(json.dumps(myD.get('molStar-maps', [])))
-            display_object_str = ','.join(myD.get('molStar-display-objects', []) + [molStarMapsJson])
-            logging.debug('MOLSTAR COMMAND: %s', display_object_str)
-            myD['molStar'] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
-            myD['molStar-display'] = '<div id="myViewer">display_mol_star()</div>'
+        if myD.get("molStar-display-objects"):
+            molStarMapsJson = "mapsList:{}".format(json.dumps(myD.get("molStar-maps", [])))
+            display_object_str = ",".join(myD.get("molStar-display-objects", []) + [molStarMapsJson])
+            logging.debug("MOLSTAR COMMAND: %s", display_object_str)
+            myD["molStar"] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
+            myD["molStar-display"] = '<div id="myViewer">display_mol_star()</div>'
 
         else:
             myD["molStar"] = ""
