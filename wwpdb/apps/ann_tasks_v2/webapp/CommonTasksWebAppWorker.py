@@ -1950,6 +1950,76 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         return bSuccess
 
+    def molstarDisplay(self, entryId, fileSource="archive", instance=None):
+
+        du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+        molDisDict = {}
+        # map display in binary cif
+        # list of em file types to find
+        ok = du.getFilePath(entryId)
+        ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
+        dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
+        # initiate data_files with map-xray to be appended with em files
+        data_files = [("map-xray", "bcif", "1")]
+        if dIn and len(dIn) != 0:
+            cObj = dIn[0].getObj("em_map")
+            if cObj:
+                # loop through all the map file names in the mmcif file, get content type partition num and contour
+                for mapNumber in range(0, len(cObj)):
+                    mapLocation = cObj.getValue("file", mapNumber)
+                    mapContour = cObj.getValue("contour_level", mapNumber)
+                    mapContentType = du.getContentTypeFromFileName(mapLocation)
+                    mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
+                    data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
+
+        for data_file in data_files:
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
+                            instance=instance, partNumber=data_file[2])
+            if ok:
+                # Get download path and populate dictionary with information
+                downloadPath = du.getWebPath()
+                logging.info(downloadPath)
+
+                mapInfoDictionary = {"url_name": downloadPath,
+                                     "displayName": "{}-{}".format(data_file[0], data_file[2])}
+                # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
+                # Add to dictionary if present
+                if len(data_file) == 4:
+                    mapInfoDictionary["contourLevel"] = float(data_file[3])
+
+                # Assign colours to different map types and add to dictionary
+                if data_file[0] == "em-volume":
+                    mapColour = "0x666666"
+                    mapInfoDictionary["mapColor"] = mapColour
+                elif data_file[0] == "em-half-volume" and int(data_file[2]) == 1:
+                    mapColour = "0x8FCE00"
+                    mapInfoDictionary["mapColor"] = mapColour
+                elif data_file[0] == "em-half-volume" and int(data_file[2]) == 2:
+                    mapColour = "0x38761D"
+                    mapInfoDictionary["mapColor"] = mapColour
+                elif data_file[0] == "em-mask-volume":
+                    mapColour = "0x3D85C6"
+                    mapInfoDictionary["mapColor"] = mapColour
+                else:
+                    mapColour = "0xFF9900"
+                    mapInfoDictionary["mapColor"] = mapColour
+                # append molDisDict with dictionary populated above
+                molDisDict.setdefault("molStar-maps", []).append(mapInfoDictionary)
+
+        if molDisDict.get("molStar-display-objects"):
+            molStarMapsJson = "mapsList:{}".format(json.dumps(molDisDict.get("molStar-maps", [])))
+            display_object_str = ",".join(molDisDict.get("molStar-display-objects", []) + [molStarMapsJson])
+            logging.debug("MOLSTAR COMMAND: %s", display_object_str)
+            molDisDict["molStar"] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
+            molDisDict["molStar-display"] = '<div id="myViewer">display_mol_star()</div>'
+
+        else:
+            molDisDict["molStar"] = ""
+            molDisDict["molStar-display"] = "no model available"
+
+        return molDisDict
+
+
     def _renderCheckReports(self, entryId, fileSource="archive", instance=None, contentTypeList=None, useModelFileVersion=True):
         """Prepare HTML rendered reports for existing check report content for input Id code and fileSource.
 
@@ -2160,56 +2230,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD["data-downloads"] = ""
 
-        # map display in binary cif
-        # list of em file types to find
-        ok = du.getFilePath(entryId)
-        ioObj = IoAdapterCore(verbose=self._verbose, log=self._lfh)
-        dIn = ioObj.readFile(inputFilePath=ok, selectList=["em_map"])
-        # initiate data_files with map-xray to be appended with em files
-        data_files = [("map-xray", "bcif", "1")]
-        if dIn and len(dIn) != 0:
-            cObj = dIn[0].getObj("em_map")
-            if cObj:
-                # loop through all the map file names in the mmcif file, get content type partition num and contour
-                for mapNumber in range(0, len(cObj)):
-                    mapLocation = cObj.getValue("file", mapNumber)
-                    mapContour = cObj.getValue("contour_level", mapNumber)
-                    mapContentType = du.getContentTypeFromFileName(mapLocation)
-                    mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
-                    data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
-
-        for data_file in data_files:
-            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource, instance=instance, partNumber=data_file[2])
-            if ok:
-                # Get download path and populate dictionary with information
-                downloadPath = du.getWebPath()
-                logging.info(downloadPath)
-
-                mapInfoDictionary = {"url_name": downloadPath, "displayName": "{}-{}".format(data_file[0], data_file[2])}
-                # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
-                # Add to dictionary if present
-                if len(data_file) == 4:
-                    mapInfoDictionary["contourLevel"] = float(data_file[3])
-
-                # Assign colours to different map types and add to dictionary
-                if data_file[0] == "em-volume":
-                    mapColour = "0x666666"
-                    mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == "em-half-volume" and int(data_file[2]) == 1:
-                    mapColour = "0x8FCE00"
-                    mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == "em-half-volume" and int(data_file[2]) == 2:
-                    mapColour = "0x38761D"
-                    mapInfoDictionary["mapColor"] = mapColour
-                elif data_file[0] == "em-mask-volume":
-                    mapColour = "0x3D85C6"
-                    mapInfoDictionary["mapColor"] = mapColour
-                else:
-                    mapColour = "0xFF9900"
-                    mapInfoDictionary["mapColor"] = mapColour
-                # append myD with dictionary populated above
-                myD.setdefault("molStar-maps", []).append(mapInfoDictionary)
-
         # EM image
 
         ok = du.fetchId(entryId, contentType="img-emdb", formatType="png", fileSource=fileSource, instance=instance)
@@ -2246,6 +2266,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["identifier"] = entryId
         myD["aTagList"] = aTagList
 
+        molstarDisplayDictionary = molstarDisplay(entryId)
+
+        myD.append(molstarDisplayDictionary)
+
+        '''
         if myD.get("molStar-display-objects"):
             molStarMapsJson = "mapsList:{}".format(json.dumps(myD.get("molStar-maps", [])))
             display_object_str = ",".join(myD.get("molStar-display-objects", []) + [molStarMapsJson])
@@ -2256,7 +2281,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD["molStar"] = ""
             myD["molStar-display"] = "no model available"
-
+        '''
         #
         return myD
 
