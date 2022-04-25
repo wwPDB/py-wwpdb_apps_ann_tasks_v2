@@ -530,6 +530,7 @@ class CorresPNDTemplate(object):
         #
         count = 0
         for qdir in self.__questionList:
+            option = ""
             style = "display: none;"
             if qdir["question"] == "Ligand Identity":
                 ligandlist = "[]"
