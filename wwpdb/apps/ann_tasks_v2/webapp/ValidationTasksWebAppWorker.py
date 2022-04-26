@@ -240,7 +240,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             self._reqObj.setValue("entryid", entryId)
             self._reqObj.setValue("entryfilename", entryFileName)
             CorresPNDTObj = CorresPNDTemplate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-            _content = CorresPNDTObj.get()
+            _content = CorresPNDTObj.get()  # noqa: F841
         #
         htmlList = []
         htmlList.append("<!DOCTYPE html>")
