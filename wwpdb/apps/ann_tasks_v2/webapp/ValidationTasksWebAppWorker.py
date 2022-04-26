@@ -31,7 +31,7 @@ import inspect
 
 from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
-# from wwpdb.apps.ann_tasks_v2.correspnd.CorresPNDTemplate import CorresPNDTemplate
+from wwpdb.apps.ann_tasks_v2.correspnd.CorresPNDTemplate import CorresPNDTemplate
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 
@@ -239,8 +239,8 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             # Generating default correspondence-to-depositor letter - added by ZF
             self._reqObj.setValue("entryid", entryId)
             self._reqObj.setValue("entryfilename", entryFileName)
-            # CorresPNDTObj = CorresPNDTemplate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-            # content = CorresPNDTObj.get()
+            CorresPNDTObj = CorresPNDTemplate(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+            _content = CorresPNDTObj.get()
         #
         htmlList = []
         htmlList.append("<!DOCTYPE html>")
