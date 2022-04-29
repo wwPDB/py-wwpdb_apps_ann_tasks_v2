@@ -2010,6 +2010,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     def _launchMolstarDisplayOp(self):
 
+        self._getSession(useContext=True)
+        self._rltvSessionPath = self._sObj.getRelativePath()
+
         entryId = self._reqObj.getValue("entryid")
         molstarDisplayDict = self.__molstarDisplay(entryId)
 
