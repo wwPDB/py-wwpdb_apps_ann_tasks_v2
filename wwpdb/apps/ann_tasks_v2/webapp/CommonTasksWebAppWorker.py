@@ -2011,6 +2011,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     def _launchMolstarDisplayOp(self):
 
+        self._lfh.write('launchMolstarDisplayOp started')
         entryId = self._reqObj.getValue("entryid")
         self._lfh.write('Entry id = {}'.format(entryId))
         molstarDisplayDict = self.__molstarDisplay(entryId)
