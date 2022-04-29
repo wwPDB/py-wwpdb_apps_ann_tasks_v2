@@ -246,6 +246,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         rMapPath = os.path.join(self._rltvSessionPath, entryId + "_map-2fofc_P1.map")
 
         viewer = ModelViewer3D(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+
         viewer.setModelRelativePath(rModelPath)
         viewer.setMapRelativePath(rMapPath)
 
@@ -2010,9 +2011,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     def _launchMolstarDisplayOp(self):
 
-        self._getSession(useContext=True)
-        self._rltvSessionPath = self._sObj.getRelativePath()
-
         entryId = self._reqObj.getValue("entryid")
         molstarDisplayDict = self.__molstarDisplay(entryId)
 
@@ -2020,9 +2018,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         rC.setReturnFormat("json")
         rC.setHtmlText(json.dumps(molstarDisplayDict.get("molStar-maps", [])))
         return rC
-
-
-
 
     def _renderCheckReports(self, entryId, fileSource="archive", instance=None, contentTypeList=None, useModelFileVersion=True):
         """Prepare HTML rendered reports for existing check report content for input Id code and fileSource.
