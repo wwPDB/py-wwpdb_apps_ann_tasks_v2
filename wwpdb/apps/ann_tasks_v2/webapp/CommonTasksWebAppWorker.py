@@ -1950,7 +1950,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         return bSuccess
 
-    def _molstarDisplay(self, entryId, fileSource="archive", instance=None):
+    def molstarDisplay(self, entryId, fileSource="archive", instance=None):
 
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         molDisDict = {}
@@ -2266,7 +2266,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["identifier"] = entryId
         myD["aTagList"] = aTagList
 
-        molstarDisplayDictionary = _molstarDisplay(entryId)
+        molstarDisplayDictionary = molstarDisplay(entryId)
 
         myD.append(molstarDisplayDictionary)
 
