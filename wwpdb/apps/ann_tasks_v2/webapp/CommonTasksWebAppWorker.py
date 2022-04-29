@@ -2006,17 +2006,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # append molDisDict with dictionary populated above
                 molDisDict.setdefault("molStar-maps", []).append(mapInfoDictionary)
 
-        if molDisDict.get("molStar-display-objects"):
-            molStarMapsJson = "mapsList:{}".format(json.dumps(molDisDict.get("molStar-maps", [])))
-            display_object_str = ",".join(molDisDict.get("molStar-display-objects", []) + [molStarMapsJson])
-            logging.debug("MOLSTAR COMMAND: %s", display_object_str)
-            molDisDict["molStar"] = """onLoad='display_mol_star({{{}}})'""".format(display_object_str)
-            molDisDict["molStar-display"] = '<div id="myViewer">display_mol_star()</div>'
-
-        else:
-            molDisDict["molStar"] = ""
-            molDisDict["molStar-display"] = "no model available"
-
         return molDisDict
 
 
@@ -2270,7 +2259,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         myD.append(molstarDisplayDictionary)
 
-        '''
         if myD.get("molStar-display-objects"):
             molStarMapsJson = "mapsList:{}".format(json.dumps(myD.get("molStar-maps", [])))
             display_object_str = ",".join(myD.get("molStar-display-objects", []) + [molStarMapsJson])
@@ -2281,7 +2269,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD["molStar"] = ""
             myD["molStar-display"] = "no model available"
-        '''
         #
         return myD
 
