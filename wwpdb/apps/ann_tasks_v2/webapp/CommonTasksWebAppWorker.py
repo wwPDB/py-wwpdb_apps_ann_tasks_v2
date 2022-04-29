@@ -2266,7 +2266,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["identifier"] = entryId
         myD["aTagList"] = aTagList
 
-        molstarDisplayDictionary = molstarDisplay(entryId)
+        molstarDisplayDictionary = self.molstarDisplay(entryId)
 
         myD.append(molstarDisplayDictionary)
 
