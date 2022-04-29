@@ -1950,7 +1950,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         return bSuccess
 
-    def _molstarDisplay(self, entryId, fileSource="archive", instance=None):
+    def __molstarDisplay(self, entryId, fileSource="archive", instance=None):
 
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         molDisDict = {}
@@ -2007,6 +2007,18 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 molDisDict.setdefault("molStar-maps", []).append(mapInfoDictionary)
 
         return molDisDict
+
+    def _launchMolstarDisplayOp(self):
+
+        entryId = self._reqObj.getValue("entryid")
+        molstarDisplayDict = self.__molstarDisplay(entryId)
+
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        rC.setHtmlText(json.dumps(molstarDisplayDict.get("molStar-maps", [])))
+        return rC
+
+
 
 
     def _renderCheckReports(self, entryId, fileSource="archive", instance=None, contentTypeList=None, useModelFileVersion=True):
@@ -2256,7 +2268,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["aTagList"] = aTagList
 
         #Generate a dictionary with EM map URLs, contour levels and colours
-        molstarDisplayDictionary = self._molstarDisplay(entryId)
+        molstarDisplayDictionary = self.__molstarDisplay(entryId)
 
         if myD.get("molStar-display-objects"):
             molStarMapsJson = "mapsList:{}".format(json.dumps(molstarDisplayDictionary.get("molStar-maps", [])))
