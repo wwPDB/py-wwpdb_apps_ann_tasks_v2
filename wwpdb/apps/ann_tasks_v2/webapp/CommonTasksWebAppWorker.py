@@ -2012,7 +2012,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
     def _launchMolstarDisplayOp(self):
 
         entryId = self._reqObj.getValue("entryid")
+        self._lfh.write('Entry id = {}'.format(entryId))
         molstarDisplayDict = self.__molstarDisplay(entryId)
+        self._lfh.write('{}'.format(molstarDisplayDict))
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
