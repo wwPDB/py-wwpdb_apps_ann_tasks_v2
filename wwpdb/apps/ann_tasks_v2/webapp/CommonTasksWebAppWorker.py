@@ -1950,7 +1950,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         return bSuccess
 
-    def molstarDisplay(self, entryId, fileSource="archive", instance=None):
+    def _molstarDisplay(self, entryId, fileSource="archive", instance=None):
 
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         molDisDict = {}
@@ -2255,7 +2255,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["identifier"] = entryId
         myD["aTagList"] = aTagList
 
-        molstarDisplayDictionary = self.molstarDisplay(entryId)
+        #Generate a dictionary with EM map URLs, contour levels and colours
+        molstarDisplayDictionary = self._molstarDisplay(entryId)
 
         if myD.get("molStar-display-objects"):
             molStarMapsJson = "mapsList:{}".format(json.dumps(molstarDisplayDictionary.get("molStar-maps", [])))
