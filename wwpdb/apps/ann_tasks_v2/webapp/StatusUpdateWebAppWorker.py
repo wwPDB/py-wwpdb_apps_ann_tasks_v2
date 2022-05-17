@@ -1132,7 +1132,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
             pdbxArchivePath = pI.getModelPdbxFilePath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", versionId="next", mileStone=None)
             if self._verbose:
-                self._lfh.write("+StatusUpdateWebAppWorker.__statusUpdateOtherOpeOp() model input path %s model archive output path %s\n" % (filePath, pdbxArchivePath))
+                self._lfh.write("+StatusUpdateWebAppWorker.__statusUpdateOtherOp() model input path %s model archive output path %s\n" % (filePath, pdbxArchivePath))
 
             # filePath is session directory
 
@@ -1202,6 +1202,11 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
             else:
                 rC.setError(errMsg="Update failed.")
+
+            status1 = killAllWF(idCode, "statMod")
+            if self._verbose:
+                self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() killallwf returns %r\n" % status1)
+
 
         else:
             rC.setError(errMsg="Status update failed, data file cannot be accessed.")
