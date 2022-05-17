@@ -1147,6 +1147,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             ok1 = False
             ok1a = False
             ok2 = False
+            ok3 = False
 
             if hasPdb:
                 ok1 = sU.wfLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=newPdbStatus)
@@ -1182,23 +1183,29 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 # Copy to archive
                 shutil.copyfile(filePath, pdbxArchivePath)
 
-                # Fetch again
-                du.fetchId(idCode, "model", formatType="pdbx")
-                aTagList.append(du.getAnchorTag())
-                rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-                rC.setStatus(statusMsg="Status updated")
+                ok3 = sU.dbLoad(filePath)
+                self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateOtherOp() dbLoad completed %r\n" % ok3)
 
-                myD = {}
-                myD["authrelcode"] = newPdbStatus
-                myD["holdcoordinatesdate"] = newPdbHoldDate
-                myD["process_site"] = newProcessSite
-                myD["annotator_initials"] = newAnnotatorInitials
-                myD["em_depui_depositor_hold_instructions"] = newEmStatus
-                myD["em_map_hold_date"] = newEmHoldDate
+                if ok3:
+                    # Fetch again
+                    du.fetchId(idCode, "model", formatType="pdbx")
+                    aTagList.append(du.getAnchorTag())
+                    rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
+                    rC.setStatus(statusMsg="Status updated")
 
-                for k, v in myD.items():
-                    rC.set(k, v)
-                self._saveSessionParameter(pvD=myD)
+                    myD = {}
+                    myD["authrelcode"] = newPdbStatus
+                    myD["holdcoordinatesdate"] = newPdbHoldDate
+                    myD["process_site"] = newProcessSite
+                    myD["annotator_initials"] = newAnnotatorInitials
+                    myD["em_depui_depositor_hold_instructions"] = newEmStatus
+                    myD["em_map_hold_date"] = newEmHoldDate
+
+                    for k, v in myD.items():
+                        rC.set(k, v)
+                    self._saveSessionParameter(pvD=myD)
+                else:
+                    rC.setError(errMsg="Update failed.")
 
             else:
                 rC.setError(errMsg="Update failed.")
@@ -1206,7 +1213,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             status1 = killAllWF(idCode, "statMod")
             if self._verbose:
                 self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() killallwf returns %r\n" % status1)
-
 
         else:
             rC.setError(errMsg="Status update failed, data file cannot be accessed.")
