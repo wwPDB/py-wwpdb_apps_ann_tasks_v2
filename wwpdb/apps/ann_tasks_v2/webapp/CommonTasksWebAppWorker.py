@@ -2009,7 +2009,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         return molDisDict
 
-    def _launchMolstarDisplayOp(self):
+    def _molstarMapsJson(self):
         
         self._getSession(useContext=True)
         self._rltvSessionPath = self._sObj.getRelativePath()
