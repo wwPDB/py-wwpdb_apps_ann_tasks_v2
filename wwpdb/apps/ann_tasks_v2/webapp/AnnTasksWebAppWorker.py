@@ -86,7 +86,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             "/service/ann_tasks_v2/newsession": "_newSessionOp",
             "/service/ann_tasks_v2/launchjmol": "_launchJmolViewerOp",
             "/service/ann_tasks_v2/launchjmolwithmap": "_launchJmolViewerWithMapOp",
-            "/service/ann_tasks_v2/molstarMapsJson": "_molstarMapsJson",
+            "/service/ann_tasks_v2/molstarmapsjson": "_molstarMapsJson",
             "/service/ann_tasks_v2/assemblycalc": "_assemblyCalcOp",
             "/service/ann_tasks_v2/assemblyrestart": "_assemblyRestartOp",
             "/service/ann_tasks_v2/assemblyview": "_assemblyViewOp",
