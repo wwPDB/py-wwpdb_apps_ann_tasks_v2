@@ -246,7 +246,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         rMapPath = os.path.join(self._rltvSessionPath, entryId + "_map-2fofc_P1.map")
 
         viewer = ModelViewer3D(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-
         viewer.setModelRelativePath(rModelPath)
         viewer.setMapRelativePath(rMapPath)
 
@@ -1970,7 +1969,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapLocation = cObj.getValue("file", mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
-                    if cObj.getValue("contour_level", mapNumber) is '?':
+                    if cObj.getValue("contour_level", mapNumber) == '?':
                         mapContour = 1
                     else:
                         mapContour = cObj.getValue("contour_level", mapNumber)
