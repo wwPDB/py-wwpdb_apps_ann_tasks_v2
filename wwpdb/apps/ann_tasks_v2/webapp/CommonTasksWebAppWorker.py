@@ -1968,9 +1968,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # loop through all the map file names in the mmcif file, get content type partition num and contour
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue("file", mapNumber)
-                    mapContour = cObj.getValue("contour_level", mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
+                    if cObj.getValue("contour_level", mapNumber) is not '?':
+                        mapContour = 1
+                    else:
+                        mapContour = cObj.getValue("contour_level", mapNumber)
                     data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
 
         for data_file in data_files:
