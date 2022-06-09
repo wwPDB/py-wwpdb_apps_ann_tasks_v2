@@ -1970,7 +1970,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapLocation = cObj.getValue("file", mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
-                    if cObj.getValue("contour_level", mapNumber) is not '?':
+                    if cObj.getValue("contour_level", mapNumber) is '?':
                         mapContour = 1
                     else:
                         mapContour = cObj.getValue("contour_level", mapNumber)
