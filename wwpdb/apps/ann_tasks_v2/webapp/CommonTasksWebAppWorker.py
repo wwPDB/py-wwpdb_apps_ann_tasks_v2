@@ -246,6 +246,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         rMapPath = os.path.join(self._rltvSessionPath, entryId + "_map-2fofc_P1.map")
 
         viewer = ModelViewer3D(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+
         viewer.setModelRelativePath(rModelPath)
         viewer.setMapRelativePath(rMapPath)
 
@@ -1967,12 +1968,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # loop through all the map file names in the mmcif file, get content type partition num and contour
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue("file", mapNumber)
+                    mapContour = cObj.getValue("contour_level", mapNumber)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
-                    if cObj.getValue("contour_level", mapNumber) == '?':
-                        mapContour = 1
-                    else:
-                        mapContour = cObj.getValue("contour_level", mapNumber)
+
                     data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
 
         for data_file in data_files:
@@ -1988,6 +1987,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
                 # Add to dictionary if present
                 if len(data_file) == 4:
+                    # contour level can be a non-numerical value when not provided so some logic to fix when required
+                    try:
+                        float(data_file[3])
+                    except ValueError:
+                        data_file[3] = float(1)
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
                 # Assign colours to different map types and add to dictionary
