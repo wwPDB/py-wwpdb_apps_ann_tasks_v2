@@ -593,6 +593,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         filePath = os.path.join(self._sessionPath, fileName)
         calc = Check(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        # Default - first block only
+        calc.setCheckFirstBlock(True)
+
         if taskArgs is not None and len(taskArgs) > 0:
             calc.setArguments(taskArgs)
         ok = calc.run(entryId, filePath)
@@ -2309,6 +2312,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if "checkv5" in operationList:
                 chk = Check(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 chk.setDictionaryVersion(version="V5")
+                # Internal model file - check first block only
+                chk.setCheckFirstBlock(True)
+
                 chk.run(entryId=entryId, inpPath=modelFilePath)
                 hasDiags = chk.getReportSize() > 0
                 if hasDiags:
@@ -2330,6 +2336,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkNext\n")
 
                 chk = Check(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                # Public check - should have first block only
                 chk.setDictionaryVersion(version="archive_next")
                 chk.run(entryId=entryId, inpPath=modelFilePath)
                 hasDiags = chk.getReportSize() > 0

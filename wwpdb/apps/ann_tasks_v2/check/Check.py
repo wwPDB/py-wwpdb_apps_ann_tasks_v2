@@ -50,6 +50,7 @@ class Check(SessionWebDownloadUtils):
         self.__reportFileSize = 0
         self.__checkArgs = None
         self.__exportPath = None
+        self.__firstBlock = False
 
         self.__setup()
 
@@ -66,6 +67,9 @@ class Check(SessionWebDownloadUtils):
             return True
         else:
             return False
+
+    def setCheckFirstBlock(self, flag):
+        self.__firstBlock = flag
 
     def setExportPath(self, exportPath):
         """Set the path where output files are copyied."""
@@ -158,6 +162,8 @@ class Check(SessionWebDownloadUtils):
                 dp.setDebugMode(flag=True)
             if self.__checkArgs is not None:
                 dp.addInput(name="check_arguments", value=self.__checkArgs)
+            if self.__firstBlock:
+                dp.addInput("first_block")
 
             if self.__dictionaryVersion in ["V5", "DEPOSIT"]:
                 dp.imp(inpPath)
