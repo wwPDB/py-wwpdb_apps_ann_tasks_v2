@@ -2019,7 +2019,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         return molDisDict
 
     def _molstarMapsJson(self):
-        
         self._getSession(useContext=True)
         self._rltvSessionPath = self._sObj.getRelativePath()
 
@@ -2280,7 +2279,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         myD["identifier"] = entryId
         myD["aTagList"] = aTagList
 
-        #Generate a dictionary with EM map URLs, contour levels and colours
+        # Generate a dictionary with EM map URLs, contour levels and colours
         molstarDisplayDictionary = self.__molstarDisplay(entryId)
 
         if myD.get("molStar-display-objects"):
