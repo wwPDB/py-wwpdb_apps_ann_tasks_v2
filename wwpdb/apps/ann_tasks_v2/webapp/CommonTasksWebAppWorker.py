@@ -1972,6 +1972,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue("file", mapNumber)
                     mapContour = cObj.getValue("contour_level", mapNumber)
+                    # contour level can be a non-numerical value when not provided so some logic to fix when required
+                    try:
+                        float(mapContour)
+                    except ValueError:
+                        mapContour = float(1)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
 
@@ -1990,11 +1995,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
                 # Add to dictionary if present
                 if len(data_file) == 4:
-                    # contour level can be a non-numerical value when not provided so some logic to fix when required
-                    try:
-                        float(data_file[3])
-                    except ValueError:
-                        data_file[3] = float(1)
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
                 # Assign colours to different map types and add to dictionary
