@@ -2249,8 +2249,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if ok:
             downloadPath = du.getWebPath()
             myD["em_image"] = '<div class="container"><p><img src={} alt="EM image "style="width:600px"></p></div><br />'.format(downloadPath)
+            myD["em_image_sidebar"] = '<img src={} alt="EM image "style="max-width:99%">'.format(downloadPath)
         else:
             myD["em_image"] = ""
+            myD["em_image_sidebar"] = ""
 
         ok = du.fetchId(entryId, contentType="validation-report-slider", formatType="png", fileSource=fileSource, instance=instance)
         if ok:
