@@ -1997,7 +1997,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if len(data_file) == 4:
                     mapInfoDictionary["contourLevel"] = float(data_file[3])
 
-
                 # Assign colours to different map types and add to dictionary
                 if data_file[0] == "em-volume":
                     mapColour = "0x666666"
