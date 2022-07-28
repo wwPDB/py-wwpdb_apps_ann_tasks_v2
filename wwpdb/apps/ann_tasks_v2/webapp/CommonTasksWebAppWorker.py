@@ -1995,11 +1995,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
                 # Add to dictionary if present
                 if len(data_file) == 4:
-                    # contour level can be a non-numerical value when not provided so some logic to fix when required
-                    try:
-                        mapInfoDictionary["contourLevel"] = float(data_file[3])
-                    except ValueError:
-                        mapInfoDictionary["contourLevel"] = float(1)
+                    mapInfoDictionary["contourLevel"] = float(data_file[3])
+
 
                 # Assign colours to different map types and add to dictionary
                 if data_file[0] == "em-volume":
