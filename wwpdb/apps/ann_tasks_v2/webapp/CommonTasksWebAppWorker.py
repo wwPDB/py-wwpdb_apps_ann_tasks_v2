@@ -2249,7 +2249,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if ok:
             downloadPath = du.getWebPath()
             myD["em_image"] = '<div class="container"><p><img src={} alt="EM image "style="width:600px"></p></div><br />'.format(downloadPath)
-            myD["em_image_sidebar"] = '<div class="container"><p><img src={} alt="EM image "style="max-width:99%"></p></div><br />'.format(downloadPath)
+            myD["em_image_sidebar"] = '<img src={} alt="EM image "style="max-width:99%">'.format(downloadPath)
         else:
             myD["em_image"] = ""
             myD["em_image_sidebar"] = ""
