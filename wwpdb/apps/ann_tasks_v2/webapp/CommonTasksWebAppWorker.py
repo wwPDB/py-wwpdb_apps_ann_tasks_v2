@@ -1972,6 +1972,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue("file", mapNumber)
                     mapContour = cObj.getValue("contour_level", mapNumber)
+                    # contour level can be a non-numerical value when not provided so some logic to fix when required
+                    try:
+                        float(mapContour)
+                    except ValueError:
+                        mapContour = float(1)
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
 
