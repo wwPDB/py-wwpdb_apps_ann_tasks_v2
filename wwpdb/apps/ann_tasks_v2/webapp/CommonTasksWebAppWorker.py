@@ -2961,16 +2961,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             aTagList.append(duL.getAnchorTag())
             try:
                 pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
+                myD['Jacks bad logging'] = '1'
                 modelFilePath = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="session", versionId="none")
                 emx = EmModelUtils(verbose=self._verbose, log=self._lfh)
+                myD['Jacks bad logging'] = '2'
                 _ok1 = emx.setModelFilePath(modelFilePath)  # noqa: F841
                 emx.setMapHeaderFilePath(nextJsonPath)
                 modelD = {}
+                myD['Jacks bad logging'] = '3'
                 for tky in ["annotation_details", "contour_level", "contour_level_source"]:
                     modelD[tky] = self._reqObj.getValue("m_" + tky)
                 emx.updateHeader(modelD)
                 mapType = self._reqObj.getValue("maptype")
                 partitionNo = self._reqObj.getValue("partition")
+                myD['Jacks bad logging'] = '4'
                 if self._verbose:
                     self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, modelD.items()))
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
