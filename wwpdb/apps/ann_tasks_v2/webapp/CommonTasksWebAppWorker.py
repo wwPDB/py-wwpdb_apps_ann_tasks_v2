@@ -2995,7 +2995,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD["additional_map_list"] = htmlAdditionalMapList
         else:
             myD["map_edit_status"] = "Map edit failed"
-
+            # Convert map files to bcif files when header updated
+            try:
+                pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
+                modelFilePath = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="session", versionId="none")
+                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={},
+                                                       userParameterD={}, internalParameterD={})
         #
         if len(aTagList) > 0:
             myD["map_edit_links"] = '<span class="url-list">Download: %s</span>' % ",&nbsp;".join(aTagList)
