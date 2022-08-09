@@ -74,7 +74,7 @@ from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
 
 #
 from wwpdb.utils.wf.dbapi.WfTracking import WfTracking
-from wwpdb.utils.wf.plugins.AnnotationUtils.AnnotationUtils import emVolumeBcifConversionOp
+from wwpdb.utils.wf.plugins.AnnotationUtils import AnnotationUtils
 
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblyInput import AssemblyInput
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
@@ -2982,7 +2982,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             myD["map_edit_status"] = "Map edits completed"
             #Convert map files to bcif files when header updated
-            emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={}, userParameterD={}, internalParameterD={})
+            AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={}, userParameterD={}, internalParameterD={})
             #
             nMap, htmlMapList = emu.renderMapFileList(entryId)
             if nMap > 0:
