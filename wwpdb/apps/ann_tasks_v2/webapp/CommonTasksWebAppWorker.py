@@ -2996,10 +2996,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD["map_edit_status"] = "Map edit failed"
             # Convert map files to bcif files when header updated
-            try:
-                pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
-                modelFilePath = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="session", versionId="none")
-                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={},
+            pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
+            modelFilePath = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="session", versionId="none")
+            AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={},
                                                        userParameterD={}, internalParameterD={})
         #
         if len(aTagList) > 0:
