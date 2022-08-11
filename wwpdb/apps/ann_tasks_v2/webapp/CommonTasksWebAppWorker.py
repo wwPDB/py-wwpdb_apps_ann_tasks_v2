@@ -2974,8 +2974,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if self._verbose:
                     self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, modelD.items()))
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
+
+                modelFilePathForBcif = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="archive",
+                                                               versionId="latest")
                 # Convert map files to bcif files when header updated
-                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={},
+                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePathForBcif}, outputObjectD={},
                                                            userParameterD={}, internalParameterD={})
             except:  # noqa: E722 pylint: disable=bare-except
                 if self._verbose:
