@@ -2982,7 +2982,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             #
             myD["map_edit_status"] = "Map edits completed"
             #Convert map files to bcif files when header updated
-            AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={}, userParameterD={}, internalParameterD={})
+            AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath})
             #
             nMap, htmlMapList = emu.renderMapFileList(entryId)
             if nMap > 0:
