@@ -138,6 +138,8 @@ from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
 from wwpdb.apps.ann_tasks_v2.view3d.ModelViewer3D import ModelViewer3D
 
 #
+from wwpdb.io.locator.DataReference import DataFileReference
+#
 try:
     from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
     from wwpdb.apps.validation.src.lvw.LVW_GetHTML import LVW_GetHTML
@@ -2975,8 +2977,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, modelD.items()))
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
 
-                modelFilePathForBcif = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="archive",
-                                                               versionId="latest")
+                modelFilePathForBcif = DataFileReference(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
+                modelFilePathForBcif.setDepositionDataSetId(entryId)
+                modelFilePathForBcif.setStorageType("archive")
+                modelFilePathForBcif.setContentTypeAndFormat('model', 'cif')
+                modelFilePathForBcif.setPartitionNumber('1')
+                modelFilePathForBcif.setVersionId('latest')
+
                 # Convert map files to bcif files when header updated
                 AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePathForBcif}, outputObjectD={},
                                                            userParameterD={}, internalParameterD={})
