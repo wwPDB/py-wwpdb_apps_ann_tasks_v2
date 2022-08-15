@@ -2980,7 +2980,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 modelFilePathForBcif = DataFileReference(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
                 modelFilePathForBcif.setDepositionDataSetId(entryId)
                 modelFilePathForBcif.setStorageType("archive")
-                modelFilePathForBcif.setContentTypeAndFormat('model', 'mmcif')
+                modelFilePathForBcif.setContentTypeAndFormat('model', 'pdbx')
                 modelFilePathForBcif.setPartitionNumber('1')
                 modelFilePathForBcif.setVersionId('latest')
 
