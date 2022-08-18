@@ -2985,7 +2985,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 modelFilePathForBcif.setVersionId('latest')
 
                 # Convert map files to bcif files when header updated
-                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePathForBcif}, outputObjectD={},
+                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePath}, outputObjectD={},
                                                            userParameterD={}, internalParameterD={})
             except:  # noqa: E722 pylint: disable=bare-except
                 if self._verbose:
