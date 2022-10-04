@@ -75,6 +75,8 @@ from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
 #
 from wwpdb.utils.wf.dbapi.WfTracking import WfTracking
 from wwpdb.utils.wf.plugins.AnnotationUtils import AnnotationUtils
+from wwpdb.utils.wf.process.ProcessRunner import ProcessRunner
+from wwpdb.utils.wf.wdDataObject import WfDataObject
 
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblyInput import AssemblyInput
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
@@ -2977,15 +2979,33 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, modelD.items()))
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
 
-                modelFilePathForBcif = DataFileReference(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
-                modelFilePathForBcif.setDepositionDataSetId(entryId)
-                modelFilePathForBcif.setStorageType("archive")
-                modelFilePathForBcif.setContentTypeAndFormat('model', 'pdbx')
-                modelFilePathForBcif.setPartitionNumber('1')
-                modelFilePathForBcif.setVersionId('latest')
+                #This will get the model file in archive NOT the session directory and use the em_map category for bcif conversion int he
+                #modelFilePathForBcif = DataFileReference(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
+                #modelFilePathForBcif.setDepositionDataSetId(entryId)
+                #modelFilePathForBcif.setStorageType("archive")
+                #modelFilePathForBcif.setContentTypeAndFormat('model', 'pdbx')
+                #modelFilePathForBcif.setPartitionNumber('1')
+                #modelFilePathForBcif.setVersionId('latest')
+
+                wfoInp = WfDataObject()
+                wfoInp.setDepositionDataSetId(entryId)
+                wfoInp.setStorageType("archive")
+                wfoInp.setContentTypeAndFormat("model", "pdbx")
+                wfoInp.setVersionId("latest")
 
                 # Convert map files to bcif files when header updated
-                AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': modelFilePathForBcif}, outputObjectD={},
+                pR = ProcessRunner(verbose=self.__verbose, log=self.__lfh)
+                pR.setInput("src", wfoInp)
+
+                op = "em-volume-bcif-conversion"
+                #
+                ok = pR.setAction(op)
+                self.__lfh.write("setAction() for %s returns status %r\n" % (op, ok))
+                ok = pR.preCheck()
+                self.__lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
+                ok = pR.run()
+
+            #AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': wfoInp}, outputObjectD={},
                                                            userParameterD={}, internalParameterD={})
             except:  # noqa: E722 pylint: disable=bare-except
                 if self._verbose:
