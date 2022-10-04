@@ -2988,7 +2988,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 #modelFilePathForBcif.setVersionId('latest')
 
                 wfoInp = WfDataObject()
-                wfoInp.setDepositionDataSetId(entryId)
+                wfoInp.setDepositionDataSetId(self.__depDataSetId)
                 wfoInp.setStorageType("archive")
                 wfoInp.setContentTypeAndFormat("model", "pdbx")
                 wfoInp.setVersionId("latest")
@@ -3000,10 +3000,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 op = "em-volume-bcif-conversion"
                 #
                 ok = pR.setAction(op)
+                pR.setAction(op)
                 self.__lfh.write("setAction() for %s returns status %r\n" % (op, ok))
                 ok = pR.preCheck()
                 self.__lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
                 ok = pR.run()
+
+
+
+
 
             #AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': wfoInp}, outputObjectD={},
                                                            userParameterD={}, internalParameterD={})
