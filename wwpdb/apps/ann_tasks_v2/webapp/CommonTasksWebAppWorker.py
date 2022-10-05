@@ -2986,7 +2986,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 #modelFilePathForBcif.setContentTypeAndFormat('model', 'pdbx')
                 #modelFilePathForBcif.setPartitionNumber('1')
                 #modelFilePathForBcif.setVersionId('latest')
-
+'''
                 wfoInp = WfDataObject()
                 wfoInp.setDepositionDataSetId(entryId)
                 wfoInp.setStorageType("archive")
@@ -3005,12 +3005,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 self.__lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
                 ok = pR.run()
 
-
-
-
-
             #AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': wfoInp}, outputObjectD={},
                                                            userParameterD={}, internalParameterD={})
+'''
             except:  # noqa: E722 pylint: disable=bare-except
                 if self._verbose:
                     self._lfh.write("+CommonTasksWebAppWorker._editEmMapResponderOp() failing model file %r\n" % modelFilePath)
