@@ -2986,13 +2986,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 #modelFilePathForBcif.setContentTypeAndFormat('model', 'pdbx')
                 #modelFilePathForBcif.setPartitionNumber('1')
                 #modelFilePathForBcif.setVersionId('latest')
-'''
+
                 wfoInp = WfDataObject()
                 wfoInp.setDepositionDataSetId(entryId)
                 wfoInp.setStorageType("archive")
                 wfoInp.setContentTypeAndFormat("model", "pdbx")
                 wfoInp.setVersionId("latest")
-
+'''
                 # Convert map files to bcif files when header updated
                 pR = ProcessRunner(verbose=self.__verbose, log=self.__lfh)
                 pR.setInput("src", wfoInp)
