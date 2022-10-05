@@ -76,7 +76,7 @@ from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
 from wwpdb.utils.wf.dbapi.WfTracking import WfTracking
 from wwpdb.utils.wf.plugins.AnnotationUtils import AnnotationUtils
 from wwpdb.utils.wf.process.ProcessRunner import ProcessRunner
-from wwpdb.utils.wf.wdDataObject import WfDataObject
+from wwpdb.utils.wf.WfDataObject import WfDataObject
 
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblyInput import AssemblyInput
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
@@ -2988,7 +2988,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 #modelFilePathForBcif.setVersionId('latest')
 
                 wfoInp = WfDataObject()
-                wfoInp.setDepositionDataSetId(self.__depDataSetId)
+                wfoInp.setDepositionDataSetId(entryId)
                 wfoInp.setStorageType("archive")
                 wfoInp.setContentTypeAndFormat("model", "pdbx")
                 wfoInp.setVersionId("latest")
@@ -3000,7 +3000,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 op = "em-volume-bcif-conversion"
                 #
                 ok = pR.setAction(op)
-                pR.setAction(op)
                 self.__lfh.write("setAction() for %s returns status %r\n" % (op, ok))
                 ok = pR.preCheck()
                 self.__lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
