@@ -2995,11 +2995,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
                 # Convert map files to bcif files when header updated
                 pR = ProcessRunner(verbose=self.__verbose, log=self.__lfh)
-
                 pR.setInput("src", wfoInp)
-                '''
                 op = "em-volume-bcif-conversion"
-
+                '''
                 #
                 ok = pR.setAction(op)
                 self.__lfh.write("setAction() for %s returns status %r\n" % (op, ok))
