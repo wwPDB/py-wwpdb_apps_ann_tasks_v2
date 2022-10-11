@@ -74,7 +74,6 @@ from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
 
 #
 from wwpdb.utils.wf.dbapi.WfTracking import WfTracking
-from wwpdb.utils.wf.plugins.AnnotationUtils import AnnotationUtils
 from wwpdb.utils.wf.process.ProcessRunner import ProcessRunner
 from wwpdb.utils.wf.WfDataObject import WfDataObject
 
@@ -138,9 +137,6 @@ from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 from wwpdb.apps.ann_tasks_v2.utils.TerminalAtoms import TerminalAtoms
 from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
 from wwpdb.apps.ann_tasks_v2.view3d.ModelViewer3D import ModelViewer3D
-
-#
-from wwpdb.io.locator.DataReference import DataFileReference
 #
 try:
     from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
@@ -2979,14 +2975,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     self._lfh.write("+CommonTasksWebAppWorker._editEmMapHeaderResponderOp() type %r partitionNo %r modelD %r\n" % (mapType, partitionNo, modelD.items()))
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
 
-                #This will get the model file in archive NOT the session directory and use the em_map category for bcif conversion int he
-                #modelFilePathForBcif = DataFileReference(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
-                #modelFilePathForBcif.setDepositionDataSetId(entryId)
-                #modelFilePathForBcif.setStorageType("archive")
-                #modelFilePathForBcif.setContentTypeAndFormat('model', 'pdbx')
-                #modelFilePathForBcif.setPartitionNumber('1')
-                #modelFilePathForBcif.setVersionId('latest')
-
                 wfoInp = WfDataObject()
                 wfoInp.setDepositionDataSetId(entryId)
                 wfoInp.setStorageType("archive")
@@ -2994,17 +2982,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 wfoInp.setVersionId("latest")
 
                 # Convert map files to bcif files when header updated
-                pR = ProcessRunner(verbose=self.__verbose, log=self.__lfh)
+                pR = ProcessRunner(verbose=self._verbose, log=self._lfh)
                 pR.setInput("src", wfoInp)
                 op = "em-volume-bcif-conversion"
-
-                #
                 ok = pR.setAction(op)
                 self.__lfh.write("setAction() for %s returns status %r\n" % (op, ok))
                 ok = pR.preCheck()
                 self.__lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
                 ok = pR.run()
-                #AnnotationUtils().emVolumeBcifConversionOp(inputObjectD={'src': wfoInp}, outputObjectD={}, userParameterD={}, internalParameterD={})
 
             except:  # noqa: E722 pylint: disable=bare-except
                 if self._verbose:
