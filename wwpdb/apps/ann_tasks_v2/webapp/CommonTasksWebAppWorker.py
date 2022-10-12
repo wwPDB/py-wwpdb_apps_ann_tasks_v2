@@ -2976,7 +2976,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 emx.updateModelFromHeader(entryId, mapType=mapType, partition=partitionNo, outModelFilePath=modelFilePath)
 
                 wfoInp = WfDataObject()
-                wfoInp.setDepositionDataSetId(entryId)
+                wfoInp.setDepositionDataSetId('{}'.format(entryId))
                 wfoInp.setStorageType("archive")
                 wfoInp.setContentTypeAndFormat("model", "pdbx")
                 wfoInp.setVersionId("latest")
