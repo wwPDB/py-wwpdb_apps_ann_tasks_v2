@@ -2986,9 +2986,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 pR.setInput("src", wfoInp)
                 op = "em-volume-bcif-conversion"
                 ok = pR.setAction(op)
-                #self.__lfh.write("setAction() for %s returns status %r\n" % (op, ok))
+                self._lfh.write("setAction() for %s returns status %r\n" % (op, ok))
                 ok = pR.preCheck()
-                #self.__lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
+                self._lfh.write("preCheck() for %s returns status %r\n" % (op, ok))
                 ok = pR.run()
 
             except:  # noqa: E722 pylint: disable=bare-except
