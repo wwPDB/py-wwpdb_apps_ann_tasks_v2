@@ -61,14 +61,14 @@ class EmdXmlCheck(SessionWebDownloadUtils):
     def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs  # pylint: disable=unused-private-member
 
-    def __logerr(self, errstr):
-        """Writes to the report log"""
-        if self.__reportPath:
-            with open(self.__reportPath, "a") as fout:
-                fout.write("%s\n" % errstr)
-            self.__reportFileSize = self.__getSize(self.__reportPath)
-        else:
-            logger.error("Trying to log %s but reportPath not set!", errstr)
+    # def __logerr(self, errstr):
+    #     """Writes to the report log"""
+    #     if self.__reportPath:
+    #         with open(self.__reportPath, "a") as fout:
+    #             fout.write("%s\n" % errstr)
+    #         self.__reportFileSize = self.__getSize(self.__reportPath)
+    #     else:
+    #         logger.error("Trying to log %s but reportPath not set!", errstr)
 
     def run(self, entryId, modelInputFile):
         """Run the format-level check on the input PDBx/mmCIF data file -"""

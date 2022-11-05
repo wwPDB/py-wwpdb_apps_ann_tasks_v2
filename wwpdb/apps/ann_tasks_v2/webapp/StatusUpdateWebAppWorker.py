@@ -1027,7 +1027,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 emdfile = False
                 if hasattr(emhu, "transEmd"):
                     emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
-                    mPath  = emdFilePath
+                    mPath = emdFilePath
                     emdfile = True
 
                 ok3c = emhu.transHeader(mPath, emdbFilePath, emdbLogPath)
@@ -1487,7 +1487,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
                     mPath = emdFilePath
                     emdfile = True
-                    
+
                 #
                 # Create XML file
                 ok3c = emhu.transHeader(mPath, emdbFilePath, emdbLogPath)
