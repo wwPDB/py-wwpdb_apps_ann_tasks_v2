@@ -98,24 +98,24 @@ class EmdXmlCheck(SessionWebDownloadUtils):
             emh = EmHeaderUtils(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             #
             # Convert model to emd
-            emdModelPath = os.path.join(self.__exportPath, entryId + "_model-emd.cif")
-            if os.access(emdModelPath, os.R_OK):
-                os.remove(emdModelPath)
+            # emdModelPath = os.path.join(self.__exportPath, entryId + "_model-emd.cif")
+            # if os.access(emdModelPath, os.R_OK):
+            #     os.remove(emdModelPath)
 
-            status = emh.transEmd(modelInputFile, emdModelPath, mode="src-dst", tags=[])
-            if not status:
-                self.__logerr("Conversion of EM_ to EMD failed")
-                return False
+            # status = emh.transEmd(modelInputFile, emdModelPath, mode="src-dst", tags=[])
+            # if not status:
+            #     self.__logerr("Conversion of EM_ to EMD failed")
+            #     return False
 
-            if self.__getSize(emdModelPath):
-                self.addDownloadPath(emdModelPath)
+            # if self.__getSize(emdModelPath):
+            #     self.addDownloadPath(emdModelPath)
 
             # Generate XML
             emdXmlPath = os.path.join(self.__exportPath, entryId + "-emd.xml")
             if os.access(emdXmlPath, os.R_OK):
                 os.remove(emdXmlPath)
 
-            status = emh.transHeader(emdModelPath, emdXmlPath, self.__reportPath, validateXml=True)
+            status = emh.transHeader(modelInputFile, emdXmlPath, self.__reportPath, validateXml=True)
             logger.debug("Status of translation %s", status)
 
             if self.__getSize(emdXmlPath):

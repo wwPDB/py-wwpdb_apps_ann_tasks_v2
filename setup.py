@@ -46,7 +46,7 @@ setup(
         "wwpdb.apps.wf_engine",
         "wwpdb.io",
         "wwpdb.utils.db >= 0.6",
-        "wwpdb.utils.emdb >= 0.17",
+        "wwpdb.utils.emdb ~= 1.0",
         "wwpdb.utils.wf ~= 0.13",
         "wwpdb.utils.session",
         "mmcif >= 0.25",

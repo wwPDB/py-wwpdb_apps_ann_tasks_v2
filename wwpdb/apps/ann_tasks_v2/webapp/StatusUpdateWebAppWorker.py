@@ -1020,12 +1020,21 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     os.remove(emdbLogPath)
                 #
                 emhu = EmHeaderUtils(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
-                emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
 
-                ok3c = emhu.transHeader(emdFilePath, emdbFilePath, emdbLogPath)
+                # Legacy code
+
+                mPath = filePath
+                emdfile = False
+                if hasattr(emhu, "transEmd"):
+                    emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
+                    mPath  = emdFilePath
+                    emdfile = True
+
+                ok3c = emhu.transHeader(mPath, emdbFilePath, emdbLogPath)
                 #
-                du.copyToDownload(emdFilePath)
-                aTagList.append(du.getAnchorTag())
+                if emdfile:
+                    du.copyToDownload(emdFilePath)
+                    aTagList.append(du.getAnchorTag())
                 if ok3c and os.access(emdbFilePath, os.R_OK):
                     du.copyToDownload(emdbFilePath)
                     aTagList.append(du.getAnchorTag())
@@ -1471,13 +1480,21 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 headerFilters = []
 
                 emhu = EmHeaderUtils(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
-                emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
+
+                mPath = filePath
+                emdfile = False
+                if hasattr(emhu, "transEmd"):
+                    emhu.transEmd(filePath, emdFilePath, tags=headerFilters)
+                    mPath = emdFilePath
+                    emdfile = True
+                    
                 #
                 # Create XML file
-                ok3c = emhu.transHeader(emdFilePath, emdbFilePath, emdbLogPath)
+                ok3c = emhu.transHeader(mPath, emdbFilePath, emdbLogPath)
                 #
-                du.copyToDownload(emdFilePath)
-                aTagList.append(du.getAnchorTag())
+                if emdfile:
+                    du.copyToDownload(emdFilePath)
+                    aTagList.append(du.getAnchorTag())
 
                 ok5 = False
                 if ok3c and os.access(emdbFilePath, os.R_OK):

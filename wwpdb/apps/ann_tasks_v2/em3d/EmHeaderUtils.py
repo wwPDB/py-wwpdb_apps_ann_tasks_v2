@@ -23,7 +23,7 @@ import logging
 import shutil
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppEm
-from mmcif_utils.trans.InstanceMapper import InstanceMapper
+# from mmcif_utils.trans.InstanceMapper import InstanceMapper
 from wwpdb.utils.emdb.cif_emdb_translator.cif_emdb_translator import CifEMDBTranslator
 
 #
@@ -84,20 +84,21 @@ class EmHeaderUtils(object):
 
         return ok
 
-    def transEmd(self, inpFilePath, outFilePath, mode="src-dst", tags=None):
-        if tags is None:
-            tags = []
-        ok = False
-        try:
-            im = InstanceMapper(verbose=True, log=sys.stderr)
-            im.setMappingFilePath(self.__mappingFilePath)
-            if tags != []:
-                im.setFilterTagList(tags)
-            ok = im.translate(inpFilePath, outFilePath, mode=mode)
-        except:  # noqa: E722 pylint: disable=bare-except
-            logger.exception("failing for %s", inpFilePath)
+    # If transEmd is defined, WFE plugin will try to translated to EMD first
+    # def transEmd(self, inpFilePath, outFilePath, mode="src-dst", tags=None):
+    #     if tags is None:
+    #         tags = []
+    #     ok = False
+    #     try:
+    #         im = InstanceMapper(verbose=True, log=sys.stderr)
+    #         im.setMappingFilePath(self.__mappingFilePath)
+    #         if tags != []:
+    #             im.setFilterTagList(tags)
+    #         ok = im.translate(inpFilePath, outFilePath, mode=mode)
+    #     except:  # noqa: E722 pylint: disable=bare-except
+    #         logger.exception("failing for %s", inpFilePath)
 
-        return ok
+    #    return ok
 
     def transHeader(self, inpFilePath, outFilePath, logFilePath, validateXml=True):
         ok = False
