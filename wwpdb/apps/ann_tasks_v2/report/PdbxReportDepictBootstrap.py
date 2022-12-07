@@ -61,6 +61,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             self.__reportCategories = [
                 ("pdbx_data_processing_status", "Data Processing Skip Tasks", "row-wise"),
                 ("exptl", "Experimental", "row-wise"),
+                ("pdbx_related_exp_data_set", "Related Exp Data", "row-wise"),
                 ("pdbx_database_status", "PDB Status", "row-wise"),
                 ("em_admin", "EM admin", "row-wise"),
                 ("em_experiment", "EM experiment", "row-wise"),
@@ -310,6 +311,9 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         isFirst = True
         for ii, (catName, catNameAbbrev, catStyle) in enumerate(catList):
             # For only popuated categories
+            print("XXXXXX %s %s" % (catName, catName in cD))
+            if catName == "pdbx_related_exp_data_set" and "pdbx_related_exp_data_set" in cD:
+                print("XXXXXXXXXXXX", cD["pdbx_related_exp_data_set"])
             if catName in cD and (len(cD[catName]) > 0):
                 active = "in" if isFirst else ""
                 idSection = idPrefix + "-sec-" + str(ii)

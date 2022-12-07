@@ -33,6 +33,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ("pdbx_depui_status_flags", "table"),
         ("pdbx_database_proc", "table"),
         ("pdbx_database_related", "table"),
+        ("pdbx_related_exp_data_set", "table"),
         ("database_PDB_rev", "table"),
         ("pdbx_database_PDB_obs_spr", "table"),
         ("pdbx_database_PDB_remark", "table"),
@@ -252,6 +253,13 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_database_related.db_id", "%s", "str", ""),
             ("_pdbx_database_related.details", "%s", "str", ""),
             ("_pdbx_database_related.content_type", "%s", "str", ""),
+        ],
+        "pdbx_related_exp_data_set": [
+            ("_pdbx_related_exp_data_set.ordinal", "%s", "str", ""),
+            ("_pdbx_related_exp_data_set.data_reference", "%s", "str", ""),
+            ("_pdbx_related_exp_data_set.metadata_reference", "%s", "str", ""),
+            ("_pdbx_related_exp_data_set.data_set_type", "%s", "str", ""),
+            ("_pdbx_related_exp_data_set.details", "%s", "str", "")
         ],
         "pdbx_depui_status_flags": [
             # A subset of interesting flags
