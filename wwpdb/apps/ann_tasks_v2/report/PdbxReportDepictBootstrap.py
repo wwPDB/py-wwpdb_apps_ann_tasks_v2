@@ -311,7 +311,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         isFirst = True
         for ii, (catName, catNameAbbrev, catStyle) in enumerate(catList):
             # For only popuated categories
-            if catName == "pdbx_related_exp_data_set" and "pdbx_related_exp_data_set" in cD:
             if catName in cD and (len(cD[catName]) > 0):
                 active = "in" if isFirst else ""
                 idSection = idPrefix + "-sec-" + str(ii)
