@@ -32,7 +32,6 @@ from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 # For NMR conversioon
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.nmr.CifToNmrStar import CifToNmrStar
 from mmcif.io.IoAdapterPy import IoAdapterPy
 
@@ -44,6 +43,7 @@ def remediate_cs_file(infile, outfile):
     ctns = CifToNmrStar()
     return ctns.convert(cifPath=infile, strPath=outfile)
 
+
 def starToPdbx(starPath=None, pdbxPath=None):
     if starPath is None or pdbxPath is None:
         return False
@@ -54,15 +54,14 @@ def starToPdbx(starPath=None, pdbxPath=None):
         if containerList is not None and len(containerList) > 1:
             logger.debug("Input container list is  %r", ([(c.getName(), c.getType()) for c in containerList]))
             for c in containerList:
-                c.setType('data')                
-            #myIo.writeFile(pdbxPath, containerList=containerList[1:])
+                c.setType('data')
+            # myIo.writeFile(pdbxPath, containerList=containerList[1:])
             myIo.writeFile(pdbxPath, containerList=containerList)
             return True
-    except Exception as _e:
+    except Exception as _e:  # noqa: F841
         logger.exception("starToPdx - failed with exception")
-    
-    return False
 
+    return False
 
 
 class Validate(SessionWebDownloadUtils):
