@@ -62,7 +62,7 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             # ------------
             dp.addInput(name="request_annotation_context", value="yes")
             # adding explicit selection of steps --
-            dp.addInput(name="step_list", value=" coreclust,chemicalshifts,writexml,writepdf ")
+            dp.addInput(name="step_list", value=" coreclust,chemicalshiftanalysis,writexml,writepdf ")
             dp.imp(xyzFilePath)
             dp.addInput(name="cs_file_path", value=csInpFilePath)
             dp.op("annot-wwpdb-validate-all")

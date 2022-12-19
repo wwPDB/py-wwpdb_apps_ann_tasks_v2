@@ -288,7 +288,7 @@ class NmrChemShiftProcessUtils(object):
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.addInput(name="request_annotation_context", value="yes")
             # adding explicit selection of steps --
-            dp.addInput(name="step_list", value=" coreclust,chemicalshifts,writexml,writepdf ")
+            dp.addInput(name="step_list", value=" coreclust,chemicalshiftanalysis,writexml,writepdf ")
             dp.imp(xyzFilePath)
             dp.addInput(name="cs_file_path", value=csFilePath)
             dp.op("annot-wwpdb-validate-all")
