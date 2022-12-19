@@ -124,21 +124,21 @@ class Validate(SessionWebDownloadUtils):
             else:
                 sfPath = os.path.join(self.__sessionPath, reflnInputFile)
 
-            nmrstar = False
+            nmrdata = False
             if csInputFile is None:
                 csFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 csPath = os.path.join(self.__sessionPath, csFileName)
-                nmrstar = True
+                nmrdata = True
                 if not os.access(csPath, os.R_OK):
                     # Fallback on cs file
                     csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                     csPath = os.path.join(self.__sessionPath, csFileName)
-                    nmrstar = False
+                    nmrdata = False
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
             # Redmediate legacy CS files 2022-12-05
-            if nmrstar is False and os.access(csPath, os.R_OK):
+            if nmrdata is False and os.access(csPath, os.R_OK):
                 tmpfile1 = csPath + ".str"
                 tmpfile2 = csPath + ".cif"
                 remediate_cs_file(csPath, tmpfile1)
