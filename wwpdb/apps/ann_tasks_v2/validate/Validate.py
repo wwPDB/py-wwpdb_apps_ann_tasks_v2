@@ -26,10 +26,43 @@ import os
 import shutil
 import sys
 import traceback
+import logging
 
 from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+# For NMR conversioon
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.utils.nmr.CifToNmrStar import CifToNmrStar
+from mmcif.io.IoAdapterPy import IoAdapterPy
+
+logger = logging.getLogger()
+
+
+# The following remediation code is for legacy NMR files - correct until remediated
+def remediate_cs_file(infile, outfile):
+    ctns = CifToNmrStar()
+    return ctns.convert(cifPath=infile, strPath=outfile)
+
+def starToPdbx(starPath=None, pdbxPath=None):
+    if starPath is None or pdbxPath is None:
+        return False
+    #
+    try:
+        myIo = IoAdapterPy(False, sys.stderr)
+        containerList = myIo.readFile(starPath)
+        if containerList is not None and len(containerList) > 1:
+            logger.debug("Input container list is  %r", ([(c.getName(), c.getType()) for c in containerList]))
+            for c in containerList:
+                c.setType('data')                
+            #myIo.writeFile(pdbxPath, containerList=containerList[1:])
+            myIo.writeFile(pdbxPath, containerList=containerList)
+            return True
+    except Exception as _e:
+        logger.exception("starToPdx - failed with exception")
+    
+    return False
+
 
 
 class Validate(SessionWebDownloadUtils):
@@ -92,16 +125,27 @@ class Validate(SessionWebDownloadUtils):
             else:
                 sfPath = os.path.join(self.__sessionPath, reflnInputFile)
 
+            nmrstar = False
             if csInputFile is None:
                 csFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 csPath = os.path.join(self.__sessionPath, csFileName)
+                nmrstar = True
                 if not os.access(csPath, os.R_OK):
                     # Fallback on cs file
                     csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                     csPath = os.path.join(self.__sessionPath, csFileName)
+                    nmrstar = False
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
+            # Redmediate legacy CS files 2022-12-05
+            if nmrstar is False and os.access(csPath, os.R_OK):
+                tmpfile1 = csPath + ".str"
+                tmpfile2 = csPath + ".cif"
+                remediate_cs_file(csPath, tmpfile1)
+                starToPdbx(tmpfile1, tmpfile2)
+                csPath = tmpfile2
+
             if restraintInputFile is None:
                 restraintFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 resPath = os.path.join(self.__sessionPath, restraintFileName)
