@@ -19,6 +19,7 @@ __version__ = "V0.07"
 import sys
 import traceback
 import logging
+
 # from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppEm
 # from mmcif_utils.trans.InstanceMapper import InstanceMapper
 from wwpdb.utils.emdb.cif_emdb_translator.cif_emdb_translator import CifEMDBTranslator

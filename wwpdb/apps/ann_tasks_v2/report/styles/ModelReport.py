@@ -259,7 +259,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_related_exp_data_set.data_reference", "%s", "str", ""),
             ("_pdbx_related_exp_data_set.metadata_reference", "%s", "str", ""),
             ("_pdbx_related_exp_data_set.data_set_type", "%s", "str", ""),
-            ("_pdbx_related_exp_data_set.details", "%s", "str", "")
+            ("_pdbx_related_exp_data_set.details", "%s", "str", ""),
         ],
         "pdbx_depui_status_flags": [
             # A subset of interesting flags

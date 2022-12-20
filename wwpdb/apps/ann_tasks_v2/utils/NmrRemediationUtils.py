@@ -39,7 +39,7 @@ def starToPdbx(starPath=None, pdbxPath=None):
         if containerList is not None and len(containerList) > 1:
             logger.debug("Input container list is  %r", ([(c.getName(), c.getType()) for c in containerList]))
             for c in containerList:
-                c.setType('data')
+                c.setType("data")
             # myIo.writeFile(pdbxPath, containerList=containerList[1:])
             myIo.writeFile(pdbxPath, containerList=containerList)
             return True

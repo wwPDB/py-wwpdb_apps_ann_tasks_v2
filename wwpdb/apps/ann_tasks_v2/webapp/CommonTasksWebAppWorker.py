@@ -137,6 +137,7 @@ from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 from wwpdb.apps.ann_tasks_v2.utils.TerminalAtoms import TerminalAtoms
 from wwpdb.apps.ann_tasks_v2.validate.Validate import Validate
 from wwpdb.apps.ann_tasks_v2.view3d.ModelViewer3D import ModelViewer3D
+
 #
 try:
     from wwpdb.apps.validation.src.lvw.LVW_GetLOI import LVW_GetLOI
@@ -1984,15 +1985,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
 
         for data_file in data_files:
-            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource,
-                            instance=instance, partNumber=data_file[2])
+            ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource, instance=instance, partNumber=data_file[2])
             if ok:
                 # Get download path and populate dictionary with information
                 downloadPath = du.getWebPath()
                 logging.info(downloadPath)
 
-                mapInfoDictionary = {"url_name": downloadPath,
-                                     "displayName": "{}-{}".format(data_file[0], data_file[2])}
+                mapInfoDictionary = {"url_name": downloadPath, "displayName": "{}-{}".format(data_file[0], data_file[2])}
                 # If data_file == 4 then contour level should be present, I'm sure this could be made more intelligent
                 # Add to dictionary if present
                 if len(data_file) == 4:
@@ -2023,11 +2022,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         self._getSession(useContext=True)
         self._rltvSessionPath = self._sObj.getRelativePath()
 
-        self._lfh.write('launchMolstarDisplayOp started')
+        self._lfh.write("launchMolstarDisplayOp started")
         entryId = self._reqObj.getValue("entryid")
-        self._lfh.write('Entry id = {}'.format(entryId))
+        self._lfh.write("Entry id = {}".format(entryId))
         molstarDisplayDict = self.__molstarDisplay(entryId)
-        self._lfh.write('{}'.format(molstarDisplayDict))
+        self._lfh.write("{}".format(molstarDisplayDict))
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
