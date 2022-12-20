@@ -282,7 +282,7 @@ class NmrChemShiftProcessUtils(object):
                 xyzFilePath = self.__outModelFilePath
             #
             if self.__outCsFilePath and os.access(self.__outCsFilePath, os.R_OK):
-                #csFilePath = self.__outCsFilePath
+                # csFilePath = self.__outCsFilePath
                 # Remediation of legacy files in the system - header of chemical shifts section
 
                 tmpStrFilePath = self.__outCsFilePath + ".str"
@@ -290,7 +290,7 @@ class NmrChemShiftProcessUtils(object):
 
                 remediate_cs_file(self.__outCsFilePath, tmpStrFilePath)
                 starToPdbx(tmpStrFilePath, csFilePath)
-                
+
             #
             self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #

@@ -77,7 +77,6 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             # dp.addInput(name="cs_file_path", value=csInpFilePath)
             dp.addInput(name="cs_file_path", value=csFilePath)
 
-
             dp.op("annot-wwpdb-validate-all")
             dp.expLog(logPath)
             dp.expList(dstPathList=[ofpdf, ofxml, offullpdf, ofpng, ofsvg])
