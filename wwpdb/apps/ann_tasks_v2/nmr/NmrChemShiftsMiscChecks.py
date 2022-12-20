@@ -22,8 +22,10 @@ import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+from wwpdb.apps.ann_tasks_v2.utils.NmrRemediationUtils import remediate_cs_file, starToPdbx
 
 
+# UI appears to no longer invoke - commented out - so blindly fixing
 class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
     """
     NmrChemShiftsMiscChecks class encapsulates miscellaneous checks implemented in the validation pipeline --
@@ -64,7 +66,18 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             # adding explicit selection of steps --
             dp.addInput(name="step_list", value=" coreclust,chemicalshiftanalysis,writexml,writepdf ")
             dp.imp(xyzFilePath)
-            dp.addInput(name="cs_file_path", value=csInpFilePath)
+            # Remediation of legacy files in the system - header of chemical shifts section
+
+            tmpStrFilePath = csInpFilePath + ".str"
+            csFilePath = csInpFilePath + ".cif"
+
+            remediate_cs_file(csInpFilePath, tmpStrFilePath)
+            starToPdbx(tmpStrFilePath, csFilePath)
+
+            # dp.addInput(name="cs_file_path", value=csInpFilePath)
+            dp.addInput(name="cs_file_path", value=csFilePath)
+
+
             dp.op("annot-wwpdb-validate-all")
             dp.expLog(logPath)
             dp.expList(dstPathList=[ofpdf, ofxml, offullpdf, ofpng, ofsvg])

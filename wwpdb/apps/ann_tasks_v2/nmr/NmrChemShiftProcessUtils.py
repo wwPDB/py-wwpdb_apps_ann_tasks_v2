@@ -23,6 +23,7 @@ import traceback
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.apps.ann_tasks_v2.utils.NmrRemediationUtils import remediate_cs_file, starToPdbx
 
 
 class NmrChemShiftProcessUtils(object):
@@ -281,7 +282,15 @@ class NmrChemShiftProcessUtils(object):
                 xyzFilePath = self.__outModelFilePath
             #
             if self.__outCsFilePath and os.access(self.__outCsFilePath, os.R_OK):
-                csFilePath = self.__outCsFilePath
+                #csFilePath = self.__outCsFilePath
+                # Remediation of legacy files in the system - header of chemical shifts section
+
+                tmpStrFilePath = self.__outCsFilePath + ".str"
+                csFilePath = self.__outCsFilePath + ".cif"
+
+                remediate_cs_file(self.__outCsFilePath, tmpStrFilePath)
+                starToPdbx(tmpStrFilePath, csFilePath)
+                
             #
             self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
