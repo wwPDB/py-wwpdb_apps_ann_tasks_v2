@@ -37,7 +37,8 @@ class CorresPNDGenerator(object):
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionPath = self.__sObj.getPath()
         #
-        self.__corres_content = str(self.__reqObj.getValue("full_text"))
+        #self.__corres_content = str(self.__reqObj.getValue("full_text"))
+        self.__corres_content = self.__encodeUtf8ToCif(self.__reqObj.getValue("full_text"))
         #
         # self.__parseForm()
 
@@ -51,6 +52,17 @@ class CorresPNDGenerator(object):
             return "Generated"
         #
         return "No item selected"
+
+    def __encodeUtf8ToCif(self, p_content):
+        """Encoding unicode/utf-8 content into cif friendly ascii
+        Have to replace any ';' that begin a newline with a ' ;' in order to preserve ; matching required for multiline items
+        """
+        if sys.version_info[0] < 3:
+            return p_content.encode("ascii", "xmlcharrefreplace").replace("\n;", "\n ;").replace("\\xa0", " ")
+        else:
+            # Coming in as string already - no need to encode to bytes, however, we would like the xml character replacement
+            return p_content.encode("ascii", "xmlcharrefreplace").decode("ascii").replace("\n;", "\n ;").replace("\\xa0", " ")
+
 
     # def __parseForm(self):
     #     number = int(str(self.__reqObj.getValue("number_question")))
