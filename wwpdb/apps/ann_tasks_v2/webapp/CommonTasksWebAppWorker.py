@@ -529,7 +529,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         return rC
 
     def _makeTaskResponse(self, tssObj):
-
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
 
@@ -1957,7 +1956,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         return bSuccess
 
     def __molstarDisplay(self, entryId, fileSource="archive", instance=None):
-
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         molDisDict = {}
         # map display in binary cif
@@ -2723,7 +2721,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         # if (((entryId is not None) and (len(entryId) > 2)) and ((entryId != myEntryId) or (myD['pdb_id'] is None) or (len(myD['pdb_id']) < 1))):
         if (entryId is not None) and (len(entryId) > 2) and (entryId != myEntryId):
-
             pdbxI = PdbxEntryInfoIo(verbose=self._verbose, log=self._lfh)
             pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
             if useFileVersion == "1":
@@ -2808,7 +2805,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         return rC
 
     def __emListMaps(self, entryId, fileSource="archive"):
-
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker.__emListMaps() map list for %r\n" % entryId)
 
@@ -3609,7 +3605,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 ok = dfa.rcsbEps2Pdbx(filePath, filePath, stripFlag=True, stripEntityFlag=True)
             #
         elif inpContentType == "structure-factors":
-
             if inpFormatType == "mtz" and cnvOp == "mtz2pdbx":
                 dfa = DataFileAdapter(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
 

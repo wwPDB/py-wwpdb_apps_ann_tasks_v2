@@ -754,7 +754,6 @@ class AssemblySelect(object):
             return (None, None, {}, {})
 
         try:
-
             fb = open(ifh, "rb")
             sS = pickle.load(fb)
             pS = pickle.load(fb)
@@ -880,7 +879,6 @@ class AssemblySelect(object):
             cD["set_ser_no"] = int(assemSetId)
             #
             for col in colList[4:-1]:
-
                 if col in ["asa", "bsa", "size", "mmsize"]:
                     cD[col] = int(float(str(assem[col])))
                 elif col in ["int_energy", "diss_energy"]:

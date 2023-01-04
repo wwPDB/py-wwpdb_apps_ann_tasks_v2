@@ -106,7 +106,6 @@ class EmEditUtils(SessionWebDownloadUtils):
         Return the path of a json snipet in session directory containing the header details.
         """
         try:
-
             resultPath = os.path.join(self.__sessionPath, entryId + "_mapfix-header-report_P1.json")
             logPath = os.path.join(self.__sessionPath, entryId + "_mapfix-report_P1.txt")
             #
@@ -191,7 +190,6 @@ class EmEditUtils(SessionWebDownloadUtils):
         #
         #
         for modelKey, opid, eFlag, selectKey in self.__modelKeyList:
-
             if eFlag:
                 oL.append('<tr class="info">')
             else:
@@ -220,7 +218,6 @@ class EmEditUtils(SessionWebDownloadUtils):
             oL.append("</tr>")
         #
         for headerKey, opid, eFlag in self.__headerKeyList:
-
             if eFlag:
                 oL.append('<tr class="info">')
             else:
@@ -273,7 +270,6 @@ class EmEditUtils(SessionWebDownloadUtils):
         Return the path of a json snipet in session directory containing the header details.
         """
         try:
-
             inputMapFilePath = os.path.join(self.__pI.getArchivePath(entryId), inputMapFileName)
             argD = {}
             for tup in self.__headerKeyList:

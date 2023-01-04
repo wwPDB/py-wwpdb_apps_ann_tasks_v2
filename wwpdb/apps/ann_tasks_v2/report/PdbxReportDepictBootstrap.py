@@ -354,8 +354,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         iCol = 0
         self.__markupRow(catName, rD)
         #
-        for (itemName, itemDefault) in self.__st.getItemNameAndDefaultList(catName):
-
+        for itemName, itemDefault in self.__st.getItemNameAndDefaultList(catName):
             if itemName in rD:
                 itemValue = rD[itemName]
             else:
@@ -392,7 +391,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         """Render a row in a multirow table."""
         oL.append("<tr>")
         #
-        for (itemName, itemDefault) in self.__st.getItemNameAndDefaultList(catName):
+        for itemName, itemDefault in self.__st.getItemNameAndDefaultList(catName):
             if insertDefault:
                 itemValue = itemDefault
             elif itemName in row:

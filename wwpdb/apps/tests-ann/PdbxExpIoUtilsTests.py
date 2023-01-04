@@ -341,7 +341,6 @@ def suiteNameTests():
 
 
 if __name__ == "__main__":
-
     mySuite = suiteReadWriteTests()
     unittest.TextTestRunner(verbosity=2).run(mySuite)
 
