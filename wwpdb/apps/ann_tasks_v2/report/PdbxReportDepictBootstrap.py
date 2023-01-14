@@ -61,6 +61,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             self.__reportCategories = [
                 ("pdbx_data_processing_status", "Data Processing Skip Tasks", "row-wise"),
                 ("exptl", "Experimental", "row-wise"),
+                ("pdbx_related_exp_data_set", "Related Exp Data", "row-wise"),
                 ("pdbx_database_status", "PDB Status", "row-wise"),
                 ("em_admin", "EM admin", "row-wise"),
                 ("em_experiment", "EM experiment", "row-wise"),
@@ -353,8 +354,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         iCol = 0
         self.__markupRow(catName, rD)
         #
-        for (itemName, itemDefault) in self.__st.getItemNameAndDefaultList(catName):
-
+        for itemName, itemDefault in self.__st.getItemNameAndDefaultList(catName):
             if itemName in rD:
                 itemValue = rD[itemName]
             else:
@@ -391,7 +391,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         """Render a row in a multirow table."""
         oL.append("<tr>")
         #
-        for (itemName, itemDefault) in self.__st.getItemNameAndDefaultList(catName):
+        for itemName, itemDefault in self.__st.getItemNameAndDefaultList(catName):
             if insertDefault:
                 itemValue = itemDefault
             elif itemName in row:

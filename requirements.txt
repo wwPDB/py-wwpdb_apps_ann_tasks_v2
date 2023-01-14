@@ -3,6 +3,7 @@ wwpdb.apps.wf_engine
 wwpdb.io
 wwpdb.utils.db
 wwpdb.utils.emdb
+wwpdb.utils.nmr
 wwpdb.utils.wf
 wwpdb.utils.session
 mmcif

@@ -700,7 +700,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             if self._verbose:
                 self._lfh.write("+StatusUpdateWebAppWorker._statusReloadOp() wf load completed %r\n" % ok1)
             if ok1:
-
                 status1 = killAllWF(idCode, "statMod")
                 if self._verbose:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusReloadOp() killallwf returns %r\n" % status1)

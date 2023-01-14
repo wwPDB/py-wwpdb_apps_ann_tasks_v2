@@ -52,6 +52,7 @@ setup(
         "mmcif >= 0.25",
         "wwpdb.utils.dp ~= 0.19",
         "wwpdb.utils.detach",
+        "wwpdb.utils.nmr >= 0.24",
         "mmcif.utils ~= 0.22",
         "matplotlib",
         "pygal",

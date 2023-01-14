@@ -30,6 +30,7 @@ import traceback
 from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+from wwpdb.apps.ann_tasks_v2.utils.NmrRemediationUtils import remediate_cs_file, starToPdbx
 
 
 class Validate(SessionWebDownloadUtils):
@@ -92,16 +93,27 @@ class Validate(SessionWebDownloadUtils):
             else:
                 sfPath = os.path.join(self.__sessionPath, reflnInputFile)
 
+            nmrdata = False
             if csInputFile is None:
                 csFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 csPath = os.path.join(self.__sessionPath, csFileName)
+                nmrdata = True
                 if not os.access(csPath, os.R_OK):
                     # Fallback on cs file
                     csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                     csPath = os.path.join(self.__sessionPath, csFileName)
+                    nmrdata = False
             else:
                 csPath = os.path.join(self.__sessionPath, csInputFile)
             #
+            # Redmediate legacy CS files 2022-12-05
+            if nmrdata is False and os.access(csPath, os.R_OK):
+                tmpfile1 = csPath + ".str"
+                tmpfile2 = csPath + ".cif"
+                remediate_cs_file(csPath, tmpfile1)
+                starToPdbx(tmpfile1, tmpfile2)
+                csPath = tmpfile2
+
             if restraintInputFile is None:
                 restraintFileName = pI.getFileName(entryId, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
                 resPath = os.path.join(self.__sessionPath, restraintFileName)
