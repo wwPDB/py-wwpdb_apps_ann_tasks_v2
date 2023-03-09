@@ -481,7 +481,18 @@ class CorresPNDTemplate(object):
                 + myD["letter_footer"]
             )
         else:
-            myD["full_text"] = myD["letter_header"] + myD["letter_encourage"] + "\n\n" + myD["minor"] + "\n\n" + minor_text + "\n\n" + myD["minor_release"] + "\n\n" + myD["letter_footer"]
+            myD["full_text"] = (
+                myD["letter_header"]
+                + myD["letter_encourage"]
+                + "\n\n"
+                + myD["minor"]
+                + "\n\n"
+                + minor_text
+                + "\n\n"
+                + myD["minor_release"]
+                + "\n\n"
+                + myD["letter_footer"]
+            )
         flist = myD["full_text"].split("\n")
         myD["rows"] = str(len(flist))
         #
@@ -647,7 +658,6 @@ class CorresPNDTemplate(object):
 
         # Not EM and not NMR -- Xray
         return self.__letterTemplateMap["encourage_xray"]
-
 
     def __getRelaseInfo(self):
         text = ""
