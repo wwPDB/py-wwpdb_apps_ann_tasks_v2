@@ -448,6 +448,10 @@ class CorresPNDTemplate(object):
         #
         myD = {}
         myD["letter_header"] = self.__getHeader()
+
+        enc = self.__getEncourage()
+        myD["letter_encourage"] = "\n\n" + enc if enc else ""
+
         myD["major"] = self.__letterTemplateMap["major"]
         myD["major_release"] = self.__letterTemplateMap["major_release"]
         myD["major_minor_addition"] = self.__letterTemplateMap["major_minor_addition"]
@@ -462,6 +466,7 @@ class CorresPNDTemplate(object):
         elif major_text != "":
             myD["full_text"] = (
                 myD["letter_header"]
+                + myD["letter_encourage"]
                 + "\n\n"
                 + myD["major"]
                 + "\n\n"
@@ -476,7 +481,7 @@ class CorresPNDTemplate(object):
                 + myD["letter_footer"]
             )
         else:
-            myD["full_text"] = myD["letter_header"] + "\n\n" + myD["minor"] + "\n\n" + minor_text + "\n\n" + myD["minor_release"] + "\n\n" + myD["letter_footer"]
+            myD["full_text"] = myD["letter_header"] + myD["letter_encourage"] + "\n\n" + myD["minor"] + "\n\n" + minor_text + "\n\n" + myD["minor_release"] + "\n\n" + myD["letter_footer"]
         flist = myD["full_text"].split("\n")
         myD["rows"] = str(len(flist))
         #
@@ -622,6 +627,27 @@ class CorresPNDTemplate(object):
                 return self.__letterTemplateMap["letter_em_only"] % myD
         else:
             return self.__letterTemplateMap["header"] % myD
+
+    def __getEncourage(self):
+        myD = {}
+        for item in ("pdbid", "emdbid", "nmr_entry", "status_em"):
+            myD[item] = self.__corresInfo.get(item, "")
+
+        if len(myD["nmr_entry"]) > 0:
+            print("NMR ENTRY - no encouragement")
+            return None
+
+        if myD["emdbid"]:
+            if myD["status_em"]:
+                # map only or map + model
+                return self.__letterTemplateMap["encourage_em"]
+            else:
+                # EM model only
+                return None
+
+        # Not EM and not NMR -- Xray
+        return self.__letterTemplateMap["encourage_xray"]
+
 
     def __getRelaseInfo(self):
         text = ""
