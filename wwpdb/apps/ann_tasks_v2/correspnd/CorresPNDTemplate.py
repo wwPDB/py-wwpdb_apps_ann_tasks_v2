@@ -462,6 +462,7 @@ class CorresPNDTemplate(object):
         myD["text_map"] = self.__javascript_text_mapping
         self.__lfh.write("__javascript_text_mapping=%s\n" % self.__javascript_text_mapping)
         if self.__EmMapOnly:
+            # For map only deposition, encouragement is in the header already.
             myD["full_text"] = myD["letter_header"]
         elif major_text != "":
             myD["full_text"] = (
