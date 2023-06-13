@@ -126,8 +126,10 @@ class Check(PublicPdbxFile):
             self.addDownloadPath(logPath)
             #
             if self._verbose:
-                self._lfh.write("+%s.%s dictionary check version %s completed for entryId %s file %s report %s size %d\n" % (self.__class__.__name__, \
-                          inspect.currentframe().f_code.co_name, self.__dictionaryVersion, entryId, inpPath, self.__reportPath, self.__reportFileSize))
+                self._lfh.write(
+                    "+%s.%s dictionary check version %s completed for entryId %s file %s report %s size %d\n"
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self.__dictionaryVersion, entryId, inpPath, self.__reportPath, self.__reportFileSize)
+                )
             #
             if self._cleanup:
                 dp.cleanup()

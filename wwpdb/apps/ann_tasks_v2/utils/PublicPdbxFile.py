@@ -39,41 +39,40 @@ class PublicPdbxFile(SessionWebDownloadUtils):
         self._debug = False
         self.__setup()
         #
-        self.__opMap = { "annot-cif-to-public-pdbx": ( "_model-review_P1.cif", "-public_cif.log" ), \
-                         "cif2pdbx-ext": ( "_model-next_P1.cif", "_cif2pdbx-next.log" ), \
-                         "cif2pdbx-public": ( "_model-v4-pubic_P1.cif", "_cif2pdbx-pubic.log" ) }
+        self.__opMap = {
+            "annot-cif-to-public-pdbx": ("_model-review_P1.cif", "-public_cif.log"),
+            "cif2pdbx-ext": ("_model-next_P1.cif", "_cif2pdbx-next.log"),
+            "cif2pdbx-public": ("_model-v4-pubic_P1.cif", "_cif2pdbx-pubic.log"),
+        }
         #
 
     def __setup(self):
         self._siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
         self._sessionPath = self.__sObj.getPath()
-        self._exportPath = self._sessionPath
+        self._exportPath = self._sessionPath  # pylint: disable=attribute-defined-outside-init
         self._cleanup = False
 
     def setExportPath(self, exportPath):
-        """ Set the path where output files are copyied.
-        """
-        self._exportPath = exportPath
+        """Set the path where output files are copyied."""
+        self._exportPath = exportPath  # pylint: disable=attribute-defined-outside-init
 
-    def run(self, entryId, inpFile):
-        """ Create review model file
-        """
-        inpPath = os.path.join(self._sessionPath, inpFile)
-        if self.run_conversion("annot-cif-to-public-pdbx", entryId, inpPath):
+    def run(self, entryId, inpPath):
+        """Create review model file"""
+        full_inpPath = os.path.join(self._sessionPath, inpPath)
+        if self.run_conversion("annot-cif-to-public-pdbx", entryId, full_inpPath):
             return True
         #
         return False
 
     def run_conversion(self, op, entryId, inpPath):
-        """ Run conversion.
-        """
+        """Run conversion."""
         try:
             if op not in self.__opMap:
                 return
             #
             pdbxPath = os.path.join(self._exportPath, entryId + self.__opMap[op][0])
-            logPath  = os.path.join(self._exportPath, entryId + self.__opMap[op][1])
+            logPath = os.path.join(self._exportPath, entryId + self.__opMap[op][1])
             #
             for filePath in (pdbxPath, logPath):
                 if os.access(filePath, os.R_OK):
@@ -97,8 +96,7 @@ class PublicPdbxFile(SessionWebDownloadUtils):
                 self.addDownloadPath(logPath)
             #
             if self._verbose:
-                self._lfh.write("+%s.%s  creating public cif for entryId %s file %s\n" % (self.__class__.__name__, \
-                                 inspect.currentframe().f_code.co_name, entryId, inpPath))
+                self._lfh.write("+%s.%s  creating public cif for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
             #
             if self._cleanup:
                 dp.cleanup()
@@ -106,8 +104,7 @@ class PublicPdbxFile(SessionWebDownloadUtils):
             return pdbxPath
         except:  # noqa: E722 pylint: disable=bare-except
             if self._verbose:
-                self._lfh.write("+%s.%s public cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, \
-                                inspect.currentframe().f_code.co_name, entryId, inpPath))
+                self._lfh.write("+%s.%s public cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath))
             #
             traceback.print_exc(file=self._lfh)
         #

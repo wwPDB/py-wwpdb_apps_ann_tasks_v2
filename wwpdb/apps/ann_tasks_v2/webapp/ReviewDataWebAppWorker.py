@@ -296,7 +296,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 # 'cif2pdb',
                 "check-special-position",
                 "check-emd-xml",
-                "check-em-map"
+                "check-em-map",
             ]
             _aTagList = self._makeCheckReports([idCode], operationList=opList)  # noqa: F841
         #

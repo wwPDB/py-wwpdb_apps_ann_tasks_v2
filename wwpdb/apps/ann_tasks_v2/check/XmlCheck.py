@@ -34,16 +34,15 @@ class XmlCheck(PublicPdbxFile):
         super(XmlCheck, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__reportPath = None
         self.__reportFileSize = 0
-        self.__checkArgs = None
+        self.__checkArgs = None  # pylint: disable=unused-private-member
         self.__publicCifPath = None
         self.__xmlPath = None
 
     def setArguments(self, checkArgs):
-        self.__checkArgs = checkArgs
+        self.__checkArgs = checkArgs  # pylint: disable=unused-private-member
 
     def run(self, entryId, inpPath, publicCIFlag=True):
-        """ Run the PDBML/XML check on the input PDBx/mmCIF data file
-        """
+        """Run the PDBML/XML check on the input PDBx/mmCIF data file"""
         try:
             self.clearFileList()
             #
@@ -66,8 +65,10 @@ class XmlCheck(PublicPdbxFile):
             self.__checkXMLFile(entryId, "annot-check-xml-xmllint")
             self.__checkXMLFile(entryId, "annot-check-xml-stdinparse")
             if self._verbose:
-                self._lfh.write("+%s.%s PDBML XML check completed for entryId %s file %s report %s size %d\n" % (self.__class__.__name__, \
-                          inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportPath, self.__reportFileSize))
+                self._lfh.write(
+                    "+%s.%s PDBML XML check completed for entryId %s file %s report %s size %d\n"
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportPath, self.__reportFileSize)
+                )
             #
         except:  # noqa: E722 pylint: disable=bare-except
             if self._verbose:
@@ -83,8 +84,7 @@ class XmlCheck(PublicPdbxFile):
         return self.__reportPath
 
     def __generateXMLFile(self, entryId):
-        """ Generate noatom xml file
-        """
+        """Generate noatom xml file"""
         try:
             outputList = []
             outputList.append(os.path.join(self._exportPath, self.__publicCifPath + ".xml-noatom"))
@@ -111,15 +111,15 @@ class XmlCheck(PublicPdbxFile):
             #
         except:  # noqa: E722 pylint: disable=bare-except
             if self._verbose:
-                self._lfh.write("+%s.%s XML conversion failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, \
-                                entryId, self.__publicCifPath))
+                self._lfh.write(
+                    "+%s.%s XML conversion failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, self.__publicCifPath)
+                )
             #
             traceback.print_exc(file=self._lfh)
         #
 
     def __checkXMLFile(self, entryId, op):
-        """ Check noatom xml file
-        """
+        """Check noatom xml file"""
         try:
             if (not self.__xmlPath) or (not os.access(self.__xmlPath, os.R_OK)):
                 return
@@ -171,8 +171,9 @@ class XmlCheck(PublicPdbxFile):
             #
         except:  # noqa: E722 pylint: disable=bare-except
             if self._verbose:
-                self._lfh.write("+%s.%s XML (%s) checking failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, \
-                                op, entryId, self.__xmlPath))
+                self._lfh.write(
+                    "+%s.%s XML (%s) checking failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, op, entryId, self.__xmlPath)
+                )
             #
             traceback.print_exc(file=self._lfh)
         #

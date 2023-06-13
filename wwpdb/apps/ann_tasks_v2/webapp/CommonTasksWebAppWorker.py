@@ -2426,14 +2426,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if "checkxml" in operationList:
                 self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml\n")
 
-                chk = XmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-                pdbxPath = os.path.join(self._sessionPath, entryId + "_model-next_P1.cif") 
+                xchk = XmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                pdbxPath = os.path.join(self._sessionPath, entryId + "_model-next_P1.cif")
                 if os.access(pdbxPath, os.R_OK):
                     self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml using %s\n" % pdbxPath)
-                    chk.run(entryId=entryId, inpPath=pdbxPath, publicCIFlag=True)
+                    xchk.run(entryId=entryId, inpPath=pdbxPath, publicCIFlag=True)
                 else:
                     self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml using %s\n" % modelFilePath)
-                    chk.run(entryId=entryId, inpPath=modelFilePath, publicCIFlag=False)
+                    xchk.run(entryId=entryId, inpPath=modelFilePath, publicCIFlag=False)
                 #
                 rptPath = chk.getReportPath()
                 hasDiags = chk.getReportSize() > 0
@@ -2480,7 +2480,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     aTagList.append(duL.getAnchorTag())
 
             if "check-emd-xml" in operationList:
-                print("XXXXXXXXXX About to start")
                 try:
                     chk = EmdXmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                     chk.run(entryId=entryId, modelInputFile=modelFilePath)
@@ -2627,14 +2626,25 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "check-special-position": "special-position-report",
             "cif2pdb": "model-pdb",
             "check-emd-xml": "emd-xml-header-report",
-            "check-em-map": "em-map-check-report"
+            "check-em-map": "em-map-check-report",
         }
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         if operation in ["check-all"]:
-            opList = ["cif2pdb", "checkv5", "checkNext", "checkxml", "check-format", "check-misc", "check-geometry", "check-special-position", \
-                      "check-sf", "check-emd-xml", "check-em-map"]
+            opList = [
+                "cif2pdb",
+                "checkv5",
+                "checkNext",
+                "checkxml",
+                "check-format",
+                "check-misc",
+                "check-geometry",
+                "check-special-position",
+                "check-sf",
+                "check-emd-xml",
+                "check-em-map",
+            ]
             aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource, useFileVersions=useFileVersions)
             cTList = ["model"]
             cTList.extend(sorted(opCtD.values()))

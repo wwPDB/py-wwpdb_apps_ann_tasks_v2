@@ -27,6 +27,7 @@ from wwpdb.io.locator.PathInfo import PathInfo
 
 logger = logging.getLogger()
 
+
 class EmMapCheck(SessionWebDownloadUtils):
     """
     Encapsulates checking consistencies between em_map category vs. map files in archival directory
@@ -82,8 +83,10 @@ class EmMapCheck(SessionWebDownloadUtils):
                 self.addDownloadPath(self.__reportPath)
             #
             if self.__verbose:
-                self.__lfh.write("+%s.%s em_map check completed for entryId %s file %s report %s size %d\n" % (self.__class__.__name__, \
-                          inspect.currentframe().f_code.co_name, entryId, modelInputFile, self.__reportPath, self.__reportFileSize))
+                self.__lfh.write(
+                    "+%s.%s em_map check completed for entryId %s file %s report %s size %d\n"
+                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, modelInputFile, self.__reportPath, self.__reportFileSize)
+                )
             #
         except Exception as e:
             if self.__verbose:
@@ -106,20 +109,19 @@ class EmMapCheck(SessionWebDownloadUtils):
             return 0
         #
 
+
 class EmMapCheckTask(object):
-    """
-    """
+    """ """
+
     def __init__(self, siteId=None, sessionPath=None, verbose=False, log=sys.stderr):
-        """
-        """
+        """ """
         self.__siteId = siteId
         self.__sessionPath = sessionPath
         self.__verbose = verbose
         self.__lfh = log
 
     def run(self, entryId, modelInputFile, reportPath):
-        """
-        """
+        """ """
         # Test if em_admin present in model
         ioObj = IoAdapterCore(verbose=self.__verbose, log=self.__lfh)
         dIn = ioObj.readFile(inputFilePath=modelInputFile, selectList=["em_admin", "em_map"])
@@ -155,11 +157,21 @@ class EmMapCheckTask(object):
         pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
         #
         archivalMapList = []
-        for mapType in ( "em-3d-classification-additional-volume", "em-additional-volume", "em-alignment-mask-volume", \
-                     "em-focus-refinement-additional-volume", "em-focused-refinement-mask-volume", "em-fsc-half-mask-volume", \
-                     "em-fsc-map-model-mask-volume", "em-half-volume", "em-mask-volume", "em-raw-volume", "em-segmentation-volume", "em-volume" ):
-            archiveFilePath = pI.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=mapType, formatType="map", fileSource="archive", \
-                                             versionId="latest", partNumber="1")
+        for mapType in (
+            "em-3d-classification-additional-volume",
+            "em-additional-volume",
+            "em-alignment-mask-volume",
+            "em-focus-refinement-additional-volume",
+            "em-focused-refinement-mask-volume",
+            "em-fsc-half-mask-volume",
+            "em-fsc-map-model-mask-volume",
+            "em-half-volume",
+            "em-mask-volume",
+            "em-raw-volume",
+            "em-segmentation-volume",
+            "em-volume",
+        ):
+            archiveFilePath = pI.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=mapType, formatType="map", fileSource="archive", versionId="latest", partNumber="1")
             if archiveFilePath and os.access(archiveFilePath, os.F_OK):
                 (_dir, fileName) = os.path.split(archiveFilePath)
                 archivalMapList.append(fileName)
@@ -173,20 +185,18 @@ class EmMapCheckTask(object):
             if os.access(os.path.join(archivePath, mapFileName), os.F_OK):
                 continue
             #
-            oth.write("Map file '%s' defined in 'em_map' category of model file '%s' can not be found in archive directory.\n" % \
-                     ( mapFileName, modelFileName )) 
+            oth.write("Map file '%s' defined in 'em_map' category of model file '%s' can not be found in archive directory.\n" % (mapFileName, modelFileName))
         #
         for mapFileName in archivalMapList:
             if mapFileName in recordedMapList:
                 continue
             #
-            oth.write("Map file '%s' is not included in 'em_map' category of model file '%s'.\n" % ( mapFileName, modelFileName )) 
+            oth.write("Map file '%s' is not included in 'em_map' category of model file '%s'.\n" % (mapFileName, modelFileName))
         #
         oth.close()
 
     def __getValueList(self, catObj):
-        """
-        """
+        """ """
         valueList = []
         attribList = catObj.getAttributeList()
         rowList = catObj.getRowList()
