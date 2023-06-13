@@ -5,6 +5,7 @@
 # Update:
 # 28-Feb -2014  jdw Add base class
 # 4-Jun-2014    jdw Added V4 dictionary argument --
+# 25-May-2023   zf  Added run_conversion() method to generate different flavor of public PDBx/mmCIF files
 ##
 """
 Generate public pdbx cif file.
@@ -20,6 +21,7 @@ import os
 import os.path
 import sys
 import traceback
+import inspect
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
@@ -31,37 +33,82 @@ class PublicPdbxFile(SessionWebDownloadUtils):
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(PublicPdbxFile, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
-        self.__verbose = verbose
-        self.__lfh = log
+        self._verbose = verbose
+        self._lfh = log
         self.__reqObj = reqObj
+        self._debug = False
         self.__setup()
-
-    def __setup(self):
-        self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__sObj = self.__reqObj.getSessionObj()
-        self.__sessionPath = self.__sObj.getPath()
+        #
+        self.__opMap = { "annot-cif-to-public-pdbx": ( "_model-review_P1.cif", "-public_cif.log" ), \
+                         "cif2pdbx-ext": ( "_model-next_P1.cif", "_cif2pdbx-next.log" ), \
+                         "cif2pdbx-public": ( "_model-v4-pubic_P1.cif", "_cif2pdbx-pubic.log" ) }
         #
 
+    def __setup(self):
+        self._siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
+        self.__sObj = self.__reqObj.getSessionObj()
+        self._sessionPath = self.__sObj.getPath()
+        self._exportPath = self._sessionPath
+        self._cleanup = False
+
+    def setExportPath(self, exportPath):
+        """ Set the path where output files are copyied.
+        """
+        self._exportPath = exportPath
+
     def run(self, entryId, inpFile):
-        """Run conversion."""
+        """ Create review model file
+        """
+        inpPath = os.path.join(self._sessionPath, inpFile)
+        if self.run_conversion("annot-cif-to-public-pdbx", entryId, inpPath):
+            return True
+        #
+        return False
+
+    def run_conversion(self, op, entryId, inpPath):
+        """ Run conversion.
+        """
         try:
-            inpPath = os.path.join(self.__sessionPath, inpFile)
-            logPath = os.path.join(self.__sessionPath, entryId + "-public_cif.log")
-            retPath = os.path.join(self.__sessionPath, entryId + "_model-review_P1.cif")
+            if op not in self.__opMap:
+                return
             #
-            for filePath in (logPath, retPath):
+            pdbxPath = os.path.join(self._exportPath, entryId + self.__opMap[op][0])
+            logPath  = os.path.join(self._exportPath, entryId + self.__opMap[op][1])
+            #
+            for filePath in (pdbxPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
             #
-            dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
-            dp.imp(inpPath)
-            dp.op("annot-cif-to-public-pdbx")
-            dp.exp(retPath)
-            dp.expLog(logPath)
-            dp.cleanup()
+            dp = RcsbDpUtility(tmpPath=self._sessionPath, siteId=self._siteId, verbose=self._verbose, log=self._lfh)
+            if self._debug:
+                dp.setDebugMode(flag=True)
             #
-            return True
+            dp.imp(inpPath)
+            if op == "cif2pdbx-ext":
+                dp.addInput(name="destination", value="archive_next")
+            #
+            dp.op(op)
+            dp.exp(pdbxPath)
+            dp.expLog(logPath)
+            #
+            if op != "annot-cif-to-public-pdbx":
+                self.addDownloadPath(pdbxPath)
+                self.addDownloadPath(logPath)
+            #
+            if self._verbose:
+                self._lfh.write("+%s.%s  creating public cif for entryId %s file %s\n" % (self.__class__.__name__, \
+                                 inspect.currentframe().f_code.co_name, entryId, inpPath))
+            #
+            if self._cleanup:
+                dp.cleanup()
+            #
+            return pdbxPath
         except:  # noqa: E722 pylint: disable=bare-except
-            traceback.print_exc(file=self.__lfh)
-            return False
+            if self._verbose:
+                self._lfh.write("+%s.%s public cif conversion failed for entryId %s file %s\n" % (self.__class__.__name__, \
+                                inspect.currentframe().f_code.co_name, entryId, inpPath))
+            #
+            traceback.print_exc(file=self._lfh)
+        #
+        return None

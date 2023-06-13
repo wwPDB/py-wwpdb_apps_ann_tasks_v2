@@ -168,14 +168,15 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 chk.setDictionaryVersion(version="archive_next")
             chk.run(entryId=idCode, inpPath=filePath)
             hasDiags = chk.getReportSize() > 0
+            rptPath = chk.getReportPath()
+            duL = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
             if hasDiags:
-                rptPath = chk.getReportPath()
-                duL = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
                 duL.copyToDownload(rptPath)
                 aTagList.append(duL.getAnchorTag())
                 rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
                 rC.setStatus(statusMsg="Check completed")
             else:
+                duL.removeFromDownload(rptPath)
                 rC.setStatus(statusMsg="No diagnostics for %s" % fileName)
 
         if hasDiags and operation in ["updatewithcheck"]:
@@ -295,6 +296,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 # 'cif2pdb',
                 "check-special-position",
                 "check-emd-xml",
+                "check-em-map"
             ]
             _aTagList = self._makeCheckReports([idCode], operationList=opList)  # noqa: F841
         #
@@ -310,8 +312,10 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             "misc-check-report",
             "format-check-report",
             "dict-check-report",
+            "xml-check-report",
             # 'model-pdb',
             "emd-xml-header-report",
+            "em-map-check-report",
             "downloads",
         ]
         reportD = self._renderCheckReports(idCode, fileSource=fileSource, instance=instance, contentTypeList=cTL)

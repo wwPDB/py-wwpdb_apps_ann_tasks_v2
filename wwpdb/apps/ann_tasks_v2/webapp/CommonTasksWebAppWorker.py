@@ -80,7 +80,9 @@ from wwpdb.utils.wf.WfDataObject import WfDataObject
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblyInput import AssemblyInput
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from wwpdb.apps.ann_tasks_v2.check.Check import Check
+from wwpdb.apps.ann_tasks_v2.check.XmlCheck import XmlCheck
 from wwpdb.apps.ann_tasks_v2.check.EmdXmlCheck import EmdXmlCheck
+from wwpdb.apps.ann_tasks_v2.check.EmMapCheck import EmMapCheck
 from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
 from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
 from wwpdb.apps.ann_tasks_v2.check.GeometryCalc import GeometryCalc
@@ -1599,6 +1601,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         pth = de.copyToSession(contentType="dict-check-report", formatType="txt", version="latest", partitionNumber=1)
         #
+        # PDBML XML check file
+        #
+        pth = de.copyToSession(contentType="xml-check-report", formatType="txt", version="latest", partitionNumber=1)
+        #
         #  Handle maps if input option is set --
         if getMaps:
             pth = de.copyToSession(contentType="map-2fofc", formatType="map", version="latest", partitionNumber=1)
@@ -2044,6 +2050,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         'dict-check-report'           :  (['txt'], 'dict-check-report'),
         'dict-check-report-r4'        :  (['txt'], 'dict-check-report-r4'),
         'dict-check-report-next'      :  (['txt'], 'dict-check-report-next'),
+        'xml-check-report'            :  (['txt'], 'xml-check-report'),
         'format-check-report'         :  (['txt'], 'format-check-report'),
         'misc-check-report'           :  (['txt'], 'misc-check-report'),
         'special-position-report'     :  (['txt'], 'special-position-report'),
@@ -2070,8 +2077,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "dict-check-report",
             "dict-check-report-r4",
             "dict-check-report-next",
+            "xml-check-report",
             "special-position-report",
             "emd-xml-header-report",
+            "em-map-check-report",
             "downloads",
         ]:
             myD[ky] = None
@@ -2174,6 +2183,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 else:
                     # myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
                     myD[cT] = self.__getMessageTextWithMarkup("")
+            elif cT == "xml-check-report":
+                # Dictionary check report
+                ok = du.fetchId(entryId, contentType="xml-check-report", formatType="txt", fileSource=fileSource, instance=instance)
+                if ok:
+                    downloadPath = du.getDownloadPath()
+                    aTagList.append(du.getAnchorTag())
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                else:
+                    myD[cT] = self.__getMessageTextWithMarkup("")
             elif cT == "dict-check-report-r4":
                 # Dictionary check report
                 ok = du.fetchId(entryId, contentType="dict-check-report-r4", formatType="txt", fileSource=fileSource, instance=instance)
@@ -2193,6 +2211,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
                     # myD[cT] = self.__getMessageTextWithMarkup('No dictionary check issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup("")
+            elif cT == "xml-check-report":
+                # Xml check report
+                ok = du.fetchId(entryId, contentType="xml-check-report", formatType="txt", fileSource=fileSource, instance=instance)
+                if ok:
+                    downloadPath = du.getDownloadPath()
+                    aTagList.append(du.getAnchorTag())
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                else:
+                    # myD[cT] = self.__getMessageTextWithMarkup('No xml check issues.')
                     myD[cT] = self.__getMessageTextWithMarkup("")
             elif cT == "special-position-report":
                 #
@@ -2216,6 +2244,16 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
                     # myD[cT] = self.__getMessageTextWithMarkup('No XML generation report.')
+                    myD[cT] = self.__getMessageTextWithMarkup("")
+
+            elif cT == "em-map-check-report":
+                # em_map checking report
+                ok = du.fetchId(entryId, contentType="em-map-check-report", formatType="txt", fileSource=fileSource, instance=instance)
+                if ok:
+                    downloadPath = du.getDownloadPath()
+                    aTagList.append(du.getAnchorTag())
+                    myD[cT] = self.__getFileTextWithMarkup(downloadPath)
+                else:
                     myD[cT] = self.__getMessageTextWithMarkup("")
 
         # downloads
@@ -2305,12 +2343,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         'dict-check-report'           :  (['txt'], 'dict-check-report'),
         'dict-check-report-r4'        :  (['txt'], 'dict-check-report-r4'),
         'dict-check-report-next'      :  (['txt'], 'dict-check-report-next'),
+        'xml-check-report'            :  (['txt'], 'xml-check-report'),
         'format-check-report'         :  (['txt'], 'format-check-report'),
         'misc-check-report'           :  (['txt'], 'misc-check-report'),
         'special-position-report'     :  (['txt'], 'special-position-report'),
         'dcc-report'                  :  (['pdbx','txt'], 'dcc-report'),
         'geometry-check-report'       :  (['pdbx'],'geometry-check-report'),
         'emd-xml-header-report'       :  (['txt'], 'emd-xml-header-report'),
+        'em-map-check-report'         :  (['txt'], 'em-map-check-report'),
 
         """
         #
@@ -2348,21 +2388,25 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 chk.setCheckFirstBlock(True)
 
                 chk.run(entryId=entryId, inpPath=modelFilePath)
+                rptPath = chk.getReportPath()
                 hasDiags = chk.getReportSize() > 0
                 if hasDiags:
-                    rptPath = chk.getReportPath()
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
+                else:
+                    duL.removeFromDownload(rptPath)
 
             if "checkv4" in operationList:
                 chk = Check(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 chk.setDictionaryVersion(version="V4")
                 chk.run(entryId=entryId, inpPath=modelFilePath)
+                rptPath = chk.getReportPath()
                 hasDiags = chk.getReportSize() > 0
                 if hasDiags:
-                    rptPath = chk.getReportPath()
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
+                else:
+                    duL.removeFromDownload(rptPath)
 
             if "checkNext" in operationList:
                 self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkNext\n")
@@ -2371,11 +2415,33 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # Public check - should have first block only
                 chk.setDictionaryVersion(version="archive_next")
                 chk.run(entryId=entryId, inpPath=modelFilePath)
+                rptPath = chk.getReportPath()
                 hasDiags = chk.getReportSize() > 0
                 if hasDiags:
-                    rptPath = chk.getReportPath()
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
+                else:
+                    duL.removeFromDownload(rptPath)
+
+            if "checkxml" in operationList:
+                self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml\n")
+
+                chk = XmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                pdbxPath = os.path.join(self._sessionPath, entryId + "_model-next_P1.cif") 
+                if os.access(pdbxPath, os.R_OK):
+                    self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml using %s\n" % pdbxPath)
+                    chk.run(entryId=entryId, inpPath=pdbxPath, publicCIFlag=True)
+                else:
+                    self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml using %s\n" % modelFilePath)
+                    chk.run(entryId=entryId, inpPath=modelFilePath, publicCIFlag=False)
+                #
+                rptPath = chk.getReportPath()
+                hasDiags = chk.getReportSize() > 0
+                if hasDiags:
+                    duL.copyToDownload(rptPath)
+                    aTagList.append(duL.getAnchorTag())
+                else:
+                    duL.removeFromDownload(rptPath)
 
             if "check-format" in operationList:
                 chk = FormatCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -2414,11 +2480,26 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     aTagList.append(duL.getAnchorTag())
 
             if "check-emd-xml" in operationList:
+                print("XXXXXXXXXX About to start")
                 try:
                     chk = EmdXmlCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                     chk.run(entryId=entryId, modelInputFile=modelFilePath)
                 except Exception as e:
                     logger.error("Error running EmdXmlCheck %s", e)
+                hasDiags = chk.getReportSize() > 0
+                rptPath = chk.getReportPath()
+                if hasDiags:
+                    duL.copyToDownload(rptPath)
+                    aTagList.append(duL.getAnchorTag())
+                else:
+                    duL.removeFromDownload(rptPath)
+
+            if "check-em-map" in operationList:
+                try:
+                    chk = EmMapCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                    chk.run(entryId=entryId, modelInputFile=modelFilePath)
+                except Exception as e:
+                    logger.error("Error running EmMapCheck %s", e)
                 hasDiags = chk.getReportSize() > 0
                 rptPath = chk.getReportPath()
                 if hasDiags:
@@ -2538,6 +2619,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "checkv5": "dict-check-report",
             # 'checkv4': 'dict-check-report-r4',
             "checkNext": "dict-check-report-next",
+            "checkxml": "xml-check-report",
             "check-misc": "misc-check-report",
             "check-format": "format-check-report",
             "check-geometry": "geometry-check-report",
@@ -2545,12 +2627,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "check-special-position": "special-position-report",
             "cif2pdb": "model-pdb",
             "check-emd-xml": "emd-xml-header-report",
+            "check-em-map": "em-map-check-report"
         }
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
         if operation in ["check-all"]:
-            opList = ["cif2pdb", "checkv5", "checkNext", "check-format", "check-misc", "check-geometry", "check-special-position", "check-sf", "check-emd-xml"]
+            opList = ["cif2pdb", "checkv5", "checkNext", "checkxml", "check-format", "check-misc", "check-geometry", "check-special-position", \
+                      "check-sf", "check-emd-xml", "check-em-map"]
             aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource, useFileVersions=useFileVersions)
             cTList = ["model"]
             cTList.extend(sorted(opCtD.values()))

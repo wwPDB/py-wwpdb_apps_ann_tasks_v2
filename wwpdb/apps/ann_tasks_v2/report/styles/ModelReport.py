@@ -328,6 +328,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             # ('_pdbx_struct_assembly_prop.value', '%s', 'str', ''),
             # ('_pdbx_struct_assembly_prop.details', '%s', 'str', '')
         ],
+        "pdbx_struct_assembly_gen": [
+            ('_pdbx_struct_assembly_gen.assembly_id', '%s', 'str', ''),
+            ('_pdbx_struct_assembly_gen.oper_expression', '%s', 'str', ''),
+            ('_pdbx_struct_assembly_gen.asym_id_list', '%s', 'str', '')
+        ],
         "pdbx_struct_oper_list": [
             ("_pdbx_struct_oper_list.id", "%s", "str", ""),
             ("_pdbx_struct_oper_list.type", "%s", "str", ""),
