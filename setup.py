@@ -42,7 +42,7 @@ setup(
     ],
     #
     install_requires=[
-        "wwpdb.utils.config >= 0.12.2",
+        "wwpdb.utils.config ~= 0.37",
         "wwpdb.apps.wf_engine",
         "wwpdb.io",
         "wwpdb.utils.db >= 0.6",
