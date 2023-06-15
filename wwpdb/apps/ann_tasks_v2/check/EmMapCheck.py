@@ -171,10 +171,15 @@ class EmMapCheckTask(object):
             "em-segmentation-volume",
             "em-volume",
         ):
-            archiveFilePath = pI.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=mapType, formatType="map", fileSource="archive", versionId="latest", partNumber="1")
-            if archiveFilePath and os.access(archiveFilePath, os.F_OK):
+            partNum = 1
+            while True:
+                archiveFilePath = pI.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=mapType, formatType="map", fileSource="archive", versionId="latest", partNumber=str(partNum))
+                if (not archiveFilePath) or (not os.access(archiveFilePath, os.F_OK)):
+                    break
+                #
                 (_dir, fileName) = os.path.split(archiveFilePath)
                 archivalMapList.append(fileName)
+                partNum += 1
             #
         #
         (_dir, modelFileName) = os.path.split(modelInputFile)
