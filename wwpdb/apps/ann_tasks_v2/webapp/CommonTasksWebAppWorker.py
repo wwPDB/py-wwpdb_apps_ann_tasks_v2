@@ -1461,6 +1461,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 fList.append(fileName)
             rC.set("checkreportfiles", fList)
 
+            # PDBML report
+            fpattern = self._sessionPath + "/" + entryId + "_xml-check-report_*"
+            pthList = []
+            pthList = glob.glob(fpattern)
+            #
+            fList = []
+            for pth in pthList:
+                (_dir, fileName) = os.path.split(pth)
+                fList.append(fileName)
+            rC.set("checkxmlreportfiles", fList)
+
             fpattern = self._sessionPath + "/" + entryId + "_misc-check-report_*"
             pthList = []
             pthList = glob.glob(fpattern)
@@ -2597,7 +2608,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._listFilesResponse(entryIdList[0], fileSource="deposit")
         elif operation == "files-instance":
             return self._listFilesResponse(entryIdList[0], fileSource="wf-instance")
-        elif operation in ["check-all", "cif2pdb", "checkv5", "checkNext", "check-format", "check-misc", "check-geometry", "check-special-position", "check-sf", "check-emd-xml"]:
+        elif operation in ["check-all", "cif2pdb", "checkv5", "checkNext", "check-format", "check-misc", "check-geometry", "check-special-position", "check-sf", "check-emd-xml", "checkxml"]:
             #
             templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "consolidated_section_template.html")
             self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() templateFilePath %s\n" % templateFilePath)
