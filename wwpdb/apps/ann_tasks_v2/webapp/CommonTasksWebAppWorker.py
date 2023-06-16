@@ -2435,8 +2435,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() starting checkxml using %s\n" % modelFilePath)
                     xchk.run(entryId=entryId, inpPath=modelFilePath, publicCIFlag=False)
                 #
-                rptPath = chk.getReportPath()
-                hasDiags = chk.getReportSize() > 0
+                rptPath = xchk.getReportPath()
+                hasDiags = xchk.getReportSize() > 0
                 if hasDiags:
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
