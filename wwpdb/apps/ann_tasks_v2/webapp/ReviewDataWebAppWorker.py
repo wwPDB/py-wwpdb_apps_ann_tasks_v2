@@ -166,6 +166,10 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 chk.setDictionaryVersion(version="V5")
             elif operation in ["checkNext"]:
                 chk.setDictionaryVersion(version="archive_next")
+
+            # Dictionary check first data block only
+            chk.setCheckFirstBlock(True)
+
             chk.run(entryId=idCode, inpPath=filePath)
             hasDiags = chk.getReportSize() > 0
             rptPath = chk.getReportPath()
