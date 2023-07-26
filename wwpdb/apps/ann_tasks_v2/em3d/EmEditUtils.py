@@ -316,9 +316,9 @@ class EmEditUtils(SessionWebDownloadUtils):
                 self.__lfh.write("+EmEditUtils.updateMapHeader -  output map file written to %s\n" % (ofp))
             if self.__cleanup:
                 dp.cleanup()
-            return True, resultPath, logPath
+            return True, resultPath, logPath, ofp
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+EmEditUtils.updateMapHeader - failed with exception for entryId %s file %s\n" % (entryId, inputMapFileName))
                 traceback.print_exc(file=self.__lfh)
-        return False, None, None
+        return False, None, None, None

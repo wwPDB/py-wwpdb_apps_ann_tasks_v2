@@ -36,6 +36,8 @@ class CorresPNDTemplate(object):
         self.__reqObj = reqObj
         #
         self.__EmMapOnly = False
+        self.__EmMapwithModel = False
+        self.__EmFsc143CutOff = False
         self.__corresInfo = {}
         self.__ligandInfo = []
         self.__letterTemplateMap = {}
@@ -70,6 +72,9 @@ class CorresPNDTemplate(object):
             self.__getCorrespondenceTempltInfo()
             self.__getCorresInfo(resultfile)
             self.__getValidateInfo()
+            if self.__EmMapwithModel or self.__EmFsc143CutOff:
+                self.__getValidateInfoCif()
+            #
             return self.__doRender()
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -140,6 +145,11 @@ class CorresPNDTemplate(object):
         #
         self.__corresInfo["values"] = self.__getMissingAndInsistentValues(cifObj)
         self.__ligandInfo = cifObj.GetValue("ligand_information")
+        #
+        self.__EmFsc143CutOff = (cifObj.GetSingleValue("correspondence_information", "fsc_143_cut_off") == "yes")
+        if ("emdbid" in self.__corresInfo) and self.__corresInfo["emdbid"]and ("pdbid" in self.__corresInfo) and self.__corresInfo["pdbid"]:
+            self.__EmMapwithModel = True
+        #
 
     def __getMissingAndInsistentValues(self, cifObj):
         """ """
@@ -235,6 +245,50 @@ class CorresPNDTemplate(object):
             # self.__getNonPolymerRsrzOutlier(vobj)
         except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("Read %s failed.\n" % xmlPath)
+        #
+
+    def __getValidateInfoCif(self):
+        """
+        """
+        depid = self.__reqObj.getValue("entryid")
+        cifPath = os.path.join(self.__sessionPath, depid + "_val-data_P1.cif")
+        if not os.access(cifPath, os.F_OK):
+            return
+        #
+        try:
+            cifObj = mmCIFUtil(filePath=cifPath)
+            if self.__EmMapwithModel:
+                atom_inclusion_all_atoms = cifObj.GetSingleValue("pdbx_vrpt_summary_em", "atom_inclusion_all_atoms")
+                atom_inclusion_backbone = cifObj.GetSingleValue("pdbx_vrpt_summary_em", "atom_inclusion_backbone")
+                if atom_inclusion_all_atoms and atom_inclusion_backbone:
+                    try:
+                        self.__corresInfo["atom_inclusion_all_atoms"] = "%.2f" % (float(atom_inclusion_all_atoms) * 100)
+                        self.__corresInfo["atom_inclusion_backbone"] = "%.2f" % (float(atom_inclusion_backbone) * 100)
+                    except:
+                        self.__lfh.write("_pdbx_vrpt_summary_em.atom_inclusion_all_atoms=%r _pdbx_vrpt_summary_em.atom_inclusion_backbone=%r\n" %
+                                        (atom_inclusion_all_atoms, atom_inclusion_backbone))
+                    #
+                #
+            #
+            if self.__EmFsc143CutOff:
+                author_fsc_cutoff = cifObj.GetSingleValue("pdbx_vrpt_summary_em", "author_provided_fsc_resolution_by_cutoff_pt_143")
+                EMDB_resolution = cifObj.GetSingleValue("pdbx_vrpt_summary_em", "EMDB_resolution")
+                if author_fsc_cutoff and EMDB_resolution:
+                    try:
+                        lower_bound = 0.9 * float(author_fsc_cutoff)
+                        upper_bound = 1.1 * float(author_fsc_cutoff)
+                        resolution = float(EMDB_resolution)
+                        if (resolution < lower_bound) or (resolution > upper_bound):
+                            self.__corresInfo["fsc_curve"] = "yes"
+                        #
+                    except:
+                        self.__lfh.write("_pdbx_vrpt_summary_em.author_provided_fsc_resolution_by_cutoff_pt_143=%r _pdbx_vrpt_summary_em.EMDB_resolution=%r\n" %
+                                        (author_fsc_cutoff, EMDB_resolution))
+                    #
+                #
+            #
+        except:
+            self.__lfh.write("Read %s failed.\n" % cifPath)
         #
 
     # def __getPolymerBondOutlier(self, vobj):
@@ -460,7 +514,6 @@ class CorresPNDTemplate(object):
         myD["letter_footer"] = self.__letterTemplateMap["signature"]
         myD["slection_text"] = self.__getSlectionText(selectD, additionalD)
         myD["text_map"] = self.__javascript_text_mapping
-        self.__lfh.write("__javascript_text_mapping=%s\n" % self.__javascript_text_mapping)
         if self.__EmMapOnly:
             # For map only deposition, encouragement is in the header already.
             myD["full_text"] = myD["letter_header"]

@@ -1988,16 +1988,25 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 # loop through all the map file names in the mmcif file, get content type partition num and contour
                 for mapNumber in range(0, len(cObj)):
                     mapLocation = cObj.getValue("file", mapNumber)
+                    if (not mapLocation) or (mapLocation == "?") or (mapLocation == "."):
+                        continue
+                    #
                     mapContour = cObj.getValue("contour_level", mapNumber)
                     # contour level can be a non-numerical value when not provided so some logic to fix when required
                     try:
                         float(mapContour)
                     except ValueError:
                         mapContour = float(1)
+                    #
                     mapContentType = du.getContentTypeFromFileName(mapLocation)
                     mapPartitionNumber = du.getPartitionNumberFromFileName(mapLocation)
 
-                    data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
+                    if (mapContentType is not None) and (mapPartitionNumber is not None):
+                        data_files.append((mapContentType, "bcif", mapPartitionNumber, mapContour))
+                    #
+                #
+            #
+        #
 
         for data_file in data_files:
             ok = du.fetchId(entryId, contentType=data_file[0], formatType=data_file[1], fileSource=fileSource, instance=instance, partNumber=data_file[2])
@@ -3056,7 +3065,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if (len(entryId) > 0) and (len(mapFileName) > 0):
             emu = EmUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             emed = EmEditUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-            _ok, nextJsonPath, nextLogPath = emed.updateMapHeader(entryId, mapFileName)
+            _ok, nextJsonPath, nextLogPath, nextMapFilePath = emed.updateMapHeader(entryId, mapFileName)
             duL.copyToDownload(nextLogPath)
             aTagList.append(duL.getAnchorTag())
             duL.copyToDownload(nextJsonPath)
@@ -3070,7 +3079,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 modelD = {}
                 for tky in ["annotation_details", "contour_level", "contour_level_source"]:
                     modelD[tky] = self._reqObj.getValue("m_" + tky)
+                #
                 emx.updateHeader(modelD)
+                if nextMapFilePath:
+                    emx.setMapFileName(os.path.basename(nextMapFilePath))
+                #
                 mapType = self._reqObj.getValue("maptype")
                 partitionNo = self._reqObj.getValue("partition")
                 if self._verbose:

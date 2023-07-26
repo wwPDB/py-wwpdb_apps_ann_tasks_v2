@@ -37,10 +37,10 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUt
 
 #
 from wwpdb.apps.ann_tasks_v2.check.Check import Check
+from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
 
 # from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
 # from wwpdb.apps.ann_tasks_v2.check.GeometryCheck import GeometryCheck
-# from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
 # from wwpdb.apps.ann_tasks_v2.mapcalc.DccCalc import DccCalc
 
 
@@ -157,6 +157,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 rC.setStatus(statusMsg="Reports completed")
             else:
                 rC.setError(errMsg="Report preparation failed")
+            #
         elif operation in ["checkv5", "checkv4", "checkNext", "updatewithcheck"]:
             filePath = du.getDownloadPath()
             chk = Check(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -182,6 +183,24 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             else:
                 duL.removeFromDownload(rptPath)
                 rC.setStatus(statusMsg="No diagnostics for %s" % fileName)
+            #
+        elif operation in ["check-misc"]:
+            filePath = du.getDownloadPath()
+            chk = ExtraCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+            chk.run(entryId=idCode, inpPath=filePath)
+            hasDiags = chk.getReportSize() > 0
+            rptPath = chk.getReportPath()
+            duL = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
+            if hasDiags:
+                duL.copyToDownload(rptPath)
+                aTagList.append(duL.getAnchorTag())
+                rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
+                rC.setStatus(statusMsg="Check completed")
+            else:
+                duL.removeFromDownload(rptPath)
+                rC.setStatus(statusMsg="No diagnostics for %s" % fileName)
+            #
+        #
 
         if hasDiags and operation in ["updatewithcheck"]:
             return rC
