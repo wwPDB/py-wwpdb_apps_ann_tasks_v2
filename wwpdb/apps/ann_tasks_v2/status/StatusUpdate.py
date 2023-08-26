@@ -259,7 +259,8 @@ class StatusUpdate(object):
             "map_hold_date",
             "header_release_date",
             "replace_existing_entry_flag",
-            "title",
+            "title"
+            # Do not add process_site here.  Handled internally below
         ]
 
         depuiAttributeNameList = ["depositor_hold_instructions"]
@@ -335,6 +336,12 @@ class StatusUpdate(object):
                     continue
                 if ky in kys:
                     dcObj.setValue(statusD[emKy], attributeName=ky, rowIndex=0)
+
+            # em_admin.process_site
+            if processSite is not None:
+                if dcObj.getAttributeIndex("process_site") < 0:
+                    dcObj.appendAttribute("process_site")
+                dcObj.setValue(processSite, attributeName="process_site", rowIndex=0)
 
             dcObj = cObj.getObj("em_depui")
             if dcObj is None:
