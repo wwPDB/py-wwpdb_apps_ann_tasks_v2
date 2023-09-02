@@ -2617,9 +2617,19 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return self._listFilesResponse(entryIdList[0], fileSource="deposit")
         elif operation == "files-instance":
             return self._listFilesResponse(entryIdList[0], fileSource="wf-instance")
-        elif operation in ["check-all", "cif2pdb", "checkv5", "checkNext", "check-format", "check-misc",
-                           "check-geometry", "check-special-position",
-                           "check-sf", "check-emd-xml", "checkxml"]:
+        elif operation in [
+            "check-all",
+            "cif2pdb",
+            "checkv5",
+            "checkNext",
+            "check-format",
+            "check-misc",
+            "check-geometry",
+            "check-special-position",
+            "check-sf",
+            "check-emd-xml",
+            "checkxml",
+        ]:
             #
             templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "consolidated_section_template.html")
             self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() templateFilePath %s\n" % templateFilePath)

@@ -173,9 +173,9 @@ class EmMapCheckTask(object):
         ):
             partNum = 1
             while True:
-                archiveFilePath = pI.getFilePath(dataSetId=entryId, wfInstanceId=None, contentType=mapType,
-                                                 formatType="map", fileSource="archive", versionId="latest",
-                                                 partNumber=str(partNum))
+                archiveFilePath = pI.getFilePath(
+                    dataSetId=entryId, wfInstanceId=None, contentType=mapType, formatType="map", fileSource="archive", versionId="latest", partNumber=str(partNum)
+                )
                 if (not archiveFilePath) or (not os.access(archiveFilePath, os.F_OK)):
                     break
                 #

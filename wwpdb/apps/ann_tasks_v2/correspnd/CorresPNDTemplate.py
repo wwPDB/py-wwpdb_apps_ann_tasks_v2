@@ -146,7 +146,7 @@ class CorresPNDTemplate(object):
         self.__corresInfo["values"] = self.__getMissingAndInsistentValues(cifObj)
         self.__ligandInfo = cifObj.GetValue("ligand_information")
         #
-        self.__EmFsc143CutOff = (cifObj.GetSingleValue("correspondence_information", "fsc_143_cut_off") == "yes")
+        self.__EmFsc143CutOff = cifObj.GetSingleValue("correspondence_information", "fsc_143_cut_off") == "yes"
         if ("emdbid" in self.__corresInfo) and self.__corresInfo["emdbid"] and ("pdbid" in self.__corresInfo) and self.__corresInfo["pdbid"]:
             self.__EmMapwithModel = True
         #
@@ -248,8 +248,7 @@ class CorresPNDTemplate(object):
         #
 
     def __getValidateInfoCif(self):
-        """
-        """
+        """ """
         depid = self.__reqObj.getValue("entryid")
         cifPath = os.path.join(self.__sessionPath, depid + "_val-data_P1.cif")
         if not os.access(cifPath, os.F_OK):
@@ -265,8 +264,10 @@ class CorresPNDTemplate(object):
                         self.__corresInfo["atom_inclusion_all_atoms"] = "%.2f" % (float(atom_inclusion_all_atoms) * 100)
                         self.__corresInfo["atom_inclusion_backbone"] = "%.2f" % (float(atom_inclusion_backbone) * 100)
                     except:  # noqa: E722 pylint: disable=bare-except
-                        self.__lfh.write("_pdbx_vrpt_summary_em.atom_inclusion_all_atoms=%r _pdbx_vrpt_summary_em.atom_inclusion_backbone=%r\n" %
-                                         (atom_inclusion_all_atoms, atom_inclusion_backbone))
+                        self.__lfh.write(
+                            "_pdbx_vrpt_summary_em.atom_inclusion_all_atoms=%r _pdbx_vrpt_summary_em.atom_inclusion_backbone=%r\n"
+                            % (atom_inclusion_all_atoms, atom_inclusion_backbone)
+                        )
                     #
                 #
             #
@@ -282,8 +283,10 @@ class CorresPNDTemplate(object):
                             self.__corresInfo["fsc_curve"] = "yes"
                         #
                     except:  # noqa: E722 pylint: disable=bare-except
-                        self.__lfh.write("_pdbx_vrpt_summary_em.author_provided_fsc_resolution_by_cutoff_pt_143=%r _pdbx_vrpt_summary_em.EMDB_resolution=%r\n" %
-                                         (author_fsc_cutoff, EMDB_resolution))
+                        self.__lfh.write(
+                            "_pdbx_vrpt_summary_em.author_provided_fsc_resolution_by_cutoff_pt_143=%r _pdbx_vrpt_summary_em.EMDB_resolution=%r\n"
+                            % (author_fsc_cutoff, EMDB_resolution)
+                        )
                     #
                 #
             #
