@@ -409,7 +409,16 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                 "+%s.%s() checking for structure factor file filesource %s identifier %s path %s\n"
                 % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, wPath)
             )
-
+        #
+        mtz2mmcifLogPath = os.path.join(self._sessionPath, identifier + "-mtz2mmcif.log")
+        sfInfoPath = os.path.join(self._sessionPath, "sf_information.cif")
+        if os.access(mtz2mmcifLogPath, os.F_OK) and os.access(sfInfoPath, os.F_OK):
+            cifObj = mmCIFUtil(filePath=sfInfoPath)
+            error = cifObj.GetSingleValue("sf_convert", "error")
+            if not error:
+                resetFreeR = True
+            #
+        #
         if resetFreeR or os.access(tPath, os.F_OK):
             filelist.append([expFileName, "structure-factors", "pdbx"])
         #
