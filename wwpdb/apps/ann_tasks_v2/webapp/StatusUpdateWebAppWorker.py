@@ -877,7 +877,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
     #     return retDate
 
-
     def _statusUpdateOtherOp(self):
         """Update header including site, annotator, auth hold requests and date"""
         self._getSession(useContext=True, overWrite=False)
