@@ -415,13 +415,44 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
 
             if operation == "pdb":
+                # To determine if failure to produce PDB file, need to check current status
+                currArchivePath = pI.getModelPdbFilePath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
+                currexist = os.path.exists(currArchivePath)
+
                 pdbArchivePath = pI.getModelPdbFilePath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", versionId="next", mileStone=None)
                 dfa = DataFileAdapter(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-                dfa.cif2Pdb(filePath, pdbArchivePath)
-                du.fetchId(idCode, "model", formatType="pdb")
-                aTagList.append(du.getAnchorTag())
-                rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-                rC.setStatus(statusMsg="PDB format file created")
+                dfa.cif2Pdb(filePath, pdbArchivePath)  # This code returns status - True if succeeds or not.
+
+                # Scenarios:
+                #  a) old not present and new present --> good
+                #  b) old not present, new not present --> error
+                #  c) old present and new present
+                #     1) old_name==new_name --> error, 
+                #     2) old_name != new_name --> ok
+                #  d) old present and new not present -> error
+
+                newexist = os.path.exists(pdbArchivePath)
+
+                # (b) + (d) -> new not present error
+                convok = False
+                if newexist:
+                    if not currexist:
+                        # (a)
+                        convok = True
+                    elif pdbArchivePath != currArchivePath:
+                        convok = True
+                    # else fall through as false
+
+                if self._verbose:
+                    self._lfh.write("+StatusUpdateWebAppWorker._createFileOps() PDB conversion status %s XXXX\n" % convok)
+
+                if convok:
+                    du.fetchId(idCode, "model", formatType="pdb")
+                    aTagList.append(du.getAnchorTag())
+                    rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
+                    rC.setStatus(statusMsg="PDB format file created")
+                else:
+                    rC.setError(errMsg="PDB format file cannot be produced")
             elif operation == "pdbx":
                 pdbxArchivePath = pI.getModelPdbxFilePath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", versionId="next", mileStone="review")
                 dfa = DataFileAdapter(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
