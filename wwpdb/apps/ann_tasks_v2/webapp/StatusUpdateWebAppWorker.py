@@ -444,7 +444,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     # else fall through as false
 
                 if self._verbose:
-                    self._lfh.write("+StatusUpdateWebAppWorker._createFileOps() PDB conversion status %s XXXX\n" % convok)
+                    self._lfh.write("+StatusUpdateWebAppWorker._createFileOps() PDB conversion status %s\n" % convok)
 
                 if convok:
                     du.fetchId(idCode, "model", formatType="pdb")
