@@ -427,7 +427,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 #  a) old not present and new present --> good
                 #  b) old not present, new not present --> error
                 #  c) old present and new present
-                #     1) old_name==new_name --> error, 
+                #     1) old_name==new_name --> error,
                 #     2) old_name != new_name --> ok
                 #  d) old present and new not present -> error
 
