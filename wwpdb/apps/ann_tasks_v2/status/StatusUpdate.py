@@ -221,6 +221,27 @@ class StatusUpdate(object):
                 traceback.print_exc(file=self.__lfh)
             return False
 
+    # This interface is still used by wwpdb.utils.letters.AutoOnHold
+    def setEmStatusDetails(self, inpFilePath, outFilePath, statusD, processSite=None, annotatorInitials=None, approvalType=None):
+        self.__lfh.write(
+            "\n+StatusUpdate.setEmStatusDetails() statuD %s, processSite %s, annotatorInitials %s, approvalType %s \n" % (statusD, processSite, annotatorInitials, approvalType)
+        )
+
+        try:
+            cList = self.__io.readFile(inpFilePath)
+            container = cList[0]
+
+            ok = self.__setEmStatusDetails(container, statusD=statusD, processSite=processSite, annotatorInitials=annotatorInitials, approvalType=approvalType)
+            if ok:
+                return self.__io.writeFile(outFilePath, cList)
+
+        except:  # noqa: E722 pylint: disable=bare-except
+            if self.__verbose:
+                self.__lfh.write("+StatusUpdate.setEmStatusDetails() failed file %s outPath %s\n" % (inpFilePath, outFilePath))
+                traceback.print_exc(file=self.__lfh)
+
+        return False
+
     def __setEmStatusDetails(self, cObj, statusD, processSite=None, annotatorInitials=None, approvalType=None):
         """Set selected status items in the em_admin data category represented as attributes in
         input dictionary --  Input dictionary assumed to have artificial "em_" key prefixes ---
