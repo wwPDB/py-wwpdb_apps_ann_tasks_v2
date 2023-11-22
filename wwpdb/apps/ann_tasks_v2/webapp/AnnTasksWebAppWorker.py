@@ -81,8 +81,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             "/service/ann_tasks_v2/nmr_cs_misc_checks": "_nmrCsMiscChecksOp",
             "/service/ann_tasks_v2/nmr_rep_model_update": "_nmrRepresentativeModelUpdateOp",
             "/service/ann_tasks_v2/nmr_cs_archive_update": "_nmrCsArchiveUpdateOp",
+            "/service/ann_tasks_v2/nmr_data_auto_processing": "_nmrDataAutoProcessingOp",
             "/service/ann_tasks_v2/nmr_cs_auto_processing": "_nmrCsAutoProcessingOp",
-            "/service/ann_tasks_v2/get_nmr_processing_message": "_getNmrCsAutoProcessingMessageOp",
+            "/service/ann_tasks_v2/get_nmr_processing_message": "_getNmrExpAutoProcessingMessageOp",
             "/service/ann_tasks_v2/newsession": "_newSessionOp",
             "/service/ann_tasks_v2/launchjmol": "_launchJmolViewerOp",
             "/service/ann_tasks_v2/launchjmolwithmap": "_launchJmolViewerWithMapOp",
@@ -277,6 +278,12 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(filePath, os.R_OK):
             sfOk = True
         #
+        nmrDataOk = False
+        entryNmrDataFileName = pI.getFileName(identifier, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+        entryNmrDataFilePath = os.path.join(self._sessionPath, entryNmrDataFileName)
+        if os.access(entryNmrDataFilePath, os.R_OK):
+            nmrDataOk = True
+        #
         csOk = False
         entryCsFileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         entryCsFilePath = os.path.join(self._sessionPath, entryCsFileName)
@@ -328,6 +335,11 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             htmlList.append(
                 '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
                 % (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+            )
+        elif nmrDataOk:
+            htmlList.append(
+                '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrynmrdatafilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
+                % (sessionId, entryId, entryFileName, entryNmrDataFileName, wfStatus, standaloneMode, auto_assembly_status_url)
             )
         elif csOk:
             htmlList.append(
@@ -639,6 +651,33 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         return rC
 
+    def _nmrDataAutoProcessingOp(self):
+        """Run automatic chemical shift processing"""
+        if self._verbose:
+            self._lfh.write("+AnnTasksWebAppWorker._nmrDataAutoProcessingOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        entryId = self._reqObj.getValue("entryid")
+        taskFormId = self._reqObj.getValue("taskformid")
+        #
+        self._autoProcessNmrCombinedDataFile(entryId)
+        #
+        tagL = []
+        pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
+        for contentType in ("model", "nmr-data-str"):
+            fileName = pI.getFileName(entryId, contentType=contentType, formatType="pdbx", versionId="none", partNumber="1")
+            filePath = os.path.join(self._sessionPath, fileName)
+            if os.access(filePath, os.R_OK):
+                tagL.append('<a class="" href="/sessions/' + self._sessionId + "/" + fileName + '" target="_blank">' + fileName + "</a>")
+            #
+        #
+        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        tss.assign(name="Chemical shift processing", formId=taskFormId, args="", completionFlag=True, tagList=tagL, entryId=entryId)
+        rC = self._makeTaskResponse(tssObj=tss)
+        rC.setHtmlText(self.__getNmrDiagnosticsHtmlText(entryId))
+
+        return rC
+
     def _nmrCsAutoProcessingOp(self):
         """Run automatic chemical shift processing"""
         if self._verbose:
@@ -666,10 +705,10 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
 
         return rC
 
-    def _getNmrCsAutoProcessingMessageOp(self):
+    def _getNmrExpAutoProcessingMessageOp(self):
         """Read automatic chemical shift processing result messages and return to NMR tab page"""
         if self._verbose:
-            self._lfh.write("+AnnTasksWebAppWorker._nmrCsAutoProcessingOp() starting\n")
+            self._lfh.write("+AnnTasksWebAppWorker._getNmrExpAutoProcessingMessageOp() starting\n")
         #
         self._getSession(useContext=True)
         entryId = self._reqObj.getValue("entryid")
@@ -755,6 +794,12 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         """Get diagnostics from validation xml and nmr-shift-error-report json files"""
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         #
+        csFileName = self._reqObj.getValue("entrycsfilename")
+        nefFileName = self._reqObj.getValue("entrynmrdatafilename")
+        if nefFileName and (not csFileName):
+            return ""
+        #
+
         csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId="none", partNumber="1")
         csFilePath = os.path.join(self._sessionPath, csFileName)
         #

@@ -1353,6 +1353,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 "#nmr-rep-model-update-form",
                 "#nmr-cs-update-archive-form",
                 "#nmr-cs-update-form",
+                "#nmr-data-processing-form",
                 "#nmr-cs-processing-form",
                 "#nmr-cs-edit-form",
                 "#tls-range-correction-form",
@@ -1649,6 +1650,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pth = deArchive.copyToSession(contentType="nmr-data-str", formatType="pdbx", version="latest", partitionNumber=1)
         #
         pth = de.copyToSession(contentType="nmr-shift-error-report", formatType="json", version="latest", partitionNumber=1)
+        pth = de.copyToSession(contentType="nmr-data-error-report", formatType="json", version="latest", partitionNumber=1)
 
         # fsc file (xml)
         #
@@ -3558,7 +3560,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         # transfer any existing input parameters to the output content object
         #
-        reqKeyList = ["entryid", "entryfilename", "entryexpfilename", "entrycsfilename"]
+        reqKeyList = ["entryid", "entryfilename", "entryexpfilename", "entrynmrdatafilename", "entrycsfilename"]
         for ky in reqKeyList:
             val = self._reqObj.getValue(ky)
             if val is not None and len(val) > 0:
@@ -3677,13 +3679,23 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if os.access(filePath, os.R_OK):
             rC.set("entryexpfilename", fileName)
 
-        fileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+        fileName = pI.getFileName(identifier, contentType="nmr-data-str", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
         filePath = os.path.join(self._sessionPath, fileName)
         if os.access(filePath, os.R_OK):
-            rC.set("entrycsfilename", fileName)
+            rC.set("entrynmrdatafilename", fileName)
             #
             if ann_tasks == "y":
-                self._autoProcessNmrChemShifts(identifier)
+                self._autoProcessNmrCombinedDataFile(identifier)
+            #
+        else:
+            fileName = pI.getFileName(identifier, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+            filePath = os.path.join(self._sessionPath, fileName)
+            if os.access(filePath, os.R_OK):
+                rC.set("entrycsfilename", fileName)
+                #
+                if ann_tasks == "y":
+                    self._autoProcessNmrChemShifts(identifier)
+                #
             #
         #
         rC.setStatusCode(None)
@@ -3691,14 +3703,31 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker._launchFromIdcodeOp() completed for identifier %s\n" % identifier)
+        #
         return rC
 
-    def _autoProcessNmrChemShifts(self, identifier):
-        """ """
+    def _autoProcessNmrCombinedDataFile(self, identifier):
+        """
+        """
+        if self._verbose:
+            self._lfh.write("+CommonTasksWebAppWorker._autoProcessNmrCombinedDataFile() starting with identifier %s\n" % identifier)
+        #
         try:
             csUtil = NmrChemShiftProcessUtils(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
             csUtil.setWorkingDirPath(dirPath=self._sessionPath)
             csUtil.setIdentifier(identifier=identifier)
+            csUtil.runNefProcess(identifier=identifier)
+        except:  # noqa: E722 pylint: disable=bare-except
+            traceback.print_exc(file=self._lfh)
+        #
+
+    def _autoProcessNmrChemShifts(self, identifier):
+        """
+        """
+        try:
+            csUtil = NmrChemShiftProcessUtils(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
+            csUtil.setWorkingDirPath(dirPath=self._sessionPath)
+            csUtil.setIdentifier(identifier=identifier, nmrDataFlag=False)
             csUtil.run()
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self._lfh)
