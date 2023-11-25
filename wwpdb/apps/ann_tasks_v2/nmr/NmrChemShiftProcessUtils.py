@@ -310,7 +310,7 @@ class NmrChemShiftProcessUtils(object):
             #
             updatedNmrDataFilePath = os.path.join(self.__workingDirPath, identifier + "-nmr-data-next.cif")
             updatedNmrDataStrPath = os.path.join(self.__workingDirPath, identifier + "-nmr-data-next.str")
-            for filePath in ( nmrDataStrFilePath, logFilePath, updatedNmrDataFilePath, updatedNmrDataStrPath ):
+            for filePath in (nmrDataStrFilePath, logFilePath, updatedNmrDataFilePath, updatedNmrDataStrPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
@@ -325,7 +325,7 @@ class NmrChemShiftProcessUtils(object):
                 return
             #
             ndp = NmrDpUtility()
-            ndp.setSource(nmrDataStrFilePath);
+            ndp.setSource(nmrDataStrFilePath)
             ndp.addInput(name="coordinate_file_path", value=xyzFilePath, type="file")
             ndp.addInput(name="nonblk_anomalous_cs", value=True, type="param")
             ndp.addInput(name="nonblk_bad_nterm", value=True, type="param")
