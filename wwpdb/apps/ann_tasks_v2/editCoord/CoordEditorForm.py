@@ -17,7 +17,7 @@ import sys
 import os.path
 import os
 
-from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon, ConfigInfoAppCc
 
 
 class CoordEditorForm(object):
@@ -36,6 +36,7 @@ class CoordEditorForm(object):
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__cICommon = ConfigInfoAppCommon(self.__siteId)
+        self.__cIAppCc = ConfigInfoAppCc(self.__siteId)
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
@@ -73,7 +74,7 @@ class CoordEditorForm(object):
         f.write("#!/bin/tcsh -f\n")
         f.write("#\n")
         f.write("setenv RCSBROOT   " + self.__cICommon.get_site_annot_tools_path() + "\n")
-        f.write("setenv COMP_PATH  " + self.__cICommon.get_site_cc_cvs_path() + "\n")
+        f.write("setenv COMP_PATH  " + self.__cIAppCc.get_site_cc_cvs_path() + "\n")
         f.write("setenv BINPATH  ${RCSBROOT}/bin\n")
         f.write("#\n")
         f.write(
