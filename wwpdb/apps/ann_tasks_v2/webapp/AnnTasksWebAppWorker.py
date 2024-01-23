@@ -9,6 +9,8 @@
 #   13-Jan-2017  ep  add support for correcting occupancy on special position
 #   02-Oct-2017  zf  add /service/ann_tasks_v2/entityloadinfo, /service/ann_tasks_v2/symoploadinfo
 #   14-Jun-2019  zf  add automatical filling in assembly for NMR entry
+#   28-Sep-2020  zf  add _getCloseContactContentOp() and _updateCloseContactContentOp()
+#   22-Jan-2024  zf  add _getCovalentBondContentOp() and _updateCovalentBondContentOp()
 #
 ##
 """
@@ -42,11 +44,13 @@ from wwpdb.apps.ann_tasks_v2.expIoUtils.MtzTommCIF import MtzTommCIF
 from wwpdb.apps.ann_tasks_v2.expIoUtils.ReSetFreeRinSFmmCIF import ReSetFreeRinSFmmCIF
 from wwpdb.apps.ann_tasks_v2.related.Related import Related
 from wwpdb.apps.ann_tasks_v2.utils.GetCloseContact import GetCloseContact
+from wwpdb.apps.ann_tasks_v2.utils.GetCovalentBond import GetCovalentBond
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 from wwpdb.apps.ann_tasks_v2.utils.TlsRange import TlsRange
 from wwpdb.apps.ann_tasks_v2.utils.UpdateCloseContact import UpdateCloseContact
+from wwpdb.apps.ann_tasks_v2.utils.UpdateCovalentBond import UpdateCovalentBond
 
 from wwpdb.utils.session.WebRequest import ResponseContent
 from wwpdb.io.file.DataExchange import DataExchange
@@ -149,6 +153,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             "/service/ann_tasks_v2/edit_em_map_header_responder": "_editEmMapHeaderResponderOp",
             "/service/ann_tasks_v2/get_close_contact_content": "_getCloseContactContentOp",
             "/service/ann_tasks_v2/update_close_contact_content": "_updateCloseContactContentOp",
+            "/service/ann_tasks_v2/get_covalent_bond_content": "_getCovalentBondContentOp",
+            "/service/ann_tasks_v2/update_covalent_bond_content": "_updateCovalentBondContentOp",
             "placeholder": "_dumpOp",
         }
         self.addServices(self.__appPathD)
@@ -772,6 +778,63 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         tss.assign(name="Update link from close contact", formId="#review-close-contact-form", args="", completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        rC = self._makeTaskResponse(tssObj=tss)
+
+        return rC
+
+    def _getCovalentBondContentOp(self):
+        """Read covalent bond information from coordinate model file"""
+        if self._verbose:
+            self._lfh.write("+AnnTasksWebAppWorker._getCovalentBondContentOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        fileName = self._reqObj.getValue("entryfilename")
+        entryId = self._reqObj.getValue("entryid")
+        #
+        calc = GetCovalentBond(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        retD = calc.run(entryId, fileName)
+
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        rC.addDictionaryItems(cD=retD)
+
+        return rC
+
+    def _updateCovalentBondContentOp(self):
+        """Remove selected covalent bond(s) in coordinate model file"""
+        if self._verbose:
+            self._lfh.write("+AnnTasksWebAppWorker._updateCovalentBondContentOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        fileName = self._reqObj.getValue("entryfilename")
+        entryId = self._reqObj.getValue("entryid")
+        covalent_bond_list = []
+        covalent_bond_num_str = self._reqObj.getValue("total_covalent_bond_num")
+        if covalent_bond_num_str:
+            covalent_bond_num = int(covalent_bond_num_str)
+            for i in range(0, covalent_bond_num):
+                covalent_bond = self._reqObj.getValue("covalent_bond_" + str(i))
+                if covalent_bond:
+                    covalent_bond_list.append(covalent_bond)
+                #
+            #
+        #
+        if not covalent_bond_list:
+            rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+            rC.setReturnFormat("json")
+            rC.setError(errMsg="No record selected")
+            return rC
+        #
+        calc = UpdateCovalentBond(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ok = calc.run(entryId, fileName, covalent_bond_list)
+
+        if self._verbose:
+            self._lfh.write("+AnnTasksWebAppWorker._updateCovalentBondContentOp() status %r\n" % ok)
+
+        tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
+        #
+        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        tss.assign(name="Remove covalent bond(s)", formId="#review-covalent-bond-form", args="", completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC

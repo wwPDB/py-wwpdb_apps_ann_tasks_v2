@@ -1,11 +1,11 @@
 ##
-# File:  GetCloseContact.py
+# File:  GetCovalentBond.py
 # Date:  28-Sep-2020  Zukang Feng
 #
 # Update:
 ##
 """
-Manage utility to correct close contact problems
+Manage utility to correct covalent bond problems
 
 """
 __docformat__ = "restructuredtext en"
@@ -22,9 +22,9 @@ import traceback
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 
-class GetCloseContact(object):
+class GetCovalentBond(object):
     """
-    GetCloseContact class encapsulates correcting close contact problems.
+    GetCovalentBond class encapsulates correcting covalent bond problems.
     """
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
@@ -45,8 +45,8 @@ class GetCloseContact(object):
         retD["found"] = "no"
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
-            logPath = os.path.join(self.__sessionPath, entryId + "-get-close-contact.log")
-            retPath = os.path.join(self.__sessionPath, entryId + "-close-contact.json")
+            logPath = os.path.join(self.__sessionPath, entryId + "-get-covalent-bond.log")
+            retPath = os.path.join(self.__sessionPath, entryId + "-covalent-bond.json")
             for filePath in (logPath, retPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
@@ -55,7 +55,7 @@ class GetCloseContact(object):
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             #
             dp.imp(inpPath)
-            dp.op("annot-get-close-contact")
+            dp.op("annot-get-covalent-bond")
             dp.expLog(dstPath=logPath, appendMode=False)
             dp.exp(retPath)
             #
@@ -77,26 +77,25 @@ class GetCloseContact(object):
 
     def __processCloseContactContent(self, jsonObj):
         """ """
-        if (not jsonObj) or ("close_contact" not in jsonObj) or (not jsonObj["close_contact"]):
+        if (not jsonObj) or ("covalent_bond" not in jsonObj) or (not jsonObj["covalent_bond"]):
             return ""
         #
         htmlTemplate = """
-        <input type="hidden" name="total_close_contact_num" value="%s" />
+        <input type="hidden" name="total_covalent_bond_num" value="%s" />
         <table class="table table-borderedless width80">
           <tr>
-            <th><input id="close_contact_select_all" class="btn btn-primary my-task-form-submit" value="Select All" type="button"
-                 onClick="select_close_contact_covalent_bond('update-close-contact-form', 'close_contact_', 'close_contact_select_all', '');" /></th>
-            %s
-            <th><input id="close_contact_submit" class="btn btn-primary my-task-form-submit" value="Submit" type="submit" /></th>
-            <th><input id="close_contact_exit" class="btn btn-primary my-task-form-submit" value="Exit" type="button"
+            <th><input id="covalent_bond_select_all" class="btn btn-primary my-task-form-submit" value="Select All" type="button"
+                 onClick="select_close_contact_covalent_bond('update-covalent-bond-form', 'covalent_bond_', 'covalent_bond_select_all', '');" /></th>
+            <th><input id="covalent_bond_submit" class="btn btn-primary my-task-form-submit" value="Submit" type="submit" /></th>
+            <th><input id="covalent_bond_exit" class="btn btn-primary my-task-form-submit" value="Exit" type="button"
                  onClick="exit_close_contact_covalent_bond_page();" /></th>
           </tr>
         </table>
         <br/>
         <table class="table table-bordered table-striped width100">
           <tr>
-            <th colspan="4">Atom1</th>
-            <th colspan="4">Atom2</th>
+            <th colspan="5">Atom1</th>
+            <th colspan="5">Atom2</th>
             <th rowspan="2">Distance</th>
           </tr>
           <tr>
@@ -104,57 +103,43 @@ class GetCloseContact(object):
             <th>Residue</th>
             <th>Number</th>
             <th>Atom</th>
+            <th>Symmetry</th>
             <th>Chain ID</th>
             <th>Residue</th>
             <th>Number</th>
             <th>Atom</th>
+            <th>Symmetry</th>
           </tr>
           %s
         </table>
         """
         #
-        green_count = 0
         tablerow = ""
         count = 0
-        for tupL in jsonObj["close_contact"]:
-            if tupL[13] == "green":
-                green_count += 1
-            #
+        for tupL in jsonObj["covalent_bond"]:
             tablerow += "<tr>"
             #
             atom = tupL[4]
             if tupL[5]:
                 atom += "(" + tupL[5] + ")"
             #
-            tablerow += "<td>" + tupL[0] + "</td>" + "<td>" + tupL[1] + "</td>" + "<td>" + tupL[2] + tupL[3] + "</td>" + "<td>" + atom + "</td>"
-            atom = tupL[10]
-            if tupL[11]:
-                atom += "(" + tupL[11] + ")"
+            tablerow += "<td>" + tupL[0] + "</td>" + "<td>" + tupL[1] + "</td>" + "<td>" + tupL[2] + tupL[3] + "</td>" + "<td>" + atom + "</td>" + "<td>" + tupL[6] + "</td>"
+            atom = tupL[11]
+            if tupL[12]:
+                atom += "(" + tupL[12] + ")"
             #
-            tablerow += "<td>" + tupL[6] + "</td>" + "<td>" + tupL[7] + "</td>" + "<td>" + tupL[8] + tupL[9] + "</td>" + "<td>" + atom + "</td>"
+            tablerow += "<td>" + tupL[7] + "</td>" + "<td>" + tupL[8] + "</td>" + "<td>" + tupL[9] + tupL[10] + "</td>" + "<td>" + atom + "</td>" + "<td>" + tupL[13] + "</td>"
             #
-            if tupL[13]:
-                tablerow += '<td style="color:' + tupL[13] + ';">' + tupL[12]
-            else:
-                tablerow += "<td>" + tupL[12]
+            tupL[6] = tupL[6].replace("_", "-");
+            tupL[13] = tupL[13].replace("_", "-");
+            bond_id = "covalent_bond_" + str(count)
             #
-            close_id = "close_contact_" + str(count)
-            tablerow += '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + close_id + '" name="' + close_id + '" value="' + "_".join(tupL[:13]) + '"'
-            if tupL[13]:
-                tablerow += ' class="' + tupL[13] + '"'
+            tablerow += "<td>" + tupL[14] + '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + bond_id + '" name="' + bond_id + '" value="' + "_".join(tupL) + '"/></td>'
             #
-            tablerow += "/></td>"
             tablerow += "</tr>\n"
             count += 1
         #
-        select_green_button = ""
-        if (green_count > 0) and (green_count < len(jsonObj["close_contact"])):
-            select_green_button = (
-                '<th><input id="close_contact_select_all_green" class="btn btn-primary my-task-form-submit" value="Select All green" type="button" '
-                + "onClick=\"select_close_contact_covalent_bond('update-close-contact-form', 'close_contact_', 'close_contact_select_all_green', 'green');\" /></th>"
-            )
-        #
-        return htmlTemplate % (str(count), select_green_button, tablerow)
+        return htmlTemplate % (str(count), tablerow)
 
 
 def main():
@@ -171,7 +156,7 @@ def main():
     myReqObj.setValue("WWPDB_SITE_ID", siteId)
     myReqObj.setValue("sessionid", "d581f7aa63cc8feba7d96fb9fd103866fca45a7d")
     #
-    calc = GetCloseContact(reqObj=myReqObj, verbose=True, log=sys.stderr)
+    calc = GetCovalentBond(reqObj=myReqObj, verbose=True, log=sys.stderr)
     retD = calc.run("D_1000001900", "D_1000001900_model_P1.cif")
     for k, v in retD.items():
         print(k + "=" + v)

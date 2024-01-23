@@ -1,11 +1,11 @@
 ##
-# File:  UpdateCloseContact.py
-# Date:  29-Sep-2020  Zukang Feng
+# File:  UpdateCovalentBond.py
+# Date:  22-Jan-2024  Zukang Feng
 #
 # Update:
 ##
 """
-Manage utility to correct close contact problems
+Manage utility to correct covalent bond problems
 
 """
 __docformat__ = "restructuredtext en"
@@ -23,14 +23,14 @@ from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
-class UpdateCloseContact(SessionWebDownloadUtils):
+class UpdateCovalentBond(SessionWebDownloadUtils):
     """
-    UpdateCloseContact class encapsulates correcting close contact problems.
+    UpdateCovalentBond class encapsulates correcting covalent bond problems.
 
     """
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
-        super(UpdateCloseContact, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
+        super(UpdateCovalentBond, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
         self.__verbose = verbose
         self.__lfh = log
         self.__reqObj = reqObj
@@ -59,8 +59,8 @@ class UpdateCloseContact(SessionWebDownloadUtils):
         """Run the calculation"""
         try:
             inpPath = os.path.join(self.__sessionPath, inpFile)
-            logPath = os.path.join(self.__sessionPath, entryId + "-update-close-contact.log")
-            dataPath = os.path.join(self.__sessionPath, entryId + "-close-contact.txt")
+            logPath = os.path.join(self.__sessionPath, entryId + "-update-covalent-bond.log")
+            dataPath = os.path.join(self.__sessionPath, entryId + "-covalent-bond.txt")
             for filePath in (logPath, dataPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
@@ -77,7 +77,7 @@ class UpdateCloseContact(SessionWebDownloadUtils):
             #
             dp.imp(inpPath)
             dp.addInput(name="datafile", value=dataPath)
-            dp.op("annot-convert-close-contact-to-link")
+            dp.op("annot-remove-covalent-bond")
             dp.expLog(dstPath=logPath, appendMode=False)
             if os.access(logPath, os.R_OK):
                 self.addDownloadPath(logPath)
