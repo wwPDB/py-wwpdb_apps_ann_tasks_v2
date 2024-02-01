@@ -2585,7 +2585,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             self._lfh.write("+ReviewDataWebAppWorker._fetchAndReportIdOps() starting with op %s\n" % operation)
 
         entryIds = self._reqObj.getValue("entryid")
-        entryIdList = entryIds.split(" ")
+        entryIdList = entryIds.strip().split(" ")  # Handles case of space at end of list
         contentType = self._reqObj.getValue("contentType")
 
         fileSource = self._reqObj.getValue("filesource")
