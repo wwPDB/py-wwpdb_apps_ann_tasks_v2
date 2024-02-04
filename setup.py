@@ -50,7 +50,7 @@ setup(
         "wwpdb.utils.wf ~= 0.13",
         "wwpdb.utils.session",
         "mmcif >= 0.25",
-        "wwpdb.utils.dp ~= 0.47",
+        "wwpdb.utils.dp ~= 0.50",
         "wwpdb.utils.detach",
         "wwpdb.utils.nmr >= 0.24",
         "mmcif.utils ~= 0.22",
