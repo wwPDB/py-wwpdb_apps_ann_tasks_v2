@@ -83,10 +83,11 @@ class GetCovalentBond(object):
         htmlTemplate = """
         <input type="hidden" name="total_covalent_bond_num" value="%s" />
         <table class="table table-borderedless width80">
+          <tr><th colspan="3">Select Links that you would like to remove and transform into close contacts and press “Delete Link(s)” button.</th></tr>
           <tr>
             <th><input id="covalent_bond_select_all" class="btn btn-primary my-task-form-submit" value="Select All" type="button"
                  onClick="select_close_contact_covalent_bond('update-covalent-bond-form', 'covalent_bond_', 'covalent_bond_select_all', '');" /></th>
-            <th><input id="covalent_bond_submit" class="btn btn-primary my-task-form-submit" value="Submit" type="submit" /></th>
+            <th><input id="covalent_bond_submit" class="btn btn-primary my-task-form-submit" value="Delete Link(s)" type="submit" /></th>
             <th><input id="covalent_bond_exit" class="btn btn-primary my-task-form-submit" value="Exit" type="button"
                  onClick="exit_close_contact_covalent_bond_page();" /></th>
           </tr>
