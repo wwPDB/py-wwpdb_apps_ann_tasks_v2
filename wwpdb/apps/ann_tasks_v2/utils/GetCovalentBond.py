@@ -97,6 +97,7 @@ class GetCovalentBond(object):
           <tr>
             <th colspan="5">Atom1</th>
             <th colspan="5">Atom2</th>
+            <th rowspan="2">Leaving<br/>atoms</th>
             <th rowspan="2">Distance</th>
           </tr>
           <tr>
@@ -129,13 +130,13 @@ class GetCovalentBond(object):
             if tupL[12]:
                 atom += "(" + tupL[12] + ")"
             #
-            tablerow += "<td>" + tupL[7] + "</td>" + "<td>" + tupL[8] + "</td>" + "<td>" + tupL[9] + tupL[10] + "</td>" + "<td>" + atom + "</td>" + "<td>" + tupL[13] + "</td>"
+            tablerow += "<td>" + tupL[7] + "</td>" + "<td>" + tupL[8] + "</td>" + "<td>" + tupL[9] + tupL[10] + "</td>" + "<td>" + atom + "</td>" + "<td>" + tupL[13] + "</td>" + "<td>" + tupL[14] + "</td>"
             #
             tupL[6] = tupL[6].replace("_", "-")
             tupL[13] = tupL[13].replace("_", "-")
             bond_id = "covalent_bond_" + str(count)
             #
-            tablerow += "<td>" + tupL[14] + '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + bond_id + '" name="' + bond_id + '" value="' + "_".join(tupL) + '"/></td>'
+            tablerow += "<td>" + tupL[15] + '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + bond_id + '" name="' + bond_id + '" value="' + "_".join(tupL) + '"/></td>'
             #
             tablerow += "</tr>\n"
             count += 1
