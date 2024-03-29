@@ -91,6 +91,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 # ('pdbx_depui_status_flags', 'DepUI Flags', 'row-wise'),
                 ("pdbx_SG_project", "Structural genomics", "row-wise"),
                 ("pdbx_database_related", "Related entries", "row-wise"),
+                ("pdbx_initial_refinement_model", "Starting models", "row-wise"),
                 ("pdbx_contact_author", "Contact authors", "row-wise"),
                 # ('citation','Primary citation','column-wise'),
                 ("pdbx_validate_close_contact", "Close contacts", "row-wise"),

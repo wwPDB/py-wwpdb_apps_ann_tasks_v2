@@ -33,6 +33,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ("pdbx_depui_status_flags", "table"),
         ("pdbx_database_proc", "table"),
         ("pdbx_database_related", "table"),
+        ("pdbx_initial_refinement_model", "table"),
         ("pdbx_related_exp_data_set", "table"),
         ("database_PDB_rev", "table"),
         ("pdbx_database_PDB_obs_spr", "table"),
@@ -288,7 +289,9 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_database_PDB_obs_spr.pdb_id", "%s", "str", ""),
             ("_pdbx_database_PDB_obs_spr.replace_pdb_id", "%s", "str", ""),
         ],
-        "pdbx_database_PDB_remark": [("_pdbx_database_PDB_remark.id", "%s", "str", ""), ("_pdbx_database_PDB_remark.text", "%s", "str", "")],
+        "pdbx_database_PDB_remark": [
+            ("_pdbx_database_PDB_remark.id", "%s", "str", ""),
+            ("_pdbx_database_PDB_remark.text", "%s", "str", "")],
         "pdbx_entity_instance_feature": [
             ("_pdbx_entity_instance_feature.ordinal", "%s", "str", ""),
             ("_pdbx_entity_instance_feature.comp_id", "%s", "str", ""),
@@ -299,6 +302,14 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_entity_instance_feature.auth_seq_num", "%s", "str", ""),
             ("_pdbx_entity_instance_feature.details", "%s", "str", ""),
             ("_pdbx_entity_instance_feature.seq_num", "%s", "str", ""),
+        ],
+        "pdbx_initial_refinement_model": [
+            ("_pdbx_initial_refinement_model.id", "%s", "str", ""),
+            ("_pdbx_initial_refinement_model.type", "%s", "str", ""),
+            ("_pdbx_initial_refinement_model.source_name",  "%s", "str", ""),
+            ("_pdbx_initial_refinement_model.accession_code", "%s", "str", ""),
+            ("_pdbx_initial_refinement_model.details", "%s", "str", ""),
+            ("_pdbx_initial_refinement_model.entity_id_list", "%s", "str", ""),
         ],
         "struct_ref": [
             ("_struct_ref.id", "%s", "str", ""),
