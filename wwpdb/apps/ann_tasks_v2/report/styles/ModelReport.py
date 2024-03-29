@@ -306,7 +306,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         "pdbx_initial_refinement_model": [
             ("_pdbx_initial_refinement_model.id", "%s", "str", ""),
             ("_pdbx_initial_refinement_model.type", "%s", "str", ""),
-            ("_pdbx_initial_refinement_model.source_name",  "%s", "str", ""),
+            ("_pdbx_initial_refinement_model.source_name", "%s", "str", ""),
             ("_pdbx_initial_refinement_model.accession_code", "%s", "str", ""),
             ("_pdbx_initial_refinement_model.details", "%s", "str", ""),
             ("_pdbx_initial_refinement_model.entity_id_list", "%s", "str", ""),

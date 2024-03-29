@@ -130,7 +130,10 @@ class GetCovalentBond(object):
             if tupL[12]:
                 atom += "(" + tupL[12] + ")"
             #
-            tablerow += "<td>" + tupL[7] + "</td>" + "<td>" + tupL[8] + "</td>" + "<td>" + tupL[9] + tupL[10] + "</td>" + "<td>" + atom + "</td>" + "<td>" + tupL[13] + "</td>" + "<td>" + tupL[14] + "</td>"
+            tablerow += "<td>" + tupL[7] + "</td>" + "<td>" + tupL[8] \
+                + "</td>" + "<td>" + tupL[9] + tupL[10] + "</td>" + "<td>" \
+                + atom + "</td>" + "<td>" + tupL[13] + "</td>" + "<td>" \
+                + tupL[14] + "</td>"
             #
             tupL[6] = tupL[6].replace("_", "-")
             tupL[13] = tupL[13].replace("_", "-")
