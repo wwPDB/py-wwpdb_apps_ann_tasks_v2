@@ -317,10 +317,13 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 idSection = idPrefix + "-sec-" + str(ii)
                 oL.append('<div class="accordion-group">')
                 oL.append('<div class="accordion-heading">')
+
+                abbrev = "%s [%s]" % (catNameAbbrev, catName)
+
                 if isMulti:
-                    oL.append('<a class="accordion-toggle" data-toggle="collapse" href="#%s"> <h4>%s</h4></a>' % (idSection, catNameAbbrev))
+                    oL.append('<a class="accordion-toggle" data-toggle="collapse" href="#%s"> <h4>%s</h4></a>' % (idSection, abbrev))
                 else:
-                    oL.append('<a class="accordion-toggle" data-toggle="collapse" data-parent="#%s" href="#%s"><h4>%s</h4></a>' % (idTop, idSection, catNameAbbrev))
+                    oL.append('<a class="accordion-toggle" data-toggle="collapse" data-parent="#%s" href="#%s"><h4>%s</h4></a>' % (idTop, idSection, abbrev))
                 oL.append("</div>")
                 oL.append('<div id="%s" class="accordion-body collapse %s">' % (idSection, active))
                 oL.append('<div  class="accordion-inner">')
