@@ -1506,7 +1506,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
 
-            # Special handling of flist, the desire for full validation pdf to come first... 
+            # Special handling of flist, the desire for full validation pdf to come first...
             # We need to find first substring list matches, and then rest
             tlist = []
             for t in ["val-report-full_P1", "val-report_P1"]:
