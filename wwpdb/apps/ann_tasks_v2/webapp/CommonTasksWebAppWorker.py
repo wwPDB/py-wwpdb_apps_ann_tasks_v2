@@ -1493,6 +1493,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 fList.append(fileName)
             rC.set("specialpositionreportfiles", fList)
 
+            # Validation file downloads
             fpattern = self._sessionPath + "/" + entryId + "_val-report*"
             pthList = []
             pthList = glob.glob(fpattern)
@@ -1504,8 +1505,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             for pth in pthList:
                 (_dir, fileName) = os.path.split(pth)
                 fList.append(fileName)
-            rC.set("valreportfiles", fList)
 
+            # Special handling of flist, the desire for full validation pdf to come first... 
+            # We need to find first substring list matches, and then rest
+            tlist = []
+            for t in ["val-report-full_P1", "val-report_P1"]:
+                tlist += [v for v in fList if t in v]
+            olist = [v for v in fList if v not in tlist]
+
+            rC.set("valreportfiles", tlist + olist)
+
+            # Map files
             fpattern = self._sessionPath + "/" + entryId + "_map-*"
             pthList = []
             pthList = glob.glob(fpattern)
