@@ -199,9 +199,9 @@ class Validate(SessionWebDownloadUtils):
             dp.expLog(logPath)
             dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultImageTarPath, resultCifPath, resultFoPath, result2FoPath])
 
+            self.addDownloadPath(resultFullPdfPath)
             self.addDownloadPath(resultPdfPath)
             self.addDownloadPath(resultXmlPath)
-            self.addDownloadPath(resultFullPdfPath)
             self.addDownloadPath(resultPngPath)
             self.addDownloadPath(resultSvgPath)
             self.addDownloadPath(resultImageTarPath)
