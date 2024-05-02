@@ -2501,15 +2501,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     rptPath = chk.getReportPath()
                     duL.copyToDownload(rptPath)
                     aTagList.append(duL.getAnchorTag())
-            
-            if "read-links" in operationList:
-                reader = LinksReader(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-                reader.run(entryId=entryId, inpPath=modelFilePath)
-                hasDiags = chk.getReportSize() > 0
-                if hasDiags:
-                    rptPath = chk.getReportPath()
-                    duL.copyToDownload(rptPath)
-                    aTagList.append(duL.getAnchorTag())
 
             if "check-special-position" in operationList:
                 chk = SpecialPositionCalc(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
