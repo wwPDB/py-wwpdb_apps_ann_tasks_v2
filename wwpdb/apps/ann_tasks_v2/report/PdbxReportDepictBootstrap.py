@@ -28,6 +28,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
     This version uses Bootstrap CSS framework constructs.
 
     """
+    MAX_LINES = 12
 
     def __init__(self, styleObject=None, includePath=None, verbose=False, log=sys.stderr):
         """
@@ -96,7 +97,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 # ('citation','Primary citation','column-wise'),
                 ("pdbx_validate_close_contact", "Close contacts", "row-wise"),
                 ("pdbx_validate_symm_contact", "Close symmetry contacts", "row-wise"),
-                ("struct_conn", "Links", "row-wise"),
                 # ('symmetry', 'Symmetry', 'row-wise'),
                 # ('cell', 'Cell constants', 'row-wise'),
                 # ('exptl_crystal_grow', 'Crystallization details', 'row-wise'),
@@ -131,6 +131,10 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ("pdbx_validate_main_chain_plane", "Main chain planarity", "row-wise"),
                 ("pdbx_validate_polymer_linkage", "Polymer linkages", "row-wise"),
                 ("pdbx_validate_chiral", "Chirality exceptions", "row-wise"),
+            ]
+        elif self.__st.getStyleId() in ["PDBX_LINKS_REPORT_V1"]:
+            self.__reportCategories = [
+                ("struct_conn", "", "row-wise"),
             ]
 
     def render(self, eD, style="tabs", leadingHtmlL=None, trailingHtmlL=None):
@@ -326,7 +330,11 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                     oL.append('<a class="accordion-toggle" data-toggle="collapse" data-parent="#%s" href="#%s"><h4>%s</h4></a>' % (idTop, idSection, abbrev))
                 oL.append("</div>")
                 oL.append('<div id="%s" class="accordion-body collapse %s">' % (idSection, active))
-                oL.append('<div  class="accordion-inner">')
+
+                if len(cD[catName]) > PdbxReportDepictBootstrap.MAX_LINES:
+                    oL.append('<div  class="accordion-inner" style="max-height: 50vh; overflow-y: scroll;">')
+                else:
+                    oL.append('<div  class="accordion-inner">')
                 #
                 oL.append('<table class="table table-striped table-bordered table-condensed">')
                 if catStyle == "column-wise":
@@ -530,6 +538,15 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                         itemValue,
                         itemValue,
                     )
+        
+        if catName == "struct_conn":
+            itemName = "_struct_conn.id"
+            if itemName in rD:
+                itemValue = rD[itemName]
+                rD[itemName] = '<a href="#" onclick="inspect(\'%s\'); return false;">%s</button>' % (
+                    itemValue.strip(),
+                    itemValue,
+                )
 
     def __attributePart(self, name):
         i = name.find(".")

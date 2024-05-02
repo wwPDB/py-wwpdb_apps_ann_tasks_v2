@@ -332,6 +332,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             "dcc-report",
             "special-position-report",
             "geometry-check-report",
+            "links-report",
             "misc-check-report",
             "format-check-report",
             "dict-check-report",

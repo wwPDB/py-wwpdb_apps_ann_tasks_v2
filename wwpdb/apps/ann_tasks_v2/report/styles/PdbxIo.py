@@ -44,6 +44,7 @@ from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCat
 
 # from mmcif_utils.style.PdbxReportCategoryStyle import PdbxReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
 
 logger = logging.getLogger()
 
@@ -131,6 +132,56 @@ class PdbxReportIo(PdbxStyleIoUtil):
         except Exception as e:
             logging.error(e)
             return ""
+
+
+class PdbxLinksReportIo(PdbxStyleIoUtil):
+    """Methods for reading PDBx data files for reporting including style details. Specific to link information."""
+
+    def __init__(self, verbose=True, log=sys.stderr):
+        super(PdbxLinksReportIo, self).__init__(styleObject=PdbxLinksReportCategoryStyle(), verbose=verbose, log=log)
+        self.__lfh = log
+        self.__filePath = None
+        self.__idCode = None
+
+    def getCategory(self, catName="entity"):
+        return self.getItemDictList(catName)
+
+    def setFilePath(self, filePath, idCode=None):
+        """Specify the file path for the target and optionally provide an identifier
+        for the data section within the file.
+        """
+        self.__filePath = filePath
+        self.__idCode = idCode
+        if self.readFile(self.__filePath):
+            if self.__idCode is not None:
+                return self.setContainer(containerName=self.__idCode)
+            else:
+                return self.setContainer(containerIndex=0)
+        else:
+            return False
+
+    def get(self):
+        """
+        Check for a valid current data container.
+
+        Returns True for success or False otherwise.
+        """
+        return self.getCurrentContainerId() is not None
+
+    def complyStyle(self):
+        return self.testStyleComplete(self.__lfh)
+
+    def setBlock(self, blockId):
+        return self.setContainer(containerName=blockId)
+
+    def newBlock(self, blockId):
+        return self.newContainer(containerName=blockId)
+
+    def update(self, catName, attributeName, value, iRow=0):
+        return self.updateAttribute(catName, attributeName, value, iRow=iRow)
+
+    def write(self, filePath):
+        return self.writeFile(filePath)
 
 
 class PdbxGeometryReportIo(PdbxStyleIoUtil):

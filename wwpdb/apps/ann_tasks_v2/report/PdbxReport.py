@@ -20,12 +20,13 @@ import shutil
 import sys
 import traceback
 
-from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo
+from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo, PdbxLinksReportIo
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReportDepictBootstrap import PdbxReportDepictBootstrap
 from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
 
 
 class PdbxReport(object):
@@ -109,6 +110,12 @@ class PdbxReport(object):
                 dd = self.doReport(contentType)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxGeometryReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
+            
+            if contentType in ["links-report"]:
+                self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
+                dd = self.doReport(contentType)
+                rdd = PdbxReportDepictBootstrap(styleObject=PdbxLinksReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
 
             if self.__debug:
                 self.__lfh.write("+PdbxReport.makeTabularReport - generated HTML \n%s\n" % "\n".join(oL))
@@ -173,6 +180,8 @@ class PdbxReport(object):
                 pdbxR = PdbxGeometryReportIo(verbose=self.__verbose, log=self.__lfh)
             elif contentType == "dcc-report":
                 pdbxR = PdbxXrayExpReportIo(verbose=self.__verbose, log=self.__lfh)
+            elif contentType == "links-report":
+                pdbxR = PdbxLinksReportIo(verbose=self.__verbose, log=self.__lfh)
 
             pdbxR.setFilePath(localPath, idCode=None)
             pdbxR.get()

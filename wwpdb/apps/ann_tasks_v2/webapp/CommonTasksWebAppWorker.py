@@ -2104,6 +2104,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "model",
             "dcc-report",
             "geometry-check-report",
+            "links-report",
             "misc-check-report",
             "format-check-report",
             "dict-check-report",
@@ -2184,6 +2185,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="geometry-check-report", idCode=entryId, layout=layout))
                 else:
                     # myD[cT] = self.__getMessageTextWithMarkup('No geometry issues.')
+                    myD[cT] = self.__getMessageTextWithMarkup("")
+            elif cT == "links-report":
+                # Links report
+                ok = du.fetchId(entryId, contentType="model", formatType="pdbx", fileSource=fileSource, instance=instance, versionId=versionId)
+                if ok:
+                    downloadPath = du.getDownloadPath()
+                    aTagList.append(du.getAnchorTag())
+                    myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="links-report", idCode=entryId, layout=layout))
+                else:
                     myD[cT] = self.__getMessageTextWithMarkup("")
             elif cT == "misc-check-report":
                 # Misc check report
@@ -2496,6 +2506,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if "check-geometry" in operationList:
                 chk = GeometryCheck(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 chk.run(entryId=entryId, inpPath=modelFilePath)
+                hasDiags = chk.getReportSize() > 0
+                if hasDiags:
+                    rptPath = chk.getReportPath()
+                    duL.copyToDownload(rptPath)
+                    aTagList.append(duL.getAnchorTag())
+            
+            if "read-links" in operationList:
+                reader = LinksReader(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                reader.run(entryId=entryId, inpPath=modelFilePath)
                 hasDiags = chk.getReportSize() > 0
                 if hasDiags:
                     rptPath = chk.getReportPath()
