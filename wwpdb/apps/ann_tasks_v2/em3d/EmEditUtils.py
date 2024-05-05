@@ -27,7 +27,6 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 
 
 class EmEditUtils(SessionWebDownloadUtils):
-
     """
     Edit volume data file header records and related data stored in model files.
 

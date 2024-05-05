@@ -3,7 +3,6 @@ Report style details for PDBx struct_conn category.
 
 """
 
-
 from mmcif_utils.style.PdbxCategoryStyleBase import PdbxCategoryStyleBase
 
 
@@ -14,7 +13,7 @@ class PdbxLinksReportCategoryStyle(PdbxCategoryStyleBase):
     ]
     _cDict = {
         "struct_conn": [
-            ('_struct_conn.id', '%s', 'str', ''),
+            ("_struct_conn.id", "%s", "str", ""),
             ("_struct_conn.pdbx_leaving_atom_flag", "%s", "str", ""),
             ("_struct_conn.ptnr1_auth_asym_id", "%s", "str", ""),
             ("_struct_conn.ptnr1_auth_comp_id", "%s", "str", ""),
@@ -36,8 +35,10 @@ class PdbxLinksReportCategoryStyle(PdbxCategoryStyleBase):
     #
 
     def __init__(self):
-        super(PdbxLinksReportCategoryStyle, self).__init__(styleId=PdbxLinksReportCategoryStyle._styleId,
-                                                              catFormatL=PdbxLinksReportCategoryStyle._categoryInfo,
-                                                              catItemD=PdbxLinksReportCategoryStyle._cDict,
-                                                              excludeList=PdbxLinksReportCategoryStyle._excludeList,
-                                                              suppressList=PdbxLinksReportCategoryStyle._suppressList)
+        super(PdbxLinksReportCategoryStyle, self).__init__(
+            styleId=PdbxLinksReportCategoryStyle._styleId,
+            catFormatL=PdbxLinksReportCategoryStyle._categoryInfo,
+            catItemD=PdbxLinksReportCategoryStyle._cDict,
+            excludeList=PdbxLinksReportCategoryStyle._excludeList,
+            suppressList=PdbxLinksReportCategoryStyle._suppressList,
+        )

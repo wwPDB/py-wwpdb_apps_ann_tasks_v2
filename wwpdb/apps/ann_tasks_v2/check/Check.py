@@ -31,7 +31,6 @@ from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 
 
 class Check(PublicPdbxFile):
-
     """
     Encapsulates dictioanry-level PDBx/mmCIF checking.
 

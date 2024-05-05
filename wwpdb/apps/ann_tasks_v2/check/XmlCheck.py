@@ -25,7 +25,6 @@ from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 
 
 class XmlCheck(PublicPdbxFile):
-
     """
     Encapsulates PDBML/XML checking.
     """

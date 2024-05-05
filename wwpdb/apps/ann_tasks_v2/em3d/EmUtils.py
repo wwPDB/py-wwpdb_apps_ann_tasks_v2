@@ -45,7 +45,6 @@ from pygal.style import LightGreenStyle  # noqa: E402
 
 
 class EmUtils(SessionWebDownloadUtils):
-
     """
     Manages mapfix (view and edit) and em2m operations.
 

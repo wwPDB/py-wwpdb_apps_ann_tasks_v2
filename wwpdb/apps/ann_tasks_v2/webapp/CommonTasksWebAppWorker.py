@@ -3727,8 +3727,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         return rC
 
     def _autoProcessNmrCombinedDataFile(self, identifier):
-        """
-        """
+        """ """
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker._autoProcessNmrCombinedDataFile() starting with identifier %s\n" % identifier)
         #
@@ -3742,8 +3741,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
 
     def _autoProcessNmrChemShifts(self, identifier):
-        """
-        """
+        """ """
         try:
             csUtil = NmrChemShiftProcessUtils(siteId=self._siteId, verbose=self._verbose, log=self._lfh)
             csUtil.setWorkingDirPath(dirPath=self._sessionPath)

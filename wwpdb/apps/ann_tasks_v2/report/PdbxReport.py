@@ -110,7 +110,7 @@ class PdbxReport(object):
                 dd = self.doReport(contentType)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxGeometryReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
-            
+
             if contentType in ["links-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)

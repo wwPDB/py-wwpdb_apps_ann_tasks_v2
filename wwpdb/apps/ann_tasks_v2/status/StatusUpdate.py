@@ -36,7 +36,6 @@ logger = logging.getLogger()
 
 
 class StatusUpdate(object):
-
     """Update release status items."""
 
     def __init__(self, reqObj, IoAdapter=IoAdapterCore(), verbose=False, log=sys.stderr):
@@ -260,7 +259,7 @@ class StatusUpdate(object):
             "map_hold_date",
             "header_release_date",
             "replace_existing_entry_flag",
-            "title"
+            "title",
             # Do not add process_site here.  Handled internally below
         ]
 

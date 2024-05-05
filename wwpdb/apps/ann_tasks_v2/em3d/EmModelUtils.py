@@ -28,7 +28,6 @@ from mmcif.io.IoAdapterCore import IoAdapterCore
 
 
 class EmModelUtils(PdbxStyleIoUtil):
-
     """
     Manage map header updates in model file -
 

@@ -28,6 +28,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
     This version uses Bootstrap CSS framework constructs.
 
     """
+
     MAX_LINES = 12
 
     def __init__(self, styleObject=None, includePath=None, verbose=False, log=sys.stderr):
@@ -538,7 +539,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                         itemValue,
                         itemValue,
                     )
-        
+
         if catName == "struct_conn":
             itemName = "_struct_conn.id"
             if itemName in rD:

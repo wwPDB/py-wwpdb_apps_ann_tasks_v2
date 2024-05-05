@@ -29,7 +29,6 @@ from mmcif.io.IoAdapterPy import IoAdapterPy
 
 
 class PdbxFileIo(object):
-
     """Read PDBx data files and package content as PDBx container object or container object list
     Write PDBx data using source PDBx container object list source content.
 
@@ -80,7 +79,6 @@ class PdbxFileIo(object):
 
 
 class ModelFileIo(object):
-
     """
     Assemble sample and coordinate sequence details from model coordinate data file.
 

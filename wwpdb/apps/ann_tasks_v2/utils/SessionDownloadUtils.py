@@ -26,7 +26,6 @@ from wwpdb.io.locator.DataReference import ReferenceFileComponents
 
 
 class SessionDownloadUtils(object):
-
     """Common methods for managing download operations for project files within the session context."""
 
     #
