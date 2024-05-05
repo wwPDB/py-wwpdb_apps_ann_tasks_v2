@@ -572,14 +572,16 @@ class CorresPNDTemplate(object):
                 if not qdir["question"] in selectD:
                     continue
                 #
+                checked_count += 1
+                #
                 context = ""
                 if "text" in qdir:
                     context = qdir["text"] % self.__corresInfo
+                    context = context.replace("$$$", str(checked_count))
                 #
                 if (qdir["question"] in additionalD) and ("additional_text" in qdir) and qdir["additional_text"]:
                     context += "\n\n" + qdir["additional_text"]
                 #
-                checked_count += 1
                 text += "\n" + str(checked_count) + ". "
                 if not qdir["question"].startswith("Free text question"):
                     text += qdir["question"] + "\n\n"
