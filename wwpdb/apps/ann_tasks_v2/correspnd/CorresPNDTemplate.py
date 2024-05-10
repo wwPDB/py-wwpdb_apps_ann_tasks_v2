@@ -717,17 +717,19 @@ class CorresPNDTemplate(object):
             text += self.__letterTemplateMap["release_hold"] % self.__corresInfo
         elif author_release_status_code == "HPUB":
             text += self.__letterTemplateMap["release_hpub"]
-        elif author_release_status_code == "REL":
+        elif (author_release_status_code == "REL") or (author_release_status_code == "REPL_REL"):
             text += self.__letterTemplateMap["release_rel"]
         else:
             text += self.__letterTemplateMap["release_unknown"]
         #
-        text += "\n\n"
-        sequence_code = self.__corresInfo["author_release_sequence_code"]
-        if sequence_code == "RELEASE NOW":
-            text += self.__letterTemplateMap["pre_release_yes"]
-        else:
-            text += self.__letterTemplateMap["pre_release_no"]
+        if author_release_status_code != "REPL_REL":
+            text += "\n\n"
+            sequence_code = self.__corresInfo["author_release_sequence_code"]
+            if sequence_code == "RELEASE NOW":
+                text += self.__letterTemplateMap["pre_release_yes"]
+            else:
+                text += self.__letterTemplateMap["pre_release_no"]
+            #
         #
         return text
 
