@@ -94,7 +94,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
         self.__htmlPath = os.path.join(self.__sessionPath, "get_mtz_infor.html")
         self.__sfInfoPath = os.path.join(self.__sessionPath, "sf_information.cif")
 
-    def __bashSetting(self):
+    def __bashSetting(self, html=False):
         setting = (
             " PACKAGE_DIR="
             + self.__packagePath
@@ -102,8 +102,13 @@ class MtzTommCIF(SessionWebDownloadUtils):
             + " SF_PATH=${PACKAGE_DIR}/sf-valid; export SF_PATH; "
             + " CCP4_PATH=${PACKAGE_DIR}/ccp4; export CCP4_PATH; "
             + " PHENIX_PATH=${PACKAGE_DIR}/phenix; export PHENIX_PATH; "
-            + " source ${CCP4_PATH}/bin/ccp4.setup.sh; source ${PHENIX_PATH}/phenix_env.sh; ${SF_PATH}/bin/sf_convert "
+            + " source ${CCP4_PATH}/bin/ccp4.setup.sh; source ${PHENIX_PATH}/phenix_env.sh; "
         )
+
+        if html:
+            setting += "${SF_PATH}/bin/sf_convert_html "
+        else:
+            setting += "${SF_PATH}/bin/sf_convert "
         return setting
 
     def __generateInputForm(self, logPath):
@@ -121,7 +126,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
             + logPath
             + " 2>&1 ; "
         )
-        self.__runCmd(options)
+        self.__runCmd(options, html=True)
         #
         if os.access(self.__mtzLogPath, os.R_OK) and os.access(self.__htmlPath, os.R_OK):
             cmd = "cat " + self.__mtzLogPath + " >> " + logPath + " ; "
@@ -165,9 +170,9 @@ class MtzTommCIF(SessionWebDownloadUtils):
         self.__status = "error"
         return False
 
-    def __runCmd(self, options):
+    def __runCmd(self, options, html=False):
         """ """
-        cmd = "cd " + self.__sessionPath + " ; " + self.__bashSetting() + options
+        cmd = "cd " + self.__sessionPath + " ; " + self.__bashSetting(html) + options
         os.system(cmd)
 
     def __readHtmlText(self):
