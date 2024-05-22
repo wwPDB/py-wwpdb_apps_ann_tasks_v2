@@ -20,13 +20,14 @@ import shutil
 import sys
 import traceback
 
-from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo, PdbxLinksReportIo
+from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo, PdbxLinksReportIo, EmInfoReportIo
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReportDepictBootstrap import PdbxReportDepictBootstrap
 from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
 
 
 class PdbxReport(object):
@@ -117,6 +118,12 @@ class PdbxReport(object):
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxLinksReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
 
+            if contentType in ["em-map-info-report"]:
+                self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
+                dd = self.doReport(contentType)
+                rdd = PdbxReportDepictBootstrap(styleObject=PdbxEmExtensionCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
+
             if self.__debug:
                 self.__lfh.write("+PdbxReport.makeTabularReport - generated HTML \n%s\n" % "\n".join(oL))
 
@@ -182,6 +189,8 @@ class PdbxReport(object):
                 pdbxR = PdbxXrayExpReportIo(verbose=self.__verbose, log=self.__lfh)
             elif contentType == "links-report":
                 pdbxR = PdbxLinksReportIo(verbose=self.__verbose, log=self.__lfh)
+            elif contentType == "em-map-info-report":
+                pdbxR = EmInfoReportIo(verbose=self.__verbose, log=self.__lfh)
 
             pdbxR.setFilePath(localPath, idCode=None)
             pdbxR.get()

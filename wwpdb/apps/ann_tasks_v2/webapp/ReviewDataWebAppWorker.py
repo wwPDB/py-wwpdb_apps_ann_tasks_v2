@@ -340,6 +340,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             # 'model-pdb',
             "emd-xml-header-report",
             "em-map-check-report",
+            "em-map-info-report",
             "downloads",
         ]
         reportD = self._renderCheckReports(idCode, fileSource=fileSource, instance=instance, contentTypeList=cTL)

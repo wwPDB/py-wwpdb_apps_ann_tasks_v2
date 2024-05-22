@@ -137,6 +137,12 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             self.__reportCategories = [
                 ("struct_conn", "", "row-wise"),
             ]
+        elif self.__st.getStyleId() in ["PDBX_STYLE_EmExtension_V1"]:
+            self.__reportCategories = [
+                ("em_map", "", "row-wise"),
+            ]
+        else:
+            self.__lfh.write("Error: PdbxReportDepict.__setup unknown style %s\n" % self.__st.getStyleId())
 
     def render(self, eD, style="tabs", leadingHtmlL=None, trailingHtmlL=None):
         """ """

@@ -2114,6 +2114,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "special-position-report",
             "emd-xml-header-report",
             "em-map-check-report",
+            "em-map-info-report",
             "downloads",
         ]:
             myD[ky] = None
@@ -2297,6 +2298,29 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     myD[cT] = self.__getFileTextWithMarkup(downloadPath)
                 else:
                     myD[cT] = self.__getMessageTextWithMarkup("")
+            elif cT == "em-map-info-report":
+                if useModelFileVersion:
+                    versionId = "latest"
+                else:
+                    versionId = "none"
+                
+                # Try to avoid fetch if not needed
+                downloadPath = du.getFilePath(entryId, contentType="model", formatType="pdbx", fileSource=fileSource, instance=instance, versionId=versionId)
+                if downloadPath is None or not os.path.exists(downloadPath):
+                    ok = du.fetchId(entryId, contentType="model", formatType="pdbx", fileSource=fileSource, instance=instance, versionId=versionId)
+                    downloadPath = du.getDownloadPath()
+                else:
+                    ok = True
+                if ok:
+                    aTagList.append(du.getAnchorTag())
+                    myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="em-map-info-report", idCode=entryId, layout=layout))
+                else:
+                    myD[cT] = self.__getMessageTextWithMarkup("None")
+            elif cT == "downloads":
+                # We call this a "report type" - might not be correct...
+                pass
+            else:
+                self._lfh.write("+CommonTasksWebAppWorker._renderCheckReports() unknown report %r\n" % cT)
 
         # downloads
 
@@ -2700,7 +2724,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 "check-em-map",
             ]
             aTagList = self._makeCheckReports([entryId], operationList=opList, fileSource=fileSource, useFileVersions=useFileVersions)
-            cTList = ["model"]
+            cTList = ["model", "em-map-info-report"]
             cTList.extend(sorted(opCtD.values()))
             if self._verbose:
                 self._lfh.write("+ReviewDataWebAppWorker._reviewDataInlineIdOps() content type list %r\n" % cTList)
