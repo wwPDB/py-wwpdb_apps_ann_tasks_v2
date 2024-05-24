@@ -513,7 +513,10 @@ class CorresPNDTemplate(object):
         myD["major_release"] = self.__letterTemplateMap["major_release"]
         myD["major_minor_addition"] = self.__letterTemplateMap["major_minor_addition"]
         myD["minor"] = self.__letterTemplateMap["minor"]
-        myD["minor_release"] = self.__getRelaseInfo()
+        myD["minor_release"],is_repl_rel = self.__getRelaseInfo()
+        if is_repl_rel:
+            myD["major_release"] = self.__letterTemplateMap["release_repl_rel"]
+        #
         myD["letter_footer"] = self.__letterTemplateMap["signature"]
         myD["slection_text"] = self.__getSlectionText(selectD, additionalD)
         myD["text_map"] = self.__javascript_text_mapping
@@ -711,6 +714,8 @@ class CorresPNDTemplate(object):
 
     def __getRelaseInfo(self):
         text = ""
+        is_repl_rel = False
+        #
         author_release_status_code = self.__corresInfo["author_release_status_code"]
         #
         if author_release_status_code == "HOLD":
@@ -721,6 +726,7 @@ class CorresPNDTemplate(object):
             text += self.__letterTemplateMap["release_rel"]
         elif author_release_status_code == "REPL_REL":
             text += self.__letterTemplateMap["release_repl_rel"]
+            is_repl_rel = True
         else:
             text += self.__letterTemplateMap["release_unknown"]
         #
@@ -733,7 +739,7 @@ class CorresPNDTemplate(object):
                 text += self.__letterTemplateMap["pre_release_no"]
             #
         #
-        return text
+        return text,is_repl_rel
 
     def __getTableContext(self, count):
         text = ""
