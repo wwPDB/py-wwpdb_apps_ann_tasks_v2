@@ -16,8 +16,6 @@ __author__ = "John Westbrook"
 __email__ = "john.westbrook@rcsb.org"
 __license__ = "Apache 2.0"
 
-
-
 from mmcif_utils.style.PdbxCategoryStyleBase import PdbxCategoryStyleBase
 
 
@@ -107,7 +105,7 @@ class PdbxEmExtensionCategoryStyle(PdbxCategoryStyleBase):
             ('_em_entity_assembly.id', '%s', 'str', ''),
             ('_em_entity_assembly.assembly_id', '%s', 'str', ''),
             ('_em_entity_assembly.parent_id', '%s', 'str', ''),
-            #('_em_entity_assembly.chimera', '%s', 'str', ''),
+            # ('_em_entity_assembly.chimera', '%s', 'str', ''),
             ('_em_entity_assembly.source', '%s', 'str', ''),
             ('_em_entity_assembly.type', '%s', 'str', ''),
             ('_em_entity_assembly.name', '%s', 'str', ''),
@@ -290,13 +288,13 @@ class PdbxEmExtensionCategoryStyle(PdbxCategoryStyleBase):
             ('_em_3d_reconstruction.nominal_pixel_size', '%s', 'str', ''),
             ('_em_3d_reconstruction.actual_pixel_size', '%s', 'str', ''),
             ('_em_3d_reconstruction.num_particles', '%s', 'str', ''),
-            #('_em_3d_reconstruction.num_subtomograms', '%s', 'str', ''),
+            # ('_em_3d_reconstruction.num_subtomograms', '%s', 'str', ''),
             ('_em_3d_reconstruction.euler_angles_details', '%s', 'str', ''),
             ('_em_3d_reconstruction.num_class_averages', '%s', 'str', ''),
             ('_em_3d_reconstruction.software', '%s', 'str', ''),
             ('_em_3d_reconstruction.fsc_type', '%s', 'str', ''),
             ('_em_3d_reconstruction.image_processing_id', '%s', 'str', ''),
-            #('_em_3d_reconstruction.software_id_list', '%s', 'str', ''),
+            # ('_em_3d_reconstruction.software_id_list', '%s', 'str', ''),
             ('_em_3d_reconstruction.symmetry_type', '%s', 'str', ''),
         ],
         'em_3d_fitting': [
@@ -309,7 +307,7 @@ class PdbxEmExtensionCategoryStyle(PdbxCategoryStyleBase):
             ('_em_3d_fitting.overall_b_value', '%s', 'str', ''),
             ('_em_3d_fitting.ref_space', '%s', 'str', ''),
             ('_em_3d_fitting.ref_protocol', '%s', 'str', ''),
-            #('_em_3d_fitting.software_id_list', '%s', 'str', ''),
+            # ('_em_3d_fitting.software_id_list', '%s', 'str', ''),
         ],
         'em_3d_fitting_list': [
             ('_em_3d_fitting_list.id', '%s', 'str', ''),
@@ -588,7 +586,7 @@ class PdbxEmExtensionCategoryStyle(PdbxCategoryStyleBase):
             ('_em_tomography.imaging_id', '%s', 'str', ''),
         ],
         'em_image_recording': [
-            #('_em_image_recording.approximate_date', '%s', 'str', ''),
+            # ('_em_image_recording.approximate_date', '%s', 'str', ''),
             ('_em_image_recording.average_exposure_time', '%s', 'str', ''),
             ('_em_image_recording.avg_electron_dose_per_image', '%s', 'str', ''),
             ('_em_image_recording.details', '%s', 'str', ''),
@@ -656,7 +654,7 @@ class PdbxEmExtensionCategoryStyle(PdbxCategoryStyleBase):
             ('_em_ctf_correction.amplitude_correction_space', '%s', 'str', ''),
             ('_em_ctf_correction.correction_operation', '%s', 'str', ''),
             ('_em_ctf_correction.details', '%s', 'str', ''),
-            #('_em_ctf_correction.em_software_id', '%s', 'str', ''),
+            # ('_em_ctf_correction.em_software_id', '%s', 'str', ''),
             ('_em_ctf_correction.id', '%s', 'str', ''),
             ('_em_ctf_correction.phase_reversal', '%s', 'str', ''),
             ('_em_ctf_correction.phase_reversal_anisotropic', '%s', 'str', ''),
@@ -667,7 +665,7 @@ class PdbxEmExtensionCategoryStyle(PdbxCategoryStyleBase):
             ('_em_ctf_correction.amplitude_correction_space', '%s', 'str', ''),
             ('_em_ctf_correction.correction_operation', '%s', 'str', ''),
             ('_em_ctf_correction.details', '%s', 'str', ''),
-            #('_em_ctf_correction.em_software_id', '%s', 'str', ''),
+            # ('_em_ctf_correction.em_software_id', '%s', 'str', ''),
             ('_em_ctf_correction.id', '%s', 'str', ''),
             ('_em_ctf_correction.phase_reversal', '%s', 'str', ''),
             ('_em_ctf_correction.phase_reversal_anisotropic', '%s', 'str', ''),

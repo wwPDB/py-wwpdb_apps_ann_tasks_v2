@@ -191,6 +191,9 @@ class PdbxReport(object):
                 pdbxR = PdbxLinksReportIo(verbose=self.__verbose, log=self.__lfh)
             elif contentType == "em-map-info-report":
                 pdbxR = EmInfoReportIo(verbose=self.__verbose, log=self.__lfh)
+            else:
+                self.__lfh.write("+PdbxReport.doReport() - unknown contentType %s\n" % contentType)
+                return oD
 
             pdbxR.setFilePath(localPath, idCode=None)
             pdbxR.get()

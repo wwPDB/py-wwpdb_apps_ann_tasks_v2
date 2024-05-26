@@ -874,6 +874,7 @@ class PdbxLocalMapIndexIo(PdbxStyleIoUtil):
     def write(self, filePath):
         return self.writeFile(filePath)
 
+
 class EmInfoReportIo(PdbxStyleIoUtil):
     """Methods for reading EM information details."""
 

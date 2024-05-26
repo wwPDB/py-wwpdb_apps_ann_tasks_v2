@@ -113,6 +113,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
 
+        contentType = contentFormat = partitionNumber = None
         if self._isFileUpload():
             # make a copy of the file in the session directory and set 'fileName'
             self._uploadFile()
@@ -149,6 +150,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             #
             pR = PdbxReport(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             aTagList.append(du.getAnchorTag())
+            downloadPath = du.getDownloadPath()
             layout = "multiaccordion"
             htmlList.extend(pR.makeTabularReport(filePath=downloadPath, contentType=contentType, idCode=idCode, layout=layout))
             if len(aTagList) > 0:

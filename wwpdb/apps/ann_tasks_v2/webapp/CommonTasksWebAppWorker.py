@@ -2303,7 +2303,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     versionId = "latest"
                 else:
                     versionId = "none"
-                
+
                 # Try to avoid fetch if not needed
                 downloadPath = du.getFilePath(entryId, contentType="model", formatType="pdbx", fileSource=fileSource, instance=instance, versionId=versionId)
                 if downloadPath is None or not os.path.exists(downloadPath):

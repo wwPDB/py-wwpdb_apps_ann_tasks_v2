@@ -513,7 +513,7 @@ class CorresPNDTemplate(object):
         myD["major_release"] = self.__letterTemplateMap["major_release"]
         myD["major_minor_addition"] = self.__letterTemplateMap["major_minor_addition"]
         myD["minor"] = self.__letterTemplateMap["minor"]
-        myD["minor_release"],is_repl_rel = self.__getRelaseInfo()
+        myD["minor_release"], is_repl_rel = self.__getRelaseInfo()
         if is_repl_rel:
             myD["major_release"] = self.__letterTemplateMap["release_repl_rel"]
         #
@@ -739,7 +739,7 @@ class CorresPNDTemplate(object):
                 text += self.__letterTemplateMap["pre_release_no"]
             #
         #
-        return text,is_repl_rel
+        return text, is_repl_rel
 
     def __getTableContext(self, count):
         text = ""
