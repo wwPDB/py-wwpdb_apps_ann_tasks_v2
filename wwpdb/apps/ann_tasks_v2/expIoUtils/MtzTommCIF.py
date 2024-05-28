@@ -173,6 +173,8 @@ class MtzTommCIF(SessionWebDownloadUtils):
     def __runCmd(self, options, html=False):
         """ """
         cmd = "cd " + self.__sessionPath + " ; " + self.__bashSetting(html) + options
+        if self.__verbose:
+            self.__lfh.write("MtzTommCIF command: %s\n" % cmd)
         os.system(cmd)
 
     def __readHtmlText(self):
@@ -240,10 +242,11 @@ class MtzTommCIF(SessionWebDownloadUtils):
             ["phwt", " 'PHWT=%s', "],
             ["delfwt", " 'DELFWT=%s', "],
             ["delphwt", " 'DELPHWT=%s', "],
-            ["freer", " -freer %s , "],
+            ["freer", " -freer %s "],
         ]
         #
         items = ""
+        lastitem = None
         for i in range(self.__intDataSet):
             if (i > 0) and items:
                 items += " : "
@@ -253,9 +256,16 @@ class MtzTommCIF(SessionWebDownloadUtils):
                 if not value:
                     continue
                 #
-                items += tokenName[1] % value
+                # This limits us to a single rfree across multiple sets.
+                if tokenName[0] == "freer":
+                    lastitem = tokenName[1] % value
+                else:
+                    items += tokenName[1] % value
             #
         #
+        if lastitem:
+            items += lastitem
+
         return items
 
     def __getPdbId(self):
