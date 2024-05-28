@@ -204,6 +204,12 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     "\n+%s.%s starting with identifier %s statusCode %r authRelCode %r annotatorId %r\n"
                     % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier, statusCode, authRelCode, annotatorId)
                 )
+        else:
+            self._lfh.write("\n+%s.%s ERROR failing to fetchId %s\n"
+                            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier))
+            rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+            rC.setError("Unable to decipher identifier")
+            return rC
 
         # Prepare the Startup data items
         myD = {}
