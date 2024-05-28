@@ -240,7 +240,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
             ["phwt", " 'PHWT=%s', "],
             ["delfwt", " 'DELFWT=%s', "],
             ["delphwt", " 'DELPHWT=%s', "],
-            ["freer", " -FREER %s , "],
+            ["freer", " -freer %s , "],
         ]
         #
         items = ""
