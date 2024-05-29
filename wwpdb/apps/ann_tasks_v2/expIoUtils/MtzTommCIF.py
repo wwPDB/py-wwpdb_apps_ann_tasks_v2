@@ -219,7 +219,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
             ["sigfp", " 'SIGFP=%s', "],
             ["i", " 'I=%s', "],
             ["sigi", " 'SIGI=%s', "],
-            ["free", " 'FREE=%s', "],
+            ["free", " 'FreeR_flag=%s', "],  # Gemmi will instantiate pdbx_r_free_flag as well. Undocumented feature
             ["phib", " 'PHIB=%s', "],
             ["fom", " 'FOM=%s', "],
             ["fc", " 'FC=%s', "],
