@@ -1132,6 +1132,28 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         return rC
 
+    def _pcmGetMissingAnnotationOp(self):
+        """ """
+        if self._verbose:
+            self._lfh.write("--------------------------------------------\n")
+            self._lfh.write("+CommonTasksWebAppWorker._newOperationOp() starting\n")
+        #
+        self._getSession(useContext=True)
+        fileName = self._reqObj.getValue("entryfilename")
+        entryId = self._reqObj.getValue("entryid")
+        taskFormId = self._reqObj.getValue("taskformid")
+        taskArgs = ""
+        #
+        #
+        calc = NewOperation(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        #
+        # Perform the operation here
+        #
+        #
+        rC = self._makeTaskResponse(tssObj=tss)
+        return rC
+
     def _mergeXyzCalcOp(self):
         """ """
         if self._verbose:
