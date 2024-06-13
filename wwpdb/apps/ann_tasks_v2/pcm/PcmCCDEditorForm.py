@@ -9,7 +9,7 @@ except ImportError:
     import pickle as pickle
 
 import os
-import shutil
+import csv
 import sys
 import logging
 import traceback
@@ -108,3 +108,65 @@ class PcmCCDEditorForm(object):
             traceback.print_exc(file=self.__lfh)
         #
 
+    def getCCDForm(self):
+        """Get CCD missing annotation form"""
+        myD = {}
+        myD["statuscode"] = "failed"
+        myD["statustext"] = "Invalid ajax call"
+        if not self.__identifier:
+            return myD
+        #
+        if self.__identifier == self.__entryId:
+            return self.__buildCCDFormHtml()
+        #
+        return myD
+    
+    def __buildCCDFormHtml(self):
+        # depending on the output of the binary
+        # check if it matches this entry id
+        
+        if not os.access(self.__csvPath, os.F_OK):
+            myD = {}
+            myD["statuscode"] = "failed"
+            myD["statustext"] = "Failed to build form for x"
+            return myD
+
+        htmlcontent = self.__tableTemplate % self.__identifier
+        htmlcontent += (
+            "<tr>\n<th>Comp Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"
+        )
+        #
+        columns = {
+            "Comp_id": {"editable": True},
+            "Modified_residue_id": {"editable": True},
+            "Type": {"editable": True},
+            "Category": {"editable": True},
+            "Position": {"editable": True},
+            "Polypeptide_position": {"editable": True},
+            "Comp_id_linking_atom": {"editable": True},
+            "Modified_residue_id_linking_atom": {"editable": True},
+            "First_instance_model_db_code": {"editable": True},
+        }
+
+        with open(self.__csvPath, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                comp_id = row['Comp_id']
+                
+                for c in columns:
+                    if columns[c]['editable']:
+                        ed_id = f"{comp_id}_{c}"
+                        ed_text = self.__editableTemplate % ("editable_text", ed_id, row[c])
+                        htmlcontent += self.__tdTagTemplate % ed_text
+                    else:
+                        htmlcontent += self.__tdTagTemplate % row[c]
+
+                # add last column with link
+                htmlcontent += "</tr>\n"        
+        #
+        htmlcontent += "</table>\n"
+        #
+        myD = {}
+        myD["statuscode"] = "ok"
+        myD["htmlcontent"] = htmlcontent
+        return myD

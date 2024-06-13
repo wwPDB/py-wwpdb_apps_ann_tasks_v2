@@ -95,6 +95,9 @@ from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorForm import CSEditorForm
 from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorUpdate import CSEditorUpdate
 
 #
+from wwpdb.apps.ann_tasks_v2.pcm.PcmCCDEditorForm import PcmCCDEditorForm
+
+#
 from wwpdb.apps.ann_tasks_v2.editCoord.CoordEditorForm_v2 import CoordEditorForm
 from wwpdb.apps.ann_tasks_v2.editCoord.CoordEditorUpdate import CoordEditorUpdate
 from wwpdb.apps.ann_tasks_v2.em3d.EmEditUtils import EmEditUtils
@@ -1132,26 +1135,40 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         return rC
 
-    def _pcmGetMissingAnnotationOp(self):
-        """ """
+    def _pcmGetCCDFormOp(self):
+        """Generating CCD missing annotation form"""
         if self._verbose:
-            self._lfh.write("--------------------------------------------\n")
-            self._lfh.write("+CommonTasksWebAppWorker._newOperationOp() starting\n")
-        #
+            self._lfh.write("+CommonTasksWebAppWorker._pcmGetCCDFormOp() starting\n")
         self._getSession(useContext=True)
-        fileName = self._reqObj.getValue("entryfilename")
-        entryId = self._reqObj.getValue("entryid")
-        taskFormId = self._reqObj.getValue("taskformid")
-        taskArgs = ""
         #
+        dU = DetachUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ccdEditorFormOp = PcmCCDEditorForm(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         #
-        calc = NewOperation(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        myD = {}
+        sph = self._reqObj.getSemaphore()
+        delayValue = self._reqObj.getValue("delay")
+        if sph:
+            if dU.semaphoreExists(sph):
+                myD = PcmCCDEditorForm.getCCDForm()
+            else:
+                time.sleep(int(delayValue))
+                myD["statuscode"] = "running"
+            #
+        else:
+            entryId = self._reqObj.getValue("entryid")
+            identifier = self._reqObj.getValue("display_identifier")
+            dU.set(workerObj=ccdEditorFormOp, workerMethod="run")
+            dU.runDetach()
+
+            # if (identifier == entryId) or identifier.startswith("chain_"):
+            #     myD["statuscode"] = "running"
+            # else:
+            #     myD = ccdEditorFormOp.get()
+            #
         #
-        # Perform the operation here
-        #
-        #
-        rC = self._makeTaskResponse(tssObj=tss)
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        rC.addDictionaryItems(myD)
         return rC
 
     def _mergeXyzCalcOp(self):

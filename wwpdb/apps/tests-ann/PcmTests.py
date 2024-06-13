@@ -19,8 +19,8 @@ def mock_config(monkeypatch):
         "PDBX_DICTIONARY_NAME_DICT": {"DEPOSIT": ""},
         "REFERENCE_PATH": "",
         "SITE_PDBX_DICT_PATH": "",
-        # "CONTENT_TYPE_DICTIONARY": {'foo': (['json'], 'foo'), 'model': (['pdbx', 'pdb', 'pdbml', 'cifeps'], 'model')},
-        # "FILE_FORMAT_EXTENSION_DICTIONARY": {'json': 'foo', 'pdbx': 'cif'}
+        "SITE_PACKAGES_PATH": "",
+        "SITE_LOCAL_APPS_PATH": "",
     }
 
     monkeypatch.setattr(ConfigInfoData, "getConfigDictionary", lambda s: mc)
@@ -42,13 +42,13 @@ class MockReqObj:
 class MockSessionObj:
     def __init__(self) -> None:
         self._session = os.path.join(MOCK_SESSIONS_PATH, "mock_session")
-        os.mkdir(self._session)
+        os.makedirs(self._session, exist_ok=True)
 
     def getPath(self):
         return self._session
 
 
-def test_read_csv(mock_config):
+def test_run_binary(mock_config):
     mock_req = MockReqObj({"display_identifier": "1cbs", "entryid": "1cbs", "entryfilename": "1cbs.cif", "WWPDB_SITE_ID": "WWPDB"})
     pcm_form = PcmCCDEditorForm(reqObj=mock_req, verbose=False)
     open(os.path.join(mock_req.session.getPath(), "1cbs.cif"), "w").close()
@@ -57,3 +57,24 @@ def test_read_csv(mock_config):
     assert os.path.exists(os.path.join(mock_req.session.getPath(), "1cbs_ccd_no_pcm_ann.csv"))
     assert os.path.exists(os.path.join(mock_req.session.getPath(), "1cbs_ccd_no_pcm_ann.log"))
 
+
+def test_get_html_form(mock_config):
+    mock_req = MockReqObj({"display_identifier": "1cbs", "entryid": "1cbs", "entryfilename": "1cbs.cif", "WWPDB_SITE_ID": "WWPDB"})
+    pcm_form = PcmCCDEditorForm(reqObj=mock_req, verbose=False)
+
+    with open(os.path.join(mock_req.session.getPath(), "1cbs_ccd_no_pcm_ann.csv"), "w") as fp:
+        fp.write("Comp_id,Modified_residue_id,Type,Category,Position,Polypeptide_position,Comp_id_linking_atom,Modified_residue_id_linking_atom,First_instance_model_db_code\n")
+        fp.write("MLU,missing,missing,missing,missing,missing,.,.,1PN3\n")
+        fp.write("OMZ,missing,missing,missing,missing,missing,.,.,1PN3\n")
+        fp.write("GHP,missing,missing,missing,missing,missing,.,.,1PN3\n")
+        fp.write("BGC,GHP,missing,missing,missing,missing,C1,O4,1PN3\n")
+        fp.write("OMY,missing,missing,missing,missing,missing,.,.,1PN3\n")
+        fp.write("3FG,missing,missing,missing,missing,missing,.,.,1PN3")
+
+    html_form = pcm_form.getCCDForm()["htmlcontent"]
+    assert "MLU" in html_form
+    assert "OMZ" in html_form
+    assert "GHP" in html_form
+    assert "BGC" in html_form
+    assert "OMY" in html_form
+    assert "3FG" in html_form
