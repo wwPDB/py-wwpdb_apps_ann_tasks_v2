@@ -1149,7 +1149,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         delayValue = self._reqObj.getValue("delay")
         if sph:
             if dU.semaphoreExists(sph):
-                myD = PcmCCDEditorForm.getCCDForm()
+                myD = ccdEditorFormOp.getCCDForm()
             else:
                 time.sleep(int(delayValue))
                 myD["statuscode"] = "running"
@@ -1159,9 +1159,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             identifier = self._reqObj.getValue("display_identifier")
             dU.set(workerObj=ccdEditorFormOp, workerMethod="run")
             dU.runDetach()
+            myD["statuscode"] = "running"
 
             # if (identifier == entryId) or identifier.startswith("chain_"):
-            #     myD["statuscode"] = "running"
             # else:
             #     myD = ccdEditorFormOp.get()
             #

@@ -35,25 +35,6 @@ class PcmCCDEditorForm(object):
         #
         self.__setup()
 
-    # Rest of the code...
-
-
-
-
-class PcmCCDEditorForm(object):
-    """
-    The CoordEditorForm class generates coordinate editor form.
-
-    """
-
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
-        self.__verbose = verbose
-        self.__lfh = log
-        self.__reqObj = reqObj
-        self.__entryFile = None
-        #
-        self.__setup()
-
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
@@ -72,6 +53,14 @@ class PcmCCDEditorForm(object):
         self.__tableTemplate = '<table id="table_%s" class="table table-condensed table-bordered table-striped">\n'
         self.__tdTagTemplate = '<td style="border-style:none">%s</td>\n'
         self.__editableTemplate = '<b class="%s" id="%s" style="display:inline">%s</b>'
+
+    def setLogHandle(self, log=sys.stderr):
+        """Reset the stream for logging output."""
+        try:
+            self.__lfh = log
+            return True
+        except:  # noqa: E722 pylint: disable=bare-except
+            return False
 
     def run(self):
         """Generate JSON format data"""
