@@ -137,15 +137,15 @@ class PcmCCDEditorForm(object):
         )
         #
         columns = {
-            "Comp_id": {"editable": True},
-            "Modified_residue_id": {"editable": True},
-            "Type": {"editable": True},
-            "Category": {"editable": True},
-            "Position": {"editable": True},
-            "Polypeptide_position": {"editable": True},
-            "Comp_id_linking_atom": {"editable": True},
-            "Modified_residue_id_linking_atom": {"editable": True},
-            "First_instance_model_db_code": {"editable": True},
+            "Comp_id": {"editable": False},
+            "Modified_residue_id": {"editable": False},
+            "Type": {"editable": False},
+            "Category": {"editable": False},
+            "Position": {"editable": False},
+            "Polypeptide_position": {"editable": False},
+            "Comp_id_linking_atom": {"editable": False},
+            "Modified_residue_id_linking_atom": {"editable": False},
+            "First_instance_model_db_code": {"editable": False},
         }
 
         with open(self.__csvPath, 'r') as csvfile:
