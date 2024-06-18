@@ -151,6 +151,8 @@ class PcmCCDEditorForm(object):
                         htmlcontent += self.__tdTagTemplate % row[c]
 
                 # add last column with link
+                chem_ref_link = "/chem_ref_data_ui/chemref_search_ref_bs.html?searchTarget=%s" % comp_id
+                htmlcontent += self.__tdTagTemplate % f'<a href="{chem_ref_link}" target="_blank">{comp_id}</a>'
                 htmlcontent += "</tr>\n"        
         #
         htmlcontent += "</table>\n"
