@@ -119,6 +119,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             "/service/ann_tasks_v2/nafeaturescalc": "_naFeaturesCalcOp",
             "/service/ann_tasks_v2/secstructcalc": "_secondaryStructureCalcOp",
             "/service/ann_tasks_v2/transformcoordcalc": "_transformCoordCalcOp",
+            "/service/ann_tasks_v2/pcm_get_ccd_form": "_pcmGetCCDFormOp",
             #
             "/service/ann_tasks_v2/mergexyzcalc": "_mergeXyzCalcOp",
             "/service/ann_tasks_v2/terminalatomscalc": "_terminalAtomsCalcOp",

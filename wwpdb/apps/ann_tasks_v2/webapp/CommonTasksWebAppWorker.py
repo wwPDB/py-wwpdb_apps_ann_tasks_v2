@@ -95,6 +95,9 @@ from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorForm import CSEditorForm
 from wwpdb.apps.ann_tasks_v2.editCoord.CSEditorUpdate import CSEditorUpdate
 
 #
+from wwpdb.apps.ann_tasks_v2.pcm.PcmCCDEditorForm import PcmCCDEditorForm
+
+#
 from wwpdb.apps.ann_tasks_v2.editCoord.CoordEditorForm_v2 import CoordEditorForm
 from wwpdb.apps.ann_tasks_v2.editCoord.CoordEditorUpdate import CoordEditorUpdate
 from wwpdb.apps.ann_tasks_v2.em3d.EmEditUtils import EmEditUtils
@@ -1130,6 +1133,42 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tss.assign(name="Transform coordinates", formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
         rC = self._makeTaskResponse(tssObj=tss)
 
+        return rC
+
+    def _pcmGetCCDFormOp(self):
+        """Generating CCD missing annotation form"""
+        if self._verbose:
+            self._lfh.write("+CommonTasksWebAppWorker._pcmGetCCDFormOp() starting\n")
+        self._getSession(useContext=True)
+        #
+        dU = DetachUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        ccdEditorFormOp = PcmCCDEditorForm(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        #
+        myD = {}
+        sph = self._reqObj.getSemaphore()
+        delayValue = self._reqObj.getValue("delay")
+        if sph:
+            if dU.semaphoreExists(sph):
+                myD = ccdEditorFormOp.getCCDForm()
+            else:
+                time.sleep(int(delayValue))
+                myD["statuscode"] = "running"
+            #
+        else:
+            entryId = self._reqObj.getValue("entryid")
+            identifier = self._reqObj.getValue("display_identifier")
+            dU.set(workerObj=ccdEditorFormOp, workerMethod="run")
+            dU.runDetach()
+            myD["statuscode"] = "running"
+
+            # if (identifier == entryId) or identifier.startswith("chain_"):
+            # else:
+            #     myD = ccdEditorFormOp.get()
+            #
+        #
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        rC.addDictionaryItems(myD)
         return rC
 
     def _mergeXyzCalcOp(self):
