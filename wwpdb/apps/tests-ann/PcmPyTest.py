@@ -1,7 +1,6 @@
 import os
 import pytest
 import tempfile
-import debugpy
 
 from wwpdb.utils.config.ConfigInfoData import ConfigInfoData
 from wwpdb.apps.ann_tasks_v2.pcm.PcmCCDEditorForm import PcmCCDEditorForm
@@ -12,10 +11,12 @@ MOCK_SESSIONS_PATH = tempfile.mkdtemp()
 @pytest.fixture
 def mock_config(monkeypatch):
     mc = {
+        "SITE_REFDATA_PROJ_NAME_PRDCC": "",
         "SITE_WEB_APPS_SESSIONS_PATH": MOCK_SESSIONS_PATH,
         "SITE_WEB_APPS_TOP_SESSIONS_PATH": MOCK_SESSIONS_PATH,
         "SITE_REFDATA_PROJ_NAME_CC": "",
-        "SITE_REFDATA_PROJ_NAME_PRDCC": "",
+        "SITE_CC_DICT_PATH": "",
+        "SITE_REFDATA_TOP_CVS_SB_PATH": "",
         "PDBX_DICTIONARY_NAME_DICT": {"DEPOSIT": ""},
         "REFERENCE_PATH": "",
         "SITE_PDBX_DICT_PATH": "",
