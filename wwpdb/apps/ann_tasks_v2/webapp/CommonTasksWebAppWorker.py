@@ -1155,8 +1155,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD["statuscode"] = "running"
             #
         else:
-            entryId = self._reqObj.getValue("entryid")
-            identifier = self._reqObj.getValue("display_identifier")
+            # entryId = self._reqObj.getValue("entryid")
+            # identifier = self._reqObj.getValue("display_identifier")
             dU.set(workerObj=ccdEditorFormOp, workerMethod="run")
             dU.runDetach()
             myD["statuscode"] = "running"

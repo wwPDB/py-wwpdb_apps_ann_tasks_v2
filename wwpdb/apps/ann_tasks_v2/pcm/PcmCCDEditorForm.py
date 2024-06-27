@@ -3,11 +3,6 @@ Manage the generating of PCM missing annotation table.
 
 """
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle as pickle
-
 import os
 import csv
 import sys
@@ -15,10 +10,9 @@ import logging
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-import logging
 
-# Set the default logger handler level to INFO
-logging.getLogger().setLevel(logging.INFO)
+# Set the default logger handler level to INFO -- this should not be set here - but at hight level
+# logging.getLogger().setLevel(logging.INFO)
 
 
 class PcmCCDEditorForm(object):
@@ -44,11 +38,11 @@ class PcmCCDEditorForm(object):
         self.__csvPath = os.path.join(self.__sessionPath, self.__entryId + "_ccd_no_pcm_ann.csv")
         self.__entryFile = None
         #
-        self.__listItemTemplate = (
-            '<li><a id="%s" class="discontrol ui-corner-all" href="#">'
-            + '<span class="ui-icon fltlft ui-icon-circle-arrow-e"></span> %s </a>\n'
-            + '<div id="display_%s" style="display:none"></div>\n</li>\n'
-        )
+        # self.__listItemTemplate = (
+        #     '<li><a id="%s" class="discontrol ui-corner-all" href="#">'
+        #     + '<span class="ui-icon fltlft ui-icon-circle-arrow-e"></span> %s </a>\n'
+        #     + '<div id="display_%s" style="display:none"></div>\n</li>\n'
+        # )
         #
         self.__tableTemplate = '<table id="table_%s" class="table table-condensed table-bordered table-striped">\n'
         self.__tdTagTemplate = '<td style="border-style:none">%s</td>\n'
@@ -69,12 +63,12 @@ class PcmCCDEditorForm(object):
         #
         if self.__identifier == self.__entryId:
             self.__runPcmCcdCheck()
-        
+
         if os.access(self.__csvPath, os.F_OK):
             return True
         #
         return False
-    
+
     def __runPcmCcdCheck(self):
         """Run X program"""
         self.__entryFile = self.__reqObj.getValue("entryfilename")
@@ -109,11 +103,11 @@ class PcmCCDEditorForm(object):
             return self.__buildCCDFormHtml()
         #
         return myD
-    
+
     def __buildCCDFormHtml(self):
         # depending on the output of the binary
         # check if it matches this entry id
-        
+
         if not os.access(self.__csvPath, os.F_OK):
             myD = {}
             myD["statuscode"] = "failed"
@@ -122,7 +116,7 @@ class PcmCCDEditorForm(object):
 
         htmlcontent = self.__tableTemplate % self.__identifier
         htmlcontent += (
-            "<tr>\n<th>Comp Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"
+            "<tr>\n<th>Comp Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
         )
         #
         columns = {
@@ -141,7 +135,7 @@ class PcmCCDEditorForm(object):
             reader = csv.DictReader(csvfile)
             for row in reader:
                 comp_id = row['Comp_id']
-                
+
                 for c in columns:
                     if columns[c]['editable']:
                         ed_id = f"{comp_id}_{c}"
@@ -153,7 +147,7 @@ class PcmCCDEditorForm(object):
                 # add last column with link
                 chem_ref_link = "/chem_ref_data_ui/chemref_editor_bs.html?searchTarget=%s" % comp_id
                 htmlcontent += self.__tdTagTemplate % f'<a href="{chem_ref_link}" target="_blank">{comp_id}</a>'
-                htmlcontent += "</tr>\n"        
+                htmlcontent += "</tr>\n"
         #
         htmlcontent += "</table>\n"
         #

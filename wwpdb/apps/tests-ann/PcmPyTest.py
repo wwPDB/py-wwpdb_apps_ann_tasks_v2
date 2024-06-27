@@ -8,6 +8,7 @@ from wwpdb.apps.ann_tasks_v2.pcm.PcmCCDEditorForm import PcmCCDEditorForm
 
 MOCK_SESSIONS_PATH = tempfile.mkdtemp()
 
+
 @pytest.fixture
 def mock_config(monkeypatch):
     mc = {
@@ -54,7 +55,7 @@ def test_run_binary(mock_config):
     pcm_form = PcmCCDEditorForm(reqObj=mock_req, verbose=False)
     open(os.path.join(mock_req.session.getPath(), "1cbs.cif"), "w").close()
 
-    assert pcm_form.run() == True
+    assert pcm_form.run() is True
     assert os.path.exists(os.path.join(mock_req.session.getPath(), "1cbs_ccd_no_pcm_ann.csv"))
     assert os.path.exists(os.path.join(mock_req.session.getPath(), "1cbs_ccd_no_pcm_ann.log"))
 
