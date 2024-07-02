@@ -1155,16 +1155,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 myD["statuscode"] = "running"
             #
         else:
-            entryId = self._reqObj.getValue("entryid")
-            identifier = self._reqObj.getValue("display_identifier")
             dU.set(workerObj=ccdEditorFormOp, workerMethod="run")
             dU.runDetach()
             myD["statuscode"] = "running"
-
-            # if (identifier == entryId) or identifier.startswith("chain_"):
-            # else:
-            #     myD = ccdEditorFormOp.get()
-            #
         #
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
