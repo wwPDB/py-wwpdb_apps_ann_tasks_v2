@@ -3,11 +3,6 @@ Manage the generating of PCM missing annotation table.
 
 """
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle as pickle
-
 import os
 import csv
 import sys
@@ -15,10 +10,9 @@ import logging
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-import logging
 
-# Set the default logger handler level to INFO
-logging.getLogger().setLevel(logging.INFO)
+# Set the default logger handler level to INFO -- this should not be set here - but at hight level
+# logging.getLogger().setLevel(logging.INFO)
 
 
 class PcmCCDEditorForm(object):
@@ -71,7 +65,7 @@ class PcmCCDEditorForm(object):
             return True
         #
         return False
-    
+
     def __runPcmCcdCheck(self):
         """Run PCM script to check missing annotation"""
         self.__entryFile = self.__reqObj.getValue("entryfilename")
@@ -107,11 +101,11 @@ class PcmCCDEditorForm(object):
             return self.__buildCCDFormHtml()
         #
         return myD
-    
+
     def __buildCCDFormHtml(self):
         # depending on the output of the binary
         # check if it matches this entry id
-        
+
         if not os.access(self.__csvPath, os.F_OK):
             myD = {}
             myD["statuscode"] = "failed"
@@ -120,7 +114,7 @@ class PcmCCDEditorForm(object):
 
         htmlcontent = self.__tableTemplate % self.__identifier
         htmlcontent += (
-            "<tr>\n<th>Comp Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"
+            "<tr>\n<th>Comp Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
         )
         #
         columns = {
@@ -139,7 +133,7 @@ class PcmCCDEditorForm(object):
             reader = csv.DictReader(csvfile)
             for row in reader:
                 comp_id = row['Comp_id']
-                
+
                 for c in columns:
                     if columns[c]['editable']:
                         ed_id = f"{comp_id}_{c}"
@@ -149,9 +143,9 @@ class PcmCCDEditorForm(object):
                         htmlcontent += self.__tdTagTemplate % row[c]
 
                 # add last column with link
-                chem_ref_link = "/chem_ref_data_ui/chemref_search_ref_bs.html?searchTarget=%s" % comp_id
+                chem_ref_link = "/chem_ref_data_ui/chemref_editor_bs.html?searchTarget=%s" % comp_id
                 htmlcontent += self.__tdTagTemplate % f'<a href="{chem_ref_link}" target="_blank">{comp_id}</a>'
-                htmlcontent += "</tr>\n"        
+                htmlcontent += "</tr>\n"
         #
         htmlcontent += "</table>\n"
         #
