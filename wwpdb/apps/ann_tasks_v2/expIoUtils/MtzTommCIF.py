@@ -20,6 +20,7 @@ import os
 import traceback
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -74,9 +75,9 @@ class MtzTommCIF(SessionWebDownloadUtils):
 
     def __setup(self):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
-        self.__cI = ConfigInfo(self.__siteId)
-        self.__packagePath = os.path.abspath(self.__cI.get("SITE_PACKAGES_PATH"))
-        self.__topSessionPath = os.path.join(self.__cI.get("SITE_WEB_APPS_TOP_SESSIONS_PATH"), "sessions")
+        self.__cICommon = ConfigInfoAppCommon(self.__siteId)
+        self.__packagePath = self.__cICommon.get_site_packages_path()
+        self.__topSessionPath = self.__cICommon.get_site_web_apps_sessions_path()
         #
         self.__mtzFileName = self.__reqObj.getValue("infile")
         self.__mtzDataSet = self.__reqObj.getValue("data_set")
