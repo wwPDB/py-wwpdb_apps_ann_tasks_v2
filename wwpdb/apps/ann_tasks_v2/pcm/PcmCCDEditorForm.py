@@ -38,15 +38,10 @@ class PcmCCDEditorForm(object):
         self.__csvPath = os.path.join(self.__sessionPath, self.__entryId + "_ccd_no_pcm_ann.csv")
         self.__entryFile = None
         #
-        # self.__listItemTemplate = (
-        #     '<li><a id="%s" class="discontrol ui-corner-all" href="#">'
-        #     + '<span class="ui-icon fltlft ui-icon-circle-arrow-e"></span> %s </a>\n'
-        #     + '<div id="display_%s" style="display:none"></div>\n</li>\n'
-        # )
-        #
         self.__tableTemplate = '<table id="table_%s" class="table table-condensed table-bordered table-striped">\n'
         self.__tdTagTemplate = '<td style="border-style:none">%s</td>\n'
         self.__editableTemplate = '<b class="%s" id="%s" style="display:inline">%s</b>'
+        logging.info("Processing entry %s", self.__entryId)
 
     def setLogHandle(self, log=sys.stderr):
         """Reset the stream for logging output."""
@@ -58,6 +53,8 @@ class PcmCCDEditorForm(object):
 
     def run(self):
         """Generate JSON format data"""
+        logging.info("Processing entry %s", self.__entryId)
+
         if not self.__identifier:
             return False
         #
@@ -70,7 +67,7 @@ class PcmCCDEditorForm(object):
         return False
 
     def __runPcmCcdCheck(self):
-        """Run X program"""
+        """Run PCM script to check missing annotation"""
         self.__entryFile = self.__reqObj.getValue("entryfilename")
         entry_file_path = os.path.join(self.__sessionPath, self.__entryFile)
 
@@ -83,6 +80,7 @@ class PcmCCDEditorForm(object):
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(entry_file_path)
+            dp.addInput(name="id", value=self.__entryId)
             dp.op("annot-pcm-check-ccd-ann")
             dp.exp(dstPath=self.__csvPath)
             dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_ccd_no_pcm_ann.log"))
@@ -111,7 +109,7 @@ class PcmCCDEditorForm(object):
         if not os.access(self.__csvPath, os.F_OK):
             myD = {}
             myD["statuscode"] = "failed"
-            myD["statustext"] = "Failed to build form for x"
+            myD["statustext"] = "Failed to build form for %s" % self.__entryId
             return myD
 
         htmlcontent = self.__tableTemplate % self.__identifier
