@@ -36,9 +36,8 @@ class ProteinModificationUtil:
         Assumptions:
             - The model file used will always be the last one in archive
     """
-    def __init__(self, dep_id: str, entry_id: str,  output_cif: str, output_csv: str) -> None:
+    def __init__(self, dep_id: str, output_cif: str, output_csv: str) -> None:
         self._dep_id = dep_id
-        self._entry_id = entry_id
         self._ci = ConfigInfo()
         self._cicommon = ConfigInfoAppCommon()
         self._io = IoAdapterCore()
@@ -48,7 +47,8 @@ class ProteinModificationUtil:
         self._output_csv = output_csv
 
         self._parse_model()
-    
+        self._entry_id = self._get_db_code()
+
     def _parse_model(self):
         self._latest_model = self._pi.getModelPdbxFilePath(
             dataSetId=self._dep_id,
@@ -141,6 +141,17 @@ class ProteinModificationUtil:
             removed = cat_data.removeRow(r)
             if not removed:
                 logger.error("Failed to remove row %d from category %s", r, category)
+    
+    def _get_db_code(self):
+        catobj = self._mmcif_data.getObj("database_2")
+
+        if not catobj:
+            logger.error("Couldn't find database_2 category in model")
+            raise ValueError("Couldn't find database_2 category in model")
+
+        vals = catobj.selectValuesWhere("database_code", "PDB", "database_id")
+        if len(vals):
+            return vals[0]
 
     def _check_sc_between_neighbors(self, sc_rec):
         """Check if the struct_conn record is between two neighboring residues in a sequence
@@ -1198,10 +1209,9 @@ class ProteinModificationUtil:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Protein Modification Utility")
     parser.add_argument("--dep-id", type=str, help="Dep ID")
-    parser.add_argument("--entry-id", type=str, help="Entry ID")
     parser.add_argument("--output-csv", type=str, help="Output CSV file")
     parser.add_argument("--output-mmcif", type=str, help="Output MMCIF file")
     args = parser.parse_args()
 
-    util = ProteinModificationUtil(args.dep_id, args.entry_id, args.output_mmcif, args.output_csv)
+    util = ProteinModificationUtil(args.dep_id, args.output_mmcif, args.output_csv)
     util.run()

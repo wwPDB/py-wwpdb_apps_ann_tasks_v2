@@ -11,9 +11,6 @@ import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
-# Set the default logger handler level to INFO -- this should not be set here - but at hight level
-# logging.getLogger().setLevel(logging.INFO)
-
 
 class PcmCCDEditorForm(object):
     """
