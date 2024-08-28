@@ -22,6 +22,8 @@
 #  13-Jan-2017  ep   add _specialPositionUpdateOp
 #  05-Oct-2017  zf   add _loadEntityInfoOp(), _loadSymopInfoOp()
 #  12-Feb-2018  ep   add reqacctypes to data returned from _entryInfoOp()
+#  09-Aug-2024  zf   add _uploadBiomtFileOp()
+#  26-Aug-2024  zf   add copying PCM missing data csv file
 ##
 """
 Common  annotation tasks.
@@ -135,6 +137,7 @@ from mmcif.io.IoAdapterCore import IoAdapterCore
 from wwpdb.apps.ann_tasks_v2.transformCoord.TransformCoord import TransformCoord
 from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
+from wwpdb.apps.ann_tasks_v2.utils.PointSuite import PointSuite
 from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
 from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 
@@ -1659,7 +1662,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         pth = de.copyToSession(contentType="xml-check-report", formatType="txt", version="latest", partitionNumber=1)
         #
+        # PCM missing data csv file
+        #
+        pth = de.copyToSession(contentType="pcm-missing-data", formatType="csv", version="latest", partitionNumber=1)
+        #
         #  Handle maps if input option is set --
+        #
         if getMaps:
             pth = de.copyToSession(contentType="map-2fofc", formatType="map", version="latest", partitionNumber=1)
             pth = de.copyToSession(contentType="map-fofc", formatType="map", version="latest", partitionNumber=1)
@@ -1667,7 +1675,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             pth = de.copyToSession(contentType="map-omit-fofc", formatType="map", version="latest", partitionNumber=1)
             de.copyDirToSession(dirName="np-cc-maps")
             de.copyDirToSession(dirName="np-cc-omit-maps")
-
         #
         # SF file
         #
@@ -3720,6 +3727,99 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             self._lfh.write("CommonTaskWebAppWorker()._uploadFileOp() rC %s\n" % "\n".join(rC.dump()))
 
         return rC
+
+    def _uploadBiomtFileOp(self):
+        """ """
+        if self._verbose:
+            self._lfh.write("+CommonTasksWebAppWorker._uploadBiomtFileOp() starting\n")
+
+        self._getSession(useContext=True)
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+
+        wuu = WebUploadUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        if not wuu.isFileUpload():
+            rC.setError(errMsg="No file uploaded")
+            return rC
+        #
+        originalUploadFileName = wuu.getUploadFileName(fileTag="file")
+        #
+        entryId = self._reqObj.getValue("entryid")
+        entryFileName = self._reqObj.getValue("entryfilename")
+        #
+        sessionInputFilePath = os.path.join(self._sessionPath, entryId + "-biomt.txt")
+        importBiomtPath = os.path.join(self._sessionPath, "import.biomt")
+        importCifPath = os.path.join(self._sessionPath, "import.cif")
+        importMatrixPath = os.path.join(self._sessionPath, "import.matrix")
+        frameCifPath = os.path.join(self._sessionPath, "findframe.cif")
+        transmtCifPath = os.path.join(self._sessionPath, "makextrans.cif")
+        assemblyCifPath = os.path.join(self._sessionPath, "assembly.cif")
+        updatedModelCifPath = os.path.join(self._sessionPath, entryId + "-updated.cif")
+        importmatsLogPath = os.path.join(self._sessionPath, "importmats.log")
+        findframeLogPath = os.path.join(self._sessionPath, "findframe.log")
+        makeassemblyLogPath = os.path.join(self._sessionPath, "makeassembly.log")
+        mergeLogPath = os.path.join(self._sessionPath, "merge.log")
+        for filePath in ( sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, transmtCifPath, \
+                          assemblyCifPath, updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
+            if os.access(filePath, os.F_OK):
+                os.remove(filePath)
+            #
+        #
+        uploadFileName = wuu.copyToSession(fileTag="file", sessionFileName=entryId + "-biomt.txt")
+        if (uploadFileName is not None) and (len(uploadFileName) > 0):
+            if os.access(sessionInputFilePath, os.R_OK):
+                pts = PointSuite(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+                pts.importMats(sessionInputFilePath, importmatsLogPath)
+                #
+                if os.access(importBiomtPath, os.R_OK):
+                    pts.findFrame(os.path.join(self._sessionPath, entryFileName), importBiomtPath, findframeLogPath)
+                    #
+                    if os.access(frameCifPath, os.R_OK):
+                        shutil.copyfile(frameCifPath, transmtCifPath)
+                    #
+                    if os.access(transmtCifPath, os.R_OK):
+                        pts.makeAssembly(os.path.join(self._sessionPath, entryFileName), transmtCifPath, makeassemblyLogPath)
+                    #
+                # 
+                ifh = open(sessionInputFilePath, "r")
+                data = ifh.read()
+                ifh.close()
+                #
+                text = 'Uploaded "' + originalUploadFileName + '" file:\n' + data
+                #
+                for fileTup in ( ( "import.biomt", importBiomtPath ), ( "import.cif", importCifPath ), \
+                                 ( "import.matrix", importMatrixPath ), ( "assembly.cif", assemblyCifPath ) ):
+                    if not os.access(fileTup[1], os.R_OK):
+                        continue
+                    #
+                    ifh = open(fileTup[1], "r")
+                    data = ifh.read()
+                    ifh.close()
+                    #
+                    text += '\n\n"' + fileTup[0] + '" file:\n' + data 
+                #
+                rC.setText(text)
+                #
+                if os.access(assemblyCifPath, os.R_OK):
+                    pts.mergeAssemblyInfo(os.path.join(self._sessionPath, entryFileName), assemblyCifPath, updatedModelCifPath, mergeLogPath)
+                    if os.access(updatedModelCifPath, os.R_OK):
+                        rC.set("model_url", os.path.join("/sessions", str(self._sessionId), entryId + "-updated.cif"))
+                        molstarDisplayDict = self.__molstarDisplay(entryId)
+                        if ("molStar-maps" in molstarDisplayDict) and molstarDisplayDict["molStar-maps"]:
+                            rC.set("molstar_maps", molstarDisplayDict["molStar-maps"], asJson=True)
+                        #
+                    #
+                #
+                #rC.setError(errMsg="Uploading file failed")
+                return rC
+            else:
+                rC.setError(errMsg="Uploading file failed")
+                return rC
+            #
+        else:
+            rC.setError(errMsg="Uploading file failed")
+            return rC
+        #
 
     def _launchFromIdcodeOp(self):
         """Standalone launch from Idcode input callback method --
