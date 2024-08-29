@@ -98,6 +98,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 # ('citation','Primary citation','column-wise'),
                 ("pdbx_validate_close_contact", "Close contacts", "row-wise"),
                 ("pdbx_validate_symm_contact", "Close symmetry contacts", "row-wise"),
+                ("pdbx_modification_feature", "PCM", "row-wise"),
                 # ('symmetry', 'Symmetry', 'row-wise'),
                 # ('cell', 'Cell constants', 'row-wise'),
                 # ('exptl_crystal_grow', 'Crystallization details', 'row-wise'),
