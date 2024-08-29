@@ -3,10 +3,17 @@ import pytest
 import tempfile
 
 from wwpdb.utils.config.ConfigInfoData import ConfigInfoData
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
 from wwpdb.apps.ann_tasks_v2.pcm.PcmCCDEditorForm import PcmCCDEditorForm
 
 
 MOCK_SESSIONS_PATH = tempfile.mkdtemp()
+
+annapp = ConfigInfoAppCommon().get_site_rcsb_apps_path()
+if os.path.exists(annapp):
+    test_bin = True
+else:
+    test_bin = False
 
 
 @pytest.fixture
@@ -50,7 +57,9 @@ class MockSessionObj:
         return self._session
 
 
+@pytest.mark.skipif(test_bin is False, reason="Require annotation pack for full test")
 def test_run_binary(mock_config):
+    assert test_bin is True
     mock_req = MockReqObj({"display_identifier": "1cbs", "entryid": "1cbs", "entryfilename": "1cbs.cif", "WWPDB_SITE_ID": "WWPDB"})
     pcm_form = PcmCCDEditorForm(reqObj=mock_req, verbose=False)
     open(os.path.join(mock_req.session.getPath(), "1cbs.cif"), "w").close()
