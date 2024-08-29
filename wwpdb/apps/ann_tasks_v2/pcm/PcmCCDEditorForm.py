@@ -10,7 +10,7 @@ import logging
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-
+from wwpdb.io.locator.PathInfo import PathInfo
 
 class PcmCCDEditorForm(object):
     """
@@ -32,8 +32,11 @@ class PcmCCDEditorForm(object):
         self.__sessionPath = self.__sObj.getPath()
         self.__entryId = self.__reqObj.getValue("entryid")
         self.__identifier = self.__reqObj.getValue("display_identifier")
-        self.__csvPath = os.path.join(self.__sessionPath, self.__entryId + "_ccd_no_pcm_ann.csv")
         self.__entryFile = None
+        #
+        self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
+        self.__csvFile = self.__pI.getFileName(self.__entryId, contentType="pcm-missing-data", formatType="csv")
+        self.__csvPath = os.path.join(self.__sessionPath, self.__csvFile)
         #
         self.__tableTemplate = '<table id="table_%s" class="table table-condensed table-bordered table-striped">\n'
         self.__tdTagTemplate = '<td style="border-style:none">%s</td>\n'
@@ -66,21 +69,21 @@ class PcmCCDEditorForm(object):
     def __runPcmCcdCheck(self):
         """Run PCM script to check missing annotation"""
         self.__entryFile = self.__reqObj.getValue("entryfilename")
-        entry_file_path = os.path.join(self.__sessionPath, self.__entryFile)
+        inpPdbxPath = os.path.join(self.__sessionPath, self.__entryFile)
+        outPdbxFile = self.__pI.getFileName(self.__identifier, fileSource="wf-session", wfInstanceId=self.__reqObj.getSessionId(), contentType="model", formatType="pdbx", versionId="next", partNumber="1")
+        outPdbxFilePath = os.path.join(self.__sessionPath, outPdbxFile)
 
-        if not os.access(entry_file_path, os.F_OK):
-            logging.error("Missing entry file %s", entry_file_path)
+        if not os.access(inpPdbxPath, os.F_OK):
+            logging.error("Missing entry file %s", inpPdbxPath)
             return
         #
         logging.info("Processing entry file %s", self.__entryFile)
 
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
-            dp.imp(entry_file_path)
-            dp.addInput(name="id", value=self.__entryId)
-            dp.op("annot-pcm-check-ccd-ann")
-            dp.exp(dstPath=self.__csvPath)
-            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_ccd_no_pcm_ann.log"))
+            dp.imp(inpPdbxPath)
+            dp.op("annot-link-ssbond-with-ptm")
+            dp.expList(dstPathList=[outPdbxFilePath, self.__csvPath])
             dp.cleanup()
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
