@@ -22,7 +22,7 @@
 #  13-Jan-2017  ep   add _specialPositionUpdateOp
 #  05-Oct-2017  zf   add _loadEntityInfoOp(), _loadSymopInfoOp()
 #  12-Feb-2018  ep   add reqacctypes to data returned from _entryInfoOp()
-#  09-Aug-2024  zf   add _uploadBiomtFileOp()
+#  09-Aug-2024  zf   add _uploadBiomtFileOp() and _assemblyAccepOp()
 #  26-Aug-2024  zf   add copying PCM missing data csv file
 ##
 """
@@ -53,6 +53,7 @@ except ImportError:
 import glob
 
 # from json import loads, dumps
+import filecmp
 import inspect
 import logging
 import ntpath
@@ -3760,7 +3761,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         makeassemblyLogPath = os.path.join(self._sessionPath, "makeassembly.log")
         mergeLogPath = os.path.join(self._sessionPath, "merge.log")
         for filePath in ( sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, transmtCifPath, \
-                          assemblyCifPath, updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
+                          assemblyCifPath, updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath ):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
             #
@@ -3769,9 +3770,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if (uploadFileName is not None) and (len(uploadFileName) > 0):
             if os.access(sessionInputFilePath, os.R_OK):
                 pts = PointSuite(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-                pts.importMats(sessionInputFilePath, importmatsLogPath)
+                num_of_matrices = pts.importMats(sessionInputFilePath, importmatsLogPath)
                 #
-                if os.access(importBiomtPath, os.R_OK):
+                if (num_of_matrices > 0) and os.access(importBiomtPath, os.R_OK):
                     pts.findFrame(os.path.join(self._sessionPath, entryFileName), importBiomtPath, findframeLogPath)
                     #
                     if os.access(frameCifPath, os.R_OK):
@@ -3781,11 +3782,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         pts.makeAssembly(os.path.join(self._sessionPath, entryFileName), transmtCifPath, makeassemblyLogPath)
                     #
                 # 
-                ifh = open(sessionInputFilePath, "r")
-                data = ifh.read()
-                ifh.close()
-                #
-                text = 'Uploaded "' + originalUploadFileName + '" file:\n' + data
+#               ifh = open(sessionInputFilePath, "r")
+#               data = ifh.read()
+#               ifh.close()
+#               #
+#               text = 'Uploaded "' + originalUploadFileName + '" file:\n' + data
+                text = ""
                 #
                 for fileTup in ( ( "import.biomt", importBiomtPath ), ( "import.cif", importCifPath ), \
                                  ( "import.matrix", importMatrixPath ), ( "assembly.cif", assemblyCifPath ) ):
@@ -3796,10 +3798,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     data = ifh.read()
                     ifh.close()
                     #
-                    text += '\n\n"' + fileTup[0] + '" file:\n' + data 
+                    if text:
+                        text += "\n\n"
+                    #
+                    text += '"' + fileTup[0] + '" file:\n' + data 
                 #
-                rC.setText(text)
-                #
+                successfulFlag = False
                 if os.access(assemblyCifPath, os.R_OK):
                     pts.mergeAssemblyInfo(os.path.join(self._sessionPath, entryFileName), assemblyCifPath, updatedModelCifPath, mergeLogPath)
                     if os.access(updatedModelCifPath, os.R_OK):
@@ -3808,18 +3812,78 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         if ("molStar-maps" in molstarDisplayDict) and molstarDisplayDict["molStar-maps"]:
                             rC.set("molstar_maps", molstarDisplayDict["molStar-maps"], asJson=True)
                         #
+                        successfulFlag = True
                     #
                 #
-                #rC.setError(errMsg="Uploading file failed")
-                return rC
+                summary_text = "Found %d matrices.\n\n" % num_of_matrices
+                if successfulFlag:
+                    summary_text += "Successfully generated the assembly information.\n\n"
+                    rC.set("successfulflag", "yes")
+                else:
+                    summary_text += "Failed to generate the assembly information.\n\n"
+                #
+                summary_text += "See below for more detail information."
+                rC.set("summary", summary_text)
+                #
+                log_text = ""
+                for filePath in ( importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath ):
+                    if not os.access(filePath, os.F_OK):
+                        continue
+                    #
+                    ifh = open(filePath, "r")
+                    data = ifh.read()
+                    ifh.close()
+                    #
+                    log_text += "\n" + data
+                #
+                if log_text:
+                    text += "\n\nLog file:" + log_text
+                #
+                rC.setText(text)
+                #
             else:
                 rC.setError(errMsg="Uploading file failed")
-                return rC
             #
         else:
             rC.setError(errMsg="Uploading file failed")
-            return rC
         #
+        if self._verbose:
+            self._lfh.write("+CommonTasksWebAppWorker._uploadBiomtFileOp() completed for identifier %s\n" % entryId)
+        #
+        return rC
+
+    def _assemblyAccepOp(self):
+        """ """
+        if self._verbose:
+            self._lfh.write("+CommonTasksWebAppWorker._assemblyAccepOp() starting\n")
+
+        self._getSession(useContext=True)
+        rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
+        rC.setReturnFormat("json")
+        #
+        entryId = self._reqObj.getValue("entryid")
+        entryFileName = self._reqObj.getValue("entryfilename")
+        #
+        entryFilePath = os.path.join(self._sessionPath, entryFileName)
+        updatedModelCifPath = os.path.join(self._sessionPath, entryId + "-updated.cif")
+        if os.access(updatedModelCifPath, os.F_OK):
+            try:
+                shutil.copyfile(updatedModelCifPath, entryFilePath)
+                if os.access(entryFilePath, os.F_OK) and filecmp.cmp(updatedModelCifPath, entryFilePath):
+                    rC.setText("Model coordinate file successfully updated")
+                else:
+                    rC.setError(errMsg="Update model coordinate file failed")
+                #
+            except:  # noqa: E722 pylint: disable=bare-except
+                rC.setError(errMsg="Update model coordinate file failed")
+            #
+        else:
+            rC.setError(errMsg="Update model coordinate file failed")
+        #
+        if self._verbose:
+            self._lfh.write("+CommonTasksWebAppWorker._assemblyAccepOp() completed for identifier %s\n" % entryId)
+        #
+        return rC
 
     def _launchFromIdcodeOp(self):
         """Standalone launch from Idcode input callback method --

@@ -11,6 +11,7 @@
 #   14-Jun-2019  zf  add automatical filling in assembly for NMR entry
 #   28-Sep-2020  zf  add _getCloseContactContentOp() and _updateCloseContactContentOp()
 #   22-Jan-2024  zf  add _getCovalentBondContentOp() and _updateCovalentBondContentOp()
+#   09-Aug-2024  zf  add "/service/ann_tasks_v2/upload_biomt" and "/service/ann_tasks_v2/assemblyaccept" service
 #
 ##
 """
@@ -79,6 +80,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             "/service/ann_tasks_v2/uploadfromid": "_launchFromIdcodeOp",
             "/service/ann_tasks_v2/upload": "_uploadFileOp",
             "/service/ann_tasks_v2/uploadmulti": "_uploadMultipleFilesOp",
+            "/service/ann_tasks_v2/upload_biomt": "_uploadBiomtFileOp",
             "/service/ann_tasks_v2/nmr_cs_update": "_nmrCsUpdateOp",
             "/service/ann_tasks_v2/nmr_cs_upload_check": "_nmrCsUploadCheckOp",
             "/service/ann_tasks_v2/nmr_cs_atom_name_check": "_nmrCsAtomNameCheckOp",
@@ -92,6 +94,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             "/service/ann_tasks_v2/launchjmol": "_launchJmolViewerOp",
             "/service/ann_tasks_v2/launchjmolwithmap": "_launchJmolViewerWithMapOp",
             "/service/ann_tasks_v2/molstarmapsjson": "_molstarMapsJson",
+            "/service/ann_tasks_v2/assemblyaccept": "_assemblyAccepOp",
             "/service/ann_tasks_v2/assemblycalc": "_assemblyCalcOp",
             "/service/ann_tasks_v2/assemblyrestart": "_assemblyRestartOp",
             "/service/ann_tasks_v2/assemblyview": "_assemblyViewOp",
