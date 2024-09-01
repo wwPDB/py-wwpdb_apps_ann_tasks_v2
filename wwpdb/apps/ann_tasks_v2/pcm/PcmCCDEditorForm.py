@@ -70,20 +70,21 @@ class PcmCCDEditorForm(object):
         """Run PCM script to check missing annotation"""
         self.__entryFile = self.__reqObj.getValue("entryfilename")
         inpPdbxPath = os.path.join(self.__sessionPath, self.__entryFile)
-        outPdbxFile = self.__pI.getFileName(self.__identifier, fileSource="wf-session", wfInstanceId=self.__reqObj.getSessionId(), contentType="model", formatType="pdbx", versionId="next", partNumber="1")
-        outPdbxFilePath = os.path.join(self.__sessionPath, outPdbxFile)
 
         if not os.access(inpPdbxPath, os.F_OK):
             logging.error("Missing entry file %s", inpPdbxPath)
             return
         #
         logging.info("Processing entry file %s", self.__entryFile)
-
+        #
+        if os.access(self.__csvPath, os.F_OK):
+            os.remove(self.__csvPath)
+        #
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPdbxPath)
-            dp.op("annot-link-ssbond-with-ptm")
-            dp.expList(dstPathList=[outPdbxFilePath, self.__csvPath])
+            dp.op("annot-pcm-check-ccd-ann")
+            dp.expList(dstPathList=[inpPdbxPath, self.__csvPath])
             dp.cleanup()
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -111,6 +112,16 @@ class PcmCCDEditorForm(object):
             myD["statuscode"] = "failed"
             myD["statustext"] = "Failed to build form for %s" % self.__entryId
             return myD
+        
+        with open(self.__csvPath, 'r') as fp:
+            print(self.__csvPath)
+            if fp.read() == "PTM annotation is successfully updated. No missing pcm data found.":
+                myD = {}
+                htmlcontent = "PTM annotation is successfully updated. No missing pcm data found"
+                myD["statuscode"] = "ok"
+                myD["htmlcontent"] = htmlcontent
+                return myD
+
 
         htmlcontent = self.__tableTemplate % self.__identifier
         htmlcontent += (
