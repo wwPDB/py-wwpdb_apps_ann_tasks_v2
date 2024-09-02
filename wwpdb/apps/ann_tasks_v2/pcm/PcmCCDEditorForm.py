@@ -70,7 +70,6 @@ class PcmCCDEditorForm(object):
         """Run PCM script to check missing annotation"""
         self.__entryFile = self.__reqObj.getValue("entryfilename")
         inpPdbxPath = os.path.join(self.__sessionPath, self.__entryFile)
-
         if not os.access(inpPdbxPath, os.F_OK):
             logging.error("Missing entry file %s", inpPdbxPath)
             return
