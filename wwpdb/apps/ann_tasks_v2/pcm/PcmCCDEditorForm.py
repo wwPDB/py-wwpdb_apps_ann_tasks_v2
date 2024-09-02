@@ -35,7 +35,7 @@ class PcmCCDEditorForm(object):
         self.__entryFile = None
         #
         self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
-        self.__csvFile = self.__pI.getFileName(self.__entryId, contentType="pcm-missing-data", formatType="csv")
+        self.__csvFile = self.__pI.getFileName(self.__entryId, contentType="pcm-missing-data", formatType="csv", versionId="none", partNumber="1")
         self.__csvPath = os.path.join(self.__sessionPath, self.__csvFile)
         #
         self.__tableTemplate = '<table id="table_%s" class="table table-condensed table-bordered table-striped">\n'
@@ -110,18 +110,16 @@ class PcmCCDEditorForm(object):
         if not os.access(self.__csvPath, os.F_OK):
             myD = {}
             myD["statuscode"] = "failed"
-            myD["statustext"] = "Failed to build form for %s" % self.__entryId
+            myD["statustext"] = "Failed to build form for %s. Couldn't find output csv file" % self.__entryId
             return myD
-        
-        with open(self.__csvPath, 'r') as fp:
-            print(self.__csvPath)
-            if fp.read() == "PTM annotation is successfully updated. No missing pcm data found.":
-                myD = {}
-                htmlcontent = "PTM annotation is successfully updated. No missing pcm data found"
-                myD["statuscode"] = "ok"
-                myD["htmlcontent"] = htmlcontent
-                return myD
 
+        with open(self.__csvPath, 'r') as fp:
+            content = "PTM annotation is successfully updated. No missing pcm data found."
+            if content in fp.read():
+                myD = {}
+                myD["statuscode"] = "ok"
+                myD["htmlcontent"] = content
+                return myD
 
         htmlcontent = self.__tableTemplate % self.__identifier
         htmlcontent += (
