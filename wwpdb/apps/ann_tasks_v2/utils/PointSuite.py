@@ -14,15 +14,18 @@ __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import json,os,sys,traceback
+import os
+import sys
+import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 try:
     from mmcif.io.IoAdapterCore import IoAdapterCore as IoAdapter
-except:
+except ImportError:
     from mmcif.io.IoAdapterPy import IoAdapterPy as IoAdapter
 #
+
 
 class PointSuite(object):
     """ PointSuite class encapsulates running the programs defined in the suite.
@@ -43,11 +46,11 @@ class PointSuite(object):
     def importMats(self, inputMatFilePath, logPath):
         """ Run PointSuite's "importmats" program
         """
-        exportList = [ os.path.join(self.__sessionPath, "import.biomt"), os.path.join(self.__sessionPath, "import.cif"), \
-                       os.path.join(self.__sessionPath, "import.matrix") ]
+        exportList = [os.path.join(self.__sessionPath, "import.biomt"), os.path.join(self.__sessionPath, "import.cif"),
+                      os.path.join(self.__sessionPath, "import.matrix")]
         #
-        allFileList = [ os.path.join(self.__sessionPath, "import.biomt"), os.path.join(self.__sessionPath, "import.cif"), \
-                        os.path.join(self.__sessionPath, "import.matrix"), logPath ]
+        allFileList = [os.path.join(self.__sessionPath, "import.biomt"), os.path.join(self.__sessionPath, "import.cif"),
+                       os.path.join(self.__sessionPath, "import.matrix"), logPath]
         #
         for filePath in allFileList:
             if os.access(filePath, os.F_OK):
@@ -75,7 +78,7 @@ class PointSuite(object):
             tmpMatricesCifPath = os.path.join(self.__sessionPath, "tmp-import.cif")
             ofh = open(tmpMatricesCifPath, "w")
             ofh.write("data_matrices\n#\n%s\n" % data)
-            ofh.close() 
+            ofh.close()
             #
             try:
                 ioObj = IoAdapter()
@@ -96,7 +99,7 @@ class PointSuite(object):
         """
         frameCifPath = os.path.join(self.__sessionPath, "findframe.cif")
         #
-        for filePath in ( frameCifPath, logPath ):
+        for filePath in (frameCifPath, logPath):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
             #
@@ -109,12 +112,12 @@ class PointSuite(object):
         dp.expLog(dstPath=logPath, appendMode=False)
         dp.cleanup()
 
-    def makeAssembly(self, modelCifPath, transmtFilePath, logPath): 
+    def makeAssembly(self, modelCifPath, transmtFilePath, logPath):
         """ Run PointSuite's "makeassembly" program
         """
         assemblyCifPath = os.path.join(self.__sessionPath, "assembly.cif")
         #
-        for filePath in ( assemblyCifPath, logPath ):
+        for filePath in (assemblyCifPath, logPath):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
             #
@@ -132,7 +135,7 @@ class PointSuite(object):
         """
         modifiedAssemblyCifPath = os.path.join(self.__sessionPath, "assembly-with-data-block.cif")
         #
-        for filePath in ( outModelCifPath, modifiedAssemblyCifPath, logPath ):
+        for filePath in (outModelCifPath, modifiedAssemblyCifPath, logPath):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
             #
@@ -146,7 +149,7 @@ class PointSuite(object):
         #
         ofh = open(modifiedAssemblyCifPath, "w")
         ofh.write("data_assembly\n#\n%s\n" % data)
-        ofh.close() 
+        ofh.close()
         #
         dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
         dp.imp(inModelCifPath)

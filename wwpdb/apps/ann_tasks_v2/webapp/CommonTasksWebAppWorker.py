@@ -3743,7 +3743,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             rC.setError(errMsg="No file uploaded")
             return rC
         #
-        originalUploadFileName = wuu.getUploadFileName(fileTag="file")
+        # originalUploadFileName = wuu.getUploadFileName(fileTag="file")
         #
         entryId = self._reqObj.getValue("entryid")
         entryFileName = self._reqObj.getValue("entryfilename")
@@ -3760,8 +3760,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         findframeLogPath = os.path.join(self._sessionPath, "findframe.log")
         makeassemblyLogPath = os.path.join(self._sessionPath, "makeassembly.log")
         mergeLogPath = os.path.join(self._sessionPath, "merge.log")
-        for filePath in ( sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, transmtCifPath, \
-                          assemblyCifPath, updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath ):
+        for filePath in (sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, transmtCifPath,
+                         assemblyCifPath, updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
             #
@@ -3781,7 +3781,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     if os.access(transmtCifPath, os.R_OK):
                         pts.makeAssembly(os.path.join(self._sessionPath, entryFileName), transmtCifPath, makeassemblyLogPath)
                     #
-                # 
+                #
 #               ifh = open(sessionInputFilePath, "r")
 #               data = ifh.read()
 #               ifh.close()
@@ -3789,8 +3789,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 #               text = 'Uploaded "' + originalUploadFileName + '" file:\n' + data
                 text = ""
                 #
-                for fileTup in ( ( "import.biomt", importBiomtPath ), ( "import.cif", importCifPath ), \
-                                 ( "import.matrix", importMatrixPath ), ( "assembly.cif", assemblyCifPath ) ):
+                for fileTup in (("import.biomt", importBiomtPath), ("import.cif", importCifPath),
+                                ("import.matrix", importMatrixPath), ("assembly.cif", assemblyCifPath)):
                     if not os.access(fileTup[1], os.R_OK):
                         continue
                     #
@@ -3801,7 +3801,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     if text:
                         text += "\n\n"
                     #
-                    text += '"' + fileTup[0] + '" file:\n' + data 
+                    text += '"' + fileTup[0] + '" file:\n' + data
                 #
                 successfulFlag = False
                 if os.access(assemblyCifPath, os.R_OK):
@@ -3826,7 +3826,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 rC.set("summary", summary_text)
                 #
                 log_text = ""
-                for filePath in ( importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath ):
+                for filePath in (importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
                     if not os.access(filePath, os.F_OK):
                         continue
                     #

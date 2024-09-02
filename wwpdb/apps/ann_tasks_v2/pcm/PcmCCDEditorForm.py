@@ -12,6 +12,7 @@ import traceback
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.io.locator.PathInfo import PathInfo
 
+
 class PcmCCDEditorForm(object):
     """
     The CoordEditorForm class generates coordinate editor form.
