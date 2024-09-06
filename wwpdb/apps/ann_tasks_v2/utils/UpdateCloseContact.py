@@ -3,6 +3,7 @@
 # Date:  29-Sep-2020  Zukang Feng
 #
 # Update:
+#  06-Sep-2024   zf   export the PTM/PCM "pcm-missing-data" csv file
 ##
 """
 Manage utility to correct close contact problems
@@ -19,9 +20,9 @@ import os.path
 import os
 import traceback
 
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
-
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class UpdateCloseContact(SessionWebDownloadUtils):
     """
@@ -58,10 +59,14 @@ class UpdateCloseContact(SessionWebDownloadUtils):
     def run(self, entryId, inpFile, closeContactList):
         """Run the calculation"""
         try:
+            pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
+            csvFile = pI.getFileName(entryId, contentType="pcm-missing-data", formatType="csv", versionId="none", partNumber="1")
+            csvPath = os.path.join(self.__sessionPath, csvFile)
+            #
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath = os.path.join(self.__sessionPath, entryId + "-update-close-contact.log")
             dataPath = os.path.join(self.__sessionPath, entryId + "-close-contact.txt")
-            for filePath in (logPath, dataPath):
+            for filePath in (csvPath, dataPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
@@ -82,7 +87,7 @@ class UpdateCloseContact(SessionWebDownloadUtils):
             if os.access(logPath, os.R_OK):
                 self.addDownloadPath(logPath)
                 if self.__checkStatus(logPath) == "ok":
-                    dp.exp(inpPath)
+                    dp.expList(dstPathList=[inpPath, csvPath])
                     self.addDownloadPath(inpPath)
                     status = True
                 #

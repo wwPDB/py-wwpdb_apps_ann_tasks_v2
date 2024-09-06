@@ -4,7 +4,8 @@
 #
 # Update:
 #   2-Aug-2012  jdw   add cis peptide annotation
-# 28-Feb -2014  Add base class
+#  28-Feb-2014        Add base class
+#  06-Sep-2024   zf   changed "annot-link-ssbond" to "annot-link-ssbond-with-ptm" operator
 #
 ##
 """
@@ -22,9 +23,9 @@ import os.path
 import os
 import traceback
 
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
-
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 class Link(SessionWebDownloadUtils):
     """
@@ -55,6 +56,12 @@ class Link(SessionWebDownloadUtils):
         added cis-peptide detection to this module --
         """
         try:
+            pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
+            csvFile = pI.getFileName(entryId, contentType="pcm-missing-data", formatType="csv", versionId="none", partNumber="1")
+            csvPath = os.path.join(self.__sessionPath, csvFile)
+            if os.access(csvPath, os.F_OK):
+                os.remove(csvPath)
+            #
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-link-anal.log")
             logPath2 = os.path.join(self.__sessionPath, entryId + "-cispeptide-anal.log")
@@ -65,9 +72,9 @@ class Link(SessionWebDownloadUtils):
             dp.imp(inpPath)
             if self.__linkArgs is not None:
                 dp.addInput(name="link_arguments", value=self.__linkArgs)
-            dp.op("annot-link-ssbond")
+            dp.op("annot-link-ssbond-with-ptm")
             dp.expLog(logPath1)
-            dp.exp(retPath1)
+            dp.expList(dstPathList=[retPath1, csvPath])
             self.addDownloadPath(retPath1)
             self.addDownloadPath(logPath1)
             #
