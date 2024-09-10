@@ -12,6 +12,7 @@
 #   28-Sep-2020  zf  add _getCloseContactContentOp() and _updateCloseContactContentOp()
 #   22-Jan-2024  zf  add _getCovalentBondContentOp() and _updateCovalentBondContentOp()
 #   09-Aug-2024  zf  add "/service/ann_tasks_v2/upload_biomt" and "/service/ann_tasks_v2/assemblyaccept" service
+#   10-Sep-2024  zf  add missingpcmstatus parameter based on PCM missing data csv file
 #
 ##
 """
@@ -300,6 +301,19 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(entryCsFilePath, os.R_OK):
             csOk = True
         #
+        missingpcmstatus = ""
+        entryCsvFileName = pI.getFileName(identifier, contentType="pcm-missing-data", formatType="csv", versionId=uploadVersionOp, partNumber="1")
+        entryCsvFilePath = os.path.join(self._sessionPath, entryCsvFileName)
+        if os.access(entryCsvFilePath, os.R_OK):
+            ifh = open(entryCsvFilePath, "r")
+            data = ifh.read()
+            ifh.close()
+            #
+            title = "Comp_id,Modified_residue_id,Type,Category,Position,Polypeptide_position,Comp_id_linking_atom,Modified_residue_id_linking_atom,First_instance_model_db_code"
+            if data.startswith(title):
+                missingpcmstatus = "yes"
+            #
+        #
         auto_assembly_status = ""
         if bIsWorkflow:
             hasAssemblyInfo = self.__checkAssemblyInfo(os.path.join(self._sessionPath, entryFileName))
@@ -335,6 +349,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         auto_assembly_status_url = ""
         if auto_assembly_status:
             auto_assembly_status_url = "&assemblystatus=" + auto_assembly_status
+        #
+        if missingpcmstatus == "yes":
+            auto_assembly_status_url += "&missingpcmstatus=" + missingpcmstatus
         #
         htmlList = []
         htmlList.append("<!DOCTYPE html>")
