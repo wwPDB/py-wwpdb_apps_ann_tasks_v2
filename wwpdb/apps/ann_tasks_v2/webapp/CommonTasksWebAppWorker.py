@@ -3753,15 +3753,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         importCifPath = os.path.join(self._sessionPath, "import.cif")
         importMatrixPath = os.path.join(self._sessionPath, "import.matrix")
         frameCifPath = os.path.join(self._sessionPath, "findframe.cif")
-        transmtCifPath = os.path.join(self._sessionPath, "makextrans.cif")
         assemblyCifPath = os.path.join(self._sessionPath, "assembly.cif")
         updatedModelCifPath = os.path.join(self._sessionPath, entryId + "-updated.cif")
         importmatsLogPath = os.path.join(self._sessionPath, "importmats.log")
         findframeLogPath = os.path.join(self._sessionPath, "findframe.log")
         makeassemblyLogPath = os.path.join(self._sessionPath, "makeassembly.log")
         mergeLogPath = os.path.join(self._sessionPath, "merge.log")
-        for filePath in (sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, transmtCifPath,
-                         assemblyCifPath, updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
+        for filePath in (sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, assemblyCifPath, \
+                         updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
             #
@@ -3776,10 +3775,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     pts.findFrame(os.path.join(self._sessionPath, entryFileName), importBiomtPath, findframeLogPath)
                     #
                     if os.access(frameCifPath, os.R_OK):
-                        shutil.copyfile(frameCifPath, transmtCifPath)
-                    #
-                    if os.access(transmtCifPath, os.R_OK):
-                        pts.makeAssembly(os.path.join(self._sessionPath, entryFileName), transmtCifPath, makeassemblyLogPath)
+                        pts.makeAssembly(os.path.join(self._sessionPath, entryFileName), frameCifPath, makeassemblyLogPath)
                     #
                 #
 #               ifh = open(sessionInputFilePath, "r")
