@@ -25,6 +25,7 @@ from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDown
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
+
 class UpdateCovalentBond(SessionWebDownloadUtils):
     """
     UpdateCovalentBond class encapsulates correcting covalent bond problems.

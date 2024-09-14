@@ -3759,7 +3759,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         findframeLogPath = os.path.join(self._sessionPath, "findframe.log")
         makeassemblyLogPath = os.path.join(self._sessionPath, "makeassembly.log")
         mergeLogPath = os.path.join(self._sessionPath, "merge.log")
-        for filePath in (sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, assemblyCifPath, \
+        for filePath in (sessionInputFilePath, importBiomtPath, importCifPath, importMatrixPath, frameCifPath, assemblyCifPath,
                          updatedModelCifPath, importmatsLogPath, findframeLogPath, makeassemblyLogPath, mergeLogPath):
             if os.access(filePath, os.F_OK):
                 os.remove(filePath)
