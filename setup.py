@@ -42,7 +42,7 @@ setup(
     ],
     #
     install_requires=[
-        "wwpdb.utils.config >= 0.37",
+        "wwpdb.utils.config >= 0.45",
         "wwpdb.apps.wf_engine",
         "wwpdb.io",
         "wwpdb.utils.db >= 0.6",
@@ -50,7 +50,7 @@ setup(
         "wwpdb.utils.wf ~= 0.13",
         "wwpdb.utils.session",
         "mmcif >= 0.25",
-        "wwpdb.utils.dp ~= 0.50",
+        "wwpdb.utils.dp ~= 0.54",
         "wwpdb.utils.detach",
         "wwpdb.utils.nmr >= 0.24",
         "mmcif.utils ~= 0.22",
