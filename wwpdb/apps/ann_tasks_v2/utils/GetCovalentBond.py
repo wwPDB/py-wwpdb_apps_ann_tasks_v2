@@ -127,20 +127,20 @@ class GetCovalentBond(object):
                 atom += "(" + tupL[5] + ")"
             #
             tablerow += "<td>" + tupL[16] + "</td><td>" + tupL[0] + "</td><td>" + tupL[1] + "</td><td>" + tupL[2] + tupL[3] + "</td><td>" \
-                      + atom + "</td><td>" + tupL[6] + "</td>"
+                + atom + "</td><td>" + tupL[6] + "</td>"
             atom = tupL[11]
             if tupL[12]:
                 atom += "(" + tupL[12] + ")"
             #
             tablerow += "<td>" + tupL[7] + "</td><td>" + tupL[8] + "</td><td>" + tupL[9] + tupL[10] + "</td><td>" + atom + "</td><td>" \
-                      + tupL[13] + "</td><td>" + tupL[14] + "</td>"
+                + tupL[13] + "</td><td>" + tupL[14] + "</td>"
             #
             tupL[6] = tupL[6].replace("_", "-")
             tupL[13] = tupL[13].replace("_", "-")
             bond_id = "covalent_bond_" + str(count)
             #
             tablerow += "<td>" + tupL[15] + '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + bond_id + '" name="' + bond_id \
-                      + '" value="' + "_".join(tupL[:16]) + '"/></td>'
+                + '" value="' + "_".join(tupL[:16]) + '"/></td>'
             #
             tablerow += "</tr>\n"
             count += 1

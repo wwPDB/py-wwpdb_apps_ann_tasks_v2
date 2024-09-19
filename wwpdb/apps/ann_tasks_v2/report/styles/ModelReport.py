@@ -133,6 +133,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ("pdbx_struct_assembly_depositor_info", "table"),
         ("entity_branch_list", "table"),
         ("pdbx_struct_ref_seq_depositor_info", "table"),
+        ("pdbx_modification_feature", "table"),
     ]
     _cDict = {
         "audit_contact_author": [
@@ -1328,6 +1329,34 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_struct_ref_seq_depositor_info.seq_align_begin", "%s", "str", ""),
             ("_pdbx_struct_ref_seq_depositor_info.seq_align_end", "%s", "str", ""),
         ],
+        "pdbx_modification_feature": [
+            ("_pdbx_modification_feature.ordinal", "%s", "str", ""),
+            ("_pdbx_modification_feature.label_comp_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.label_asym_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.label_seq_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.label_alt_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_label_comp_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_label_asym_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_label_seq_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_label_alt_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.auth_comp_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.auth_asym_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.auth_seq_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.PDB_ins_code", "%s", "str", ""),
+            ("_pdbx_modification_feature.symmetry", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_auth_comp_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_auth_asym_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_auth_seq_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_PDB_ins_code", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_symmetry", "%s", "str", ""),
+            ("_pdbx_modification_feature.comp_id_linking_atom", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_id_linking_atom", "%s", "str", ""),
+            ("_pdbx_modification_feature.modified_residue_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.ref_pcm_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.ref_comp_id", "%s", "str", ""),
+            ("_pdbx_modification_feature.type", "%s", "str", ""),
+            ("_pdbx_modification_feature.category", "%s", "str", ""),
+        ]
     }
 
     _excludeList = []
