@@ -2104,10 +2104,10 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         self._lfh.write("launchMolstarDisplayOp started")
         entryId = self._reqObj.getValue("entryid")
-        primaryMapOnlyFlag=False
+        primaryMapOnlyFlag = False
         primarymapflag = self._reqObj.getValue("primarymapflag")
         if primarymapflag == "yes":
-            primaryMapOnlyFlag=True
+            primaryMapOnlyFlag = True
         #
         self._lfh.write("Entry id = {}".format(entryId))
         molstarDisplayDict = self.__molstarDisplay(entryId, primaryMapOnly=primaryMapOnlyFlag)
