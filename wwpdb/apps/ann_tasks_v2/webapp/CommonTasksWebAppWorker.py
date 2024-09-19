@@ -24,6 +24,7 @@
 #  12-Feb-2018  ep   add reqacctypes to data returned from _entryInfoOp()
 #  09-Aug-2024  zf   add _uploadBiomtFileOp() and _assemblyAccepOp()
 #  26-Aug-2024  zf   add copying PCM missing data csv file
+#  19-Sep-2024  zf   add "primaryMapOnly" parameter to __molstarDisplay() method
 ##
 """
 Common  annotation tasks.
@@ -2024,7 +2025,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         #
         return bSuccess
 
-    def __molstarDisplay(self, entryId, fileSource="archive", instance=None):
+    def __molstarDisplay(self, entryId, fileSource="archive", instance=None, primaryMapOnly=False):
         du = SessionDownloadUtils(self._reqObj, verbose=self._verbose, log=self._lfh)
         molDisDict = {}
         # map display in binary cif
@@ -2090,8 +2091,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     mapColour = "0xFF9900"
                     mapInfoDictionary["mapColor"] = mapColour
                 # append molDisDict with dictionary populated above
-                molDisDict.setdefault("molStar-maps", []).append(mapInfoDictionary)
-
+                if (not primaryMapOnly) or (primaryMapOnly and (data_file[0] == "em-volume")):
+                    molDisDict.setdefault("molStar-maps", []).append(mapInfoDictionary)
+                #
+            #
+        #
         return molDisDict
 
     def _molstarMapsJson(self):
@@ -2100,8 +2104,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         self._lfh.write("launchMolstarDisplayOp started")
         entryId = self._reqObj.getValue("entryid")
+        primaryMapOnlyFlag=False
+        primarymapflag = self._reqObj.getValue("primarymapflag")
+        if primarymapflag == "yes":
+            primaryMapOnlyFlag=True
+        #
         self._lfh.write("Entry id = {}".format(entryId))
-        molstarDisplayDict = self.__molstarDisplay(entryId)
+        molstarDisplayDict = self.__molstarDisplay(entryId, primaryMapOnly=primaryMapOnlyFlag)
         self._lfh.write("{}".format(molstarDisplayDict))
 
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -3804,7 +3813,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     pts.mergeAssemblyInfo(os.path.join(self._sessionPath, entryFileName), assemblyCifPath, updatedModelCifPath, mergeLogPath)
                     if os.access(updatedModelCifPath, os.R_OK):
                         rC.set("model_url", os.path.join("/sessions", str(self._sessionId), entryId + "-updated.cif"))
-                        molstarDisplayDict = self.__molstarDisplay(entryId)
+                        molstarDisplayDict = self.__molstarDisplay(entryId, primaryMapOnly=True)
                         if ("molStar-maps" in molstarDisplayDict) and molstarDisplayDict["molStar-maps"]:
                             rC.set("molstar_maps", molstarDisplayDict["molStar-maps"], asJson=True)
                         #
