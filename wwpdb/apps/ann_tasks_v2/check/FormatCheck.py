@@ -42,7 +42,7 @@ class FormatCheck(SessionWebDownloadUtils):
 
         self.__exportPath = None
         self.__checkArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         self.__reportFileSize = 0
         self.__reportPath = None
 

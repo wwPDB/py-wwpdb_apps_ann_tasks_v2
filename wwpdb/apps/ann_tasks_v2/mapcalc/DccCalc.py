@@ -37,7 +37,7 @@ class DccCalc(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__dccArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         self.__exportPath = None
         self.__reportPath = None
         #

@@ -37,7 +37,7 @@ class DccRefineCalc(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__dccArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         #
         self.__setup()
 
@@ -67,6 +67,10 @@ class DccRefineCalc(SessionWebDownloadUtils):
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_dcc-refine-calc.log")
             reportPath = os.path.join(self.__sessionPath, entryId + "_dcc-refine-report.cif")
+            for filePath in ( reportPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)

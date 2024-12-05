@@ -63,11 +63,18 @@ class CSEditorForm(object):
     def __runScript(self):
         """ """
         try:
+            retPath = os.path.join(self.__sessionPath, self.__entryId + "_cs_html.txt")
+            logPath = os.path.join(self.__sessionPath, self.__entryId + "_cs_summary.log")
+            for filePath in ( retPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
+            #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(os.path.join(self.__sessionPath, self.__entryFile))
             dp.op("annot-depict-chemical-shift")
-            dp.exp(os.path.join(self.__sessionPath, self.__entryId + "_cs_html.txt"))
-            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_cs_summary.log"))
+            dp.exp(retPath)
+            dp.expLog(logPath)
             dp.cleanup()
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

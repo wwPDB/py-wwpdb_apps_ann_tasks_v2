@@ -76,26 +76,34 @@ class SecondaryStructure(SessionWebDownloadUtils):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-sec-struct-anal.log")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
+            for filePath in ( retPath, logPath1 ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
             if self.__topFilePath is not None:
                 dp.addInput(name="ss_topology_file_path", value=self.__topFilePath)
+            #
             dp.op("annot-secondary-structure")
             dp.expLog(logPath1)
             dp.exp(retPath)
             self.addDownloadPath(retPath)
             self.addDownloadPath(logPath1)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.exp(inpPath)
-
             #
             self.__status = self.__checkStatus(logPath1)
             if self.__verbose:
                 self.__lfh.write("+SecondaryStructure.run-  completed with status %s for entryId %s file %s\n" % (self.__status, entryId, inpPath))
-
+            #
             dp.cleanup()
-            return True
+            if os.access(retPath, os.R_OK):
+                return True
+            else:
+                return False
+            #
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             return False

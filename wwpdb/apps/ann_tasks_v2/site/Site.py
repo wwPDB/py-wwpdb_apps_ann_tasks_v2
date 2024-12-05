@@ -57,6 +57,10 @@ class Site(SessionWebDownloadUtils):
             logPath2 = os.path.join(self.__sessionPath, entryId + "_site-merge.log")
             resultPath = os.path.join(self.__sessionPath, entryId + "_site-anal_P1.cif")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
+            for filePath in ( resultPath, retPath, logPath1, logPath2 ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
@@ -78,12 +82,12 @@ class Site(SessionWebDownloadUtils):
             dp.exp(retPath)
             self.addDownloadPath(retPath)
             self.addDownloadPath(logPath2)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.exp(inpPath)
             #
             if self.__verbose:
                 self.__lfh.write("+Site.run-  completed for entryId %s file %s\n" % (entryId, inpPath))
-
+            #
             dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except

@@ -31,7 +31,7 @@ class EmAutoFix(object):
         self.__lfh = log
         self.__siteId = siteId
         self.__sessionPath = sessionPath
-        self.__cleanup = False
+        self.__cleanup = True
         self.__pI = PathInfo(sessionPath=sessionPath, verbose=self.__verbose, log=self.__lfh)
         self.__mD = {"primary map": "em-volume", "mask": "em-mask-volume", "additional map": "em-additional-volume", "half map": "em-half-volume", "map header": "em-volume-header"}
 
@@ -53,6 +53,11 @@ class EmAutoFix(object):
     def __mapfix(self, depsetid, emdbid, volin, volout, voxel):
         resultPath = os.path.join(self.__sessionPath, depsetid + "_mapfix-header-report_P1.json")
         logPath = os.path.join(self.__sessionPath, depsetid + "_mapfix-report_P1.txt")
+        for filePath in ( resultPath, logPath ):
+            if os.access(filePath, os.R_OK):
+                os.remove(filePath)
+            #
+        #
         dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
         dp.setDebugMode(flag=True)
         dp.addInput(name="input_map_file_path", value=volin, type="file")
@@ -65,7 +70,7 @@ class EmAutoFix(object):
 
         if self.__cleanup:
             dp.cleanup()
-
+        #
         return resultPath
 
     def autoFixMapLabels(self, datasetid, modelin, modelout, vollocation="archive"):

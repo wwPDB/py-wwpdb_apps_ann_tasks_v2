@@ -82,6 +82,8 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             csFilePath = pI.getChemcialShiftsFilePath(entryId, formatType="pdbx", fileSource="session", versionId="none", mileStone=None)
             # outPath=os.path.join(self.__sessionPath, entryId + "_cs_P1.cif")
             logPath = os.path.join(self.__sessionPath, entryId + "-annot-chem-shifts-upload-check.log")
+            if os.access(logPath, os.R_OK):
+                os.remove(logPath)
             #
             chkPath = os.path.join(self.__sessionPath, entryId + "_nmr-chemical-shifts-upload-report_P1.cif")
             dp.addInput(name="chemical_shifts_upload_check_file_path", value=chkPath)
@@ -89,7 +91,6 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             dp.op("annot-chem-shifts-upload-check")
             dp.expLog(logPath)
             dp.exp(csFilePath)
-            #
             #
             wPath = os.path.join(self.__sessionPath, "Warnings-combine.txt")
             ePath = os.path.join(self.__sessionPath, "Errors-combine.txt")
@@ -101,6 +102,7 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
 
             if self.__cleanUp:
                 dp.cleanup()
+            #
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -122,6 +124,9 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             dp.addInput(name="coordinate_file_path", value=xyzFilePath)
             #
             logPath = os.path.join(self.__sessionPath, entryId + "-chem-shifts-atom-name-check.log")
+            if os.access(logPath, os.R_OK):
+                os.remove(logPath)
+            #
             chkPath = os.path.join(self.__sessionPath, entryId + "_nmr-chemical-shifts-atom-name-report_P1.cif")
 
             dp.addInput(name="chemical_shifts_coord_check_file_path", value=chkPath)
@@ -130,7 +135,6 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             dp.expLog(logPath)
             dp.exp(csOutFilePath)
             #
-            #
             wPath = os.path.join(self.__sessionPath, "Warnings-atom-name.txt")
             ePath = os.path.join(self.__sessionPath, "Errors-atom-name.txt")
             self.__processReport(chkPath, wPath, ePath)
@@ -138,10 +142,10 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             self.addDownloadPath(chkPath)
             self.addDownloadPath(logPath)
             self.addDownloadPath(csOutFilePath)
-
             #
             if self.__cleanUp:
                 dp.cleanup()
+            #
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -163,7 +167,9 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             dp.addInput(name="coordinate_file_path", value=xyzFilePath)
             #
             logPath = os.path.join(self.__sessionPath, entryId + "-chem-shifts-update.log")
-
+            if os.access(logPath, os.R_OK):
+                os.remove(logPath)
+            #
             dp.op("annot-chem-shifts-update")
             dp.expLog(logPath)
             dp.exp(csOutFilePath)
@@ -173,6 +179,7 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
             #
             if self.__cleanUp:
                 dp.cleanup()
+            #
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
@@ -200,7 +207,7 @@ class NmrChemShiftsUtils(SessionWebDownloadUtils):
                 ofh.write("%s" % ("\n").join(self.__errors))
                 ofh.close()
                 self.addDownloadPath(errorPath)
-
+            #
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

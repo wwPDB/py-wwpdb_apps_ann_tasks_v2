@@ -47,7 +47,7 @@ class EmEditUtils(SessionWebDownloadUtils):
         self.__sessionId = self.__sObj.getId()
         self.__sessionPath = self.__sObj.getPath()
         self.__pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
-        self.__cleanup = False
+        self.__cleanup = True
 
         self.__headerKeyList = [
             ("Map title", "label", True),
@@ -107,6 +107,10 @@ class EmEditUtils(SessionWebDownloadUtils):
         try:
             resultPath = os.path.join(self.__sessionPath, entryId + "_mapfix-header-report_P1.json")
             logPath = os.path.join(self.__sessionPath, entryId + "_mapfix-report_P1.txt")
+            for filePath in ( resultPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.setDebugMode(flag=True)
@@ -289,6 +293,10 @@ class EmEditUtils(SessionWebDownloadUtils):
 
             resultPath = os.path.join(self.__sessionPath, entryId + "_mapfix-header-report_P1.json")
             logPath = os.path.join(self.__sessionPath, entryId + "_mapfix-report_P1.txt")
+            for filePath in ( resultPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.setDebugMode(flag=True)

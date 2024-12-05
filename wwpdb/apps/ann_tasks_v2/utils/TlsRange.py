@@ -65,8 +65,10 @@ class TlsRange(SessionWebDownloadUtils):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath = os.path.join(self.__sessionPath, entryId + "-tls-range.log")
             retPath = os.path.join(self.__sessionPath, entryId + "-tls-correction.cif")
-            if os.access(retPath, os.R_OK):
-                os.remove(retPath)
+            for filePath in ( retPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             #
@@ -95,7 +97,7 @@ class TlsRange(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write("+TlsRange.run-  completed with status %s for entryId %s file %s\n" % (self.__status, entryId, inpPath))
             #
-            # dp.cleanup()
+            dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

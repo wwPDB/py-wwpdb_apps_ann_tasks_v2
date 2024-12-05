@@ -58,6 +58,10 @@ class Solvent(SessionWebDownloadUtils):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-solvent-anal.log")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
+            for filePath in ( retPath, logPath1 ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
@@ -72,13 +76,18 @@ class Solvent(SessionWebDownloadUtils):
             dp.exp(retPath)
             self.addDownloadPath(retPath)
             self.addDownloadPath(logPath1)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.exp(inpPath)
+            #
             if self.__verbose:
                 self.__lfh.write("+Solvent.run-  completed for entryId %s file %s\n" % (entryId, inpPath))
-
+            #
             dp.cleanup()
-            return True
+            if os.access(retPath, os.R_OK):
+                return True
+            else:
+                return False
+            #
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)
             return False

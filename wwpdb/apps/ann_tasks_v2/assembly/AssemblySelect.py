@@ -96,11 +96,16 @@ class AssemblySelect(object):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
             logPath = os.path.join(self.__sessionPath, entryId + "-assembly-report.log")
+            for filePath in ( reportPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
             if self.__assemblyArgs is not None and len(self.__assemblyArgs) > 0:
                 dp.addInput(name="pisa_assembly_arguments", value=self.__assemblyArgs)
+            #
             dp.addInput(name="pisa_session_name", value=sessionName)
             dp.op("pisa-analysis")
             dp.expLog(logPath)
@@ -127,7 +132,10 @@ class AssemblySelect(object):
                     dp.exp(assemModelFileName)
                     if self.__verbose:
                         self.__lfh.write("+AssemblySelect.run - creating assembly model %r file %s\n" % (assemblyUid, assemModelFileName))
-                # dp.cleanup()
+                    #
+                #
+            #
+            # dp.cleanup()
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
@@ -273,6 +281,11 @@ class AssemblySelect(object):
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
             logPath = os.path.join(self.__sessionPath, entryId + "_assembly-merge.log")
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
+            for filePath in ( retPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
+            #
             if self.__verbose:
                 self.__lfh.write("+AssemblySelect.updateModelFile() input  path %s\n" % inpPath)
                 self.__lfh.write("+AssemblySelect.updateModelFile() return path %s\n" % retPath)
@@ -288,14 +301,14 @@ class AssemblySelect(object):
             #
             dp.op("pisa-assembly-merge-cif")
             dp.exp(retPath)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.exp(inpPath)
+            #
             dp.expLog(logPath)
             #
             #  Added generation of assembly files to the model update.
             if os.access(retPath, os.R_OK):
                 self.generateAssemblies(entryId, modelFilePath=retPath)
-
             #
             # dp.cleanup()
             return True
@@ -314,6 +327,10 @@ class AssemblySelect(object):
             logPath = os.path.join(self.__sessionPath, entryId + "_assembly-merge.log")
             assignPath = os.path.join(self.__sessionPath, entryId + "_assembly-assign_P1.cif")
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
+            for filePath in ( retPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
@@ -339,7 +356,6 @@ class AssemblySelect(object):
             #  Added generation of assembly files to the model update.
             if os.access(retPath, os.R_OK):
                 self.generateAssemblies(entryId, modelFilePath=retPath)
-
             #
             # dp.cleanup()
             return True
@@ -539,6 +555,10 @@ class AssemblySelect(object):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
             logPath = os.path.join(self.__sessionPath, entryId + "_assembly-report.log")
+            for filePath in ( reportPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)

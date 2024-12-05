@@ -44,7 +44,7 @@ class GeometryCheck(SessionWebDownloadUtils):
         self.__checkArgs = None
         self.__reportFileSize = 0
         self.__reportPath = None
-        self.__cleanup = False
+        self.__cleanup = True
 
         self.__setup()
 

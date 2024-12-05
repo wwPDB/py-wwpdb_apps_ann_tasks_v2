@@ -37,7 +37,7 @@ class NpCcMapCalc(SessionWebDownloadUtils):
         self.__reqObj = reqObj
         #
         self.__mapArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         #
         self.__setup()
 
@@ -65,6 +65,9 @@ class NpCcMapCalc(SessionWebDownloadUtils):
                 sfPath = os.path.join(self.__sessionPath, expInputFile)
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_map-npcc-calc.log")
+            if os.access(logPath, os.R_OK):
+                os.remove(logPath)
+            #
             outDataPath = os.path.join(self.__sessionPath, "np-cc-maps")
             outIndexPath = os.path.join(self.__sessionPath, "np-cc-maps", "np-cc-maps-index.cif")
             #
@@ -93,6 +96,9 @@ class NpCcMapCalc(SessionWebDownloadUtils):
                 dp.setDebugMode(flag=True)
                 #
                 logPath = os.path.join(self.__sessionPath, entryId + "_map-omit-npcc-calc.log")
+                if os.access(logPath, os.R_OK):
+                    os.remove(logPath)
+                #
                 outDataPath = os.path.join(self.__sessionPath, "np-cc-omit-maps")
                 outIndexPath = os.path.join(self.__sessionPath, "np-cc-omit-maps", "np-cc-omit-maps-index.cif")
                 dp.imp(inpPath)

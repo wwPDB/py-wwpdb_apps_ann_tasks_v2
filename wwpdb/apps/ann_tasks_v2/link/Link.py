@@ -60,14 +60,16 @@ class Link(SessionWebDownloadUtils):
             pI = PathInfo(siteId=self.__siteId, sessionPath=self.__sessionPath, verbose=self.__verbose, log=self.__lfh)
             csvFile = pI.getFileName(entryId, contentType="pcm-missing-data", formatType="csv", versionId="none", partNumber="1")
             csvPath = os.path.join(self.__sessionPath, csvFile)
-            if os.access(csvPath, os.F_OK):
-                os.remove(csvPath)
             #
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-link-anal.log")
             logPath2 = os.path.join(self.__sessionPath, entryId + "-cispeptide-anal.log")
             retPath1 = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
             retPath2 = os.path.join(self.__sessionPath, entryId + "_model-updated_P2.cif")
+            for filePath in ( csvPath, retPath1, retPath2, logPath1, logPath2 ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)

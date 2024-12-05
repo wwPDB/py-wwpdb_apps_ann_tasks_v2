@@ -95,7 +95,7 @@ class NmrModelUtils(SessionWebDownloadUtils):
             if updateInput and (self.__status == "ok"):
                 dp.exp(inpPath)
             #
-            # dp.cleanup()
+            dp.cleanup()
             if self.__status == "ok":
                 return True
             else:

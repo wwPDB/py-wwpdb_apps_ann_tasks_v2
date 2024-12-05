@@ -61,6 +61,10 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             ofpng = os.path.join(self.__sessionPath, entryId + "-nmr-val-slider.png")
             ofsvg = os.path.join(self.__sessionPath, entryId + "-nmr-val-slider.svg")
             logPath = os.path.join(self.__sessionPath, entryId + "-nmr-cs-check-rpt.log")
+            for filePath in ( ofpdf, ofxml, offullpdf, ofpng, ofsvg, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             # ------------
             dp.addInput(name="request_annotation_context", value="yes")
             # adding explicit selection of steps --
@@ -87,6 +91,7 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             #
             if self.__cleanUp:
                 dp.cleanup()
+            #
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

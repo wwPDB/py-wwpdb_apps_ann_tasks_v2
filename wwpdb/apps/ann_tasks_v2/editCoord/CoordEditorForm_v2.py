@@ -157,8 +157,14 @@ class CoordEditorForm(object):
             jsonPath = os.path.join(self.__jsonPath, self.__entryId + ".json")
             textPath = os.path.join(self.__sessionPath, self.__entryId + "_chainids.txt")
             indxPath = os.path.join(self.__sessionPath, self.__entryId + "_index.cif")
+            logPath = os.path.join(self.__sessionPath, self.__entryId + "_summary.log")
+            for filePath in ( jsonPath, textPath, indxPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
+            #
             dp.expList(dstPathList=[jsonPath, textPath, indxPath])
-            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_summary.log"))
+            dp.expLog(logPath)
             dp.cleanup()
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

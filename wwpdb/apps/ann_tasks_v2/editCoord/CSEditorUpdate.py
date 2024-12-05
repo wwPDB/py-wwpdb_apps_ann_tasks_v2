@@ -103,12 +103,16 @@ class CSEditorUpdate(object):
     def __runUpdateScript(self):
         """ """
         try:
+            logPath = os.path.join(self.__sessionPath, self.__entryId + "_cs_update.log")
+            if os.access(logPath, os.R_OK):
+                os.remove(logPath)
+            #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(os.path.join(self.__sessionPath, self.__entryFile))
             dp.addInput(name="assign", value=os.path.join(self.__sessionPath, self.__entryId + "_cs_select.cif"))
             dp.op("annot-edit-chemical-shift")
             dp.exp(os.path.join(self.__sessionPath, self.__entryFile))
-            dp.expLog(os.path.join(self.__sessionPath, self.__entryId + "_cs_update.log"))
+            dp.expLog(logPath)
             dp.cleanup()
             #
             return self.__readLogFile("_cs_update.log", "Update failed!")

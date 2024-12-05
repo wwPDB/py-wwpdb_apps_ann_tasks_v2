@@ -47,7 +47,7 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionPath = self.__sObj.getPath()
-        self.__cleanup = False
+        self.__cleanup = True
 
     def setArguments(self, dccArgs):  # pylint: disable=unused-argument
         # self.__dccArgs = dccArgs
@@ -97,6 +97,7 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
 
             if self.__cleanup:
                 dp.cleanup()
+            #
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:

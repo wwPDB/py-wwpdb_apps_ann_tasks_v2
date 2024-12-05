@@ -37,7 +37,7 @@ class MapCalc(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__mapArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         #
         self.__setup()
 
@@ -66,6 +66,9 @@ class MapCalc(SessionWebDownloadUtils):
             #
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_map-calc.log")
+            if os.access(logPath, os.R_OK):
+                os.remove(logPath)
+            #
             result2fofcPath = os.path.join(self.__sessionPath, entryId + "_map-2fofc_P1.map")
             resultfofcPath = os.path.join(self.__sessionPath, entryId + "_map-fofc_P1.map")
             #
@@ -90,6 +93,9 @@ class MapCalc(SessionWebDownloadUtils):
             #
             if doOmit:
                 logPath = os.path.join(self.__sessionPath, entryId + "_map-omit-calc.log")
+                if os.access(logPath, os.R_OK):
+                    os.remove(logPath)
+                #
                 result2fofcPath = os.path.join(self.__sessionPath, entryId + "_map-omit-2fofc_P1.map")
                 resultfofcPath = os.path.join(self.__sessionPath, entryId + "_map-omit-fofc_P1.map")
                 #

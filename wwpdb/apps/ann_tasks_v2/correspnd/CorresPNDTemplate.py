@@ -86,6 +86,10 @@ class CorresPNDTemplate(object):
         try:
             resultfile = os.path.join(self.__sessionPath, "corres_1.cif")
             logfilename = os.path.join(self.__sessionPath, "corres_1.log")
+            for filePath in ( resultfile, logfilename ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(os.path.join(self.__sessionPath, self.__entryFile))

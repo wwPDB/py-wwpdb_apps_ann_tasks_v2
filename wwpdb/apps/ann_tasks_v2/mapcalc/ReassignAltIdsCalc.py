@@ -37,7 +37,7 @@ class ReassignAltIdsCalc(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         self.__dccArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         #
         self.__setup()
 
@@ -57,16 +57,19 @@ class ReassignAltIdsCalc(SessionWebDownloadUtils):
                 inpPath = os.path.join(self.__sessionPath, modelFileName)
             else:
                 inpPath = os.path.join(self.__sessionPath, modelInputFile)
-
+            #
             if expInputFile is None:
                 expFileName = entryId + "_sf_P1.cif"
                 sfPath = os.path.join(self.__sessionPath, expFileName)
             else:
                 sfPath = os.path.join(self.__sessionPath, expInputFile)
             #
-            #
             logPath = os.path.join(self.__sessionPath, entryId + "_reassign-alt-ids-calc.log")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
+            for filePath in ( retPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
@@ -78,15 +81,20 @@ class ReassignAltIdsCalc(SessionWebDownloadUtils):
             dp.exp(retPath)
             self.addDownloadPath(retPath)
             self.addDownloadPath(logPath)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.exp(inpPath)
             #
             if self.__verbose:
                 self.__lfh.write("+ReassignAltIdsCalc.run-  completed for entryId %s file %s\n" % (entryId, inpPath))
-
+            #
             if self.__cleanup:
                 dp.cleanup()
-            return True
+            #
+            if os.access(retPath, os.R_OK):
+                return True
+            else:
+                return False
+            #
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+ReassignAltIdsCalc.run-  failed with exception for entryId %s file %s\n" % (entryId, inpPath))

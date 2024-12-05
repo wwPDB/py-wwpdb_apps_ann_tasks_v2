@@ -347,6 +347,8 @@ class AssemblyInput(object):
             #
         #
         symopFile = os.path.join(self.__sessionPath, entryId + "-symop-info.txt")
+        if os.access(symopFile, os.R_OK):
+            os.remove(symopFile)
         #
         try:
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)

@@ -51,7 +51,7 @@ class PublicPdbxFile(SessionWebDownloadUtils):
         self.__sObj = self.__reqObj.getSessionObj()
         self._sessionPath = self.__sObj.getPath()
         self._exportPath = self._sessionPath  # pylint: disable=attribute-defined-outside-init
-        self._cleanup = False
+        self._cleanup = True
 
     def setExportPath(self, exportPath):
         """Set the path where output files are copyied."""

@@ -40,7 +40,7 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
         self.__lfh = log
         self.__reqObj = reqObj
         # self.__checkArgs = None
-        self.__cleanup = False
+        self.__cleanup = True
         self.__modelUpdated = False
         #
         self.__setup()
@@ -69,6 +69,10 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath = os.path.join(self.__sessionPath, entryId + "_special-position-update.log")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
+            for filePath in ( retPath, logPath ):
+                if os.access(filePath, os.R_OK):
+                    os.remove(filePath)
+                #
             #
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
@@ -81,17 +85,22 @@ class SpecialPositionUpdate(SessionWebDownloadUtils):
                 self.__modelUpdated = True
 
             self.addDownloadPath(logPath)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.expList(dstPathList=[inpPath])
             #
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s special position update calc completed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile)
                 )
-
+            #
             if self.__cleanup:
                 dp.cleanup()
-            return True
+            #
+            if os.access(retPath, os.R_OK):
+                return True
+            else:
+                return False
+            #
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write(

@@ -49,7 +49,7 @@ class GeometryCalc(SessionWebDownloadUtils):
         self.__siteId = self.__reqObj.getValue("WWPDB_SITE_ID")
         self.__sObj = self.__reqObj.getSessionObj()
         self.__sessionPath = self.__sObj.getPath()
-        self.__cleanup = False
+        self.__cleanup = True
 
     def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs
@@ -76,7 +76,7 @@ class GeometryCalc(SessionWebDownloadUtils):
             dp.exp(retPath)
             self.addDownloadPath(retPath)
             self.addDownloadPath(logPath)
-            if updateInput:
+            if updateInput and os.access(retPath, os.R_OK):
                 dp.exp(inpPath)
             #
             if self.__verbose:
@@ -84,7 +84,12 @@ class GeometryCalc(SessionWebDownloadUtils):
 
             if self.__cleanup:
                 dp.cleanup()
-            return True
+            #
+            if os.access(retPath, os.R_OK):
+                return True
+            else:
+                return False
+            #
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+%s.%s geometry calc failed for entryId %s file %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpFile))
