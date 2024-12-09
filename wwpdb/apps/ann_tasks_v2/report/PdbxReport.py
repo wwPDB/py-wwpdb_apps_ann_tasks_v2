@@ -4,6 +4,7 @@
 #
 # Updates:
 # 15-Jun-2014  jdw add accessor methods for struct_title/pdb_id
+# 09-Dec-2024  zf  add "nmr-cs-validation-report" with CSValidationReportIo/CSValidationReportStyle
 ##
 """
 PDBx general report generator -
@@ -20,14 +21,16 @@ import shutil
 import sys
 import traceback
 
-from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo, PdbxLinksReportIo, EmInfoReportIo
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
 
 from wwpdb.apps.ann_tasks_v2.report.PdbxReportDepictBootstrap import PdbxReportDepictBootstrap
+from wwpdb.apps.ann_tasks_v2.report.styles.CSValidationReport import CSValidationReportStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.CSValidationReportIo import CSValidationReportIo
 from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo, PdbxLinksReportIo, EmInfoReportIo
 
 
 class PdbxReport(object):
@@ -105,28 +108,35 @@ class PdbxReport(object):
                 dd = self.doReport(contentType)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxXrayExpReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
-
+            #
             if contentType in ["geometry-check-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxGeometryReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
-
+            #
             if contentType in ["links-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxLinksReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
-
+            #
             if contentType in ["em-map-info-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxEmExtensionCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
-
+            #
+            if contentType in ["nmr-cs-validation-report"]:
+                self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
+                dd = self.doReport(contentType)
+                rdd = PdbxReportDepictBootstrap(styleObject=CSValidationReportStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
+            #
             if self.__debug:
                 self.__lfh.write("+PdbxReport.makeTabularReport - generated HTML \n%s\n" % "\n".join(oL))
-
+            #
+        #
         return oL
 
     def setFilePath(self, filePath, fileFormat="cif", idCode=None):
@@ -191,12 +201,14 @@ class PdbxReport(object):
                 pdbxR = PdbxLinksReportIo(verbose=self.__verbose, log=self.__lfh)
             elif contentType == "em-map-info-report":
                 pdbxR = EmInfoReportIo(verbose=self.__verbose, log=self.__lfh)
+            elif contentType == "nmr-cs-validation-report":
+                pdbxR = CSValidationReportIo(verbose=self.__verbose, log=self.__lfh)
             else:
                 self.__lfh.write("+PdbxReport.doReport() - unknown contentType %s\n" % contentType)
                 return oD
 
             pdbxR.setFilePath(localPath, idCode=None)
-            pdbxR.get()
+            #pdbxR.get()
             oD["blockId"] = pdbxR.getCurrentContainerId()
             if self.__verbose:
                 self.__lfh.write("+PdbxReport.doReport() - category name list %r \n" % pdbxR.getCurrentCategoryNameList())

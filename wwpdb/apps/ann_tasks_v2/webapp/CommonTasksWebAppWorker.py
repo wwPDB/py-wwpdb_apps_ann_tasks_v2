@@ -25,6 +25,7 @@
 #  09-Aug-2024  zf   add _uploadBiomtFileOp() and _assemblyAccepOp()
 #  26-Aug-2024  zf   add copying PCM missing data csv file
 #  19-Sep-2024  zf   add "primaryMapOnly" parameter to __molstarDisplay() method
+#  07-Dec-2024  zf   add "nmr-cs-validation-report" and "ext_pdb_id" (value got from /py-mmcif_utils/mmcif_utils/pdbx/PdbxIo.py)
 ##
 """
 Common  annotation tasks.
@@ -2414,6 +2415,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         # validation downloads
 
+        validationXmlPath = ""
         for val_file in (("validation-report-full", "pdf"), ("validation-data", "xml"), ("validation-data", "pdbx"), ("validation-report-slider", "png")):
             ok = du.fetchId(entryId, contentType=val_file[0], formatType=val_file[1], fileSource=fileSource, instance=instance)
             if ok:
@@ -2421,6 +2423,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 vTagList.append(du.getAnchorTag())
                 # myD[val_file[0]] = self.__getFileTextWithMarkup(downloadPath)
                 myD[val_file[0]] = self.__getMessageTextWithMarkup(downloadPath)
+                #
+                if val_file[1] == "xml":
+                    validationXmlPath = downloadPath
+                #
+            #
+        #
+
+        # nmr-cs-validation-report
+        if validationXmlPath != "":
+            myD["nmr-cs-validation-report"] = "\n".join(pR.makeTabularReport(filePath=validationXmlPath, contentType="nmr-cs-validation-report", \
+                                                                             idCode=entryId, layout=layout))
+        else:
+            myD["nmr-cs-validation-report"] = ""
+        #
 
         if len(vTagList) > 0:
             myD["validation-downloads"] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % "<br />".join(vTagList)
@@ -2860,6 +2876,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         kyPairList = [
             ("struct_title", "struct_title"),
             ("pdb_id", "pdb_id"),
+            ("ext_pdb_id", "ext_pdb_id"),
             ("emdb_id", "emdb_id"),
             ("bmrb_id", "bmrb_id"),
             ("experimental_methods", "experimental_methods"),
@@ -2974,7 +2991,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             if comb_id != "":
                 comb_id += "/"
             #
-            comb_id += myD[key]
+            if key == "pdb_id":
+                if ("ext_pdb_id" in myD) and myD["ext_pdb_id"]:
+                    comb_id += myD["ext_pdb_id"]
+                else:
+                    comb_id += myD[key]
+                #
+            else:
+                comb_id += myD[key]
+            #
         #
         if comb_id:
             myD["comb_id"] = comb_id

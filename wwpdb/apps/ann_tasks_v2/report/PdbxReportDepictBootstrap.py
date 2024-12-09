@@ -3,6 +3,7 @@
 # Date:  11-Jul-2013  Jdw
 #
 # Updates:
+# 09-Dec-2024  zf  add "NMR_CHEMICAL_SHIFT_VALIDATION_REPORT_V1" section
 #
 ##
 """
@@ -112,7 +113,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 # ('software','Software','row-wise'),
                 # ('pdbx_binding_assay','Binding Assay','row-wise')
             ]
-
         elif self.__st.getStyleId() in ["PDBX_DCC_REPORT_V1"]:
             self.__reportCategories = [
                 ("pdbx_density", "DCC Errors", "column-wise"),
@@ -142,8 +142,14 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             self.__reportCategories = [
                 ("em_map", "", "row-wise"),
             ]
+        elif self.__st.getStyleId() in ["NMR_CHEMICAL_SHIFT_VALIDATION_REPORT_V1"]:
+            self.__reportCategories = [
+                ("pdbx_nmr_chemical_shift_validation_statistics", "The number of nuclei with statistically unusual chemical shifts", "column-wise"),
+                ("pdbx_nmr_chemical_shift_not_found_list", "List of chemical shifts with no matching atom found in the structure", "row-wise")
+            ]
         else:
             self.__lfh.write("Error: PdbxReportDepict.__setup unknown style %s\n" % self.__st.getStyleId())
+        #
 
     def render(self, eD, style="tabs", leadingHtmlL=None, trailingHtmlL=None):
         """ """
@@ -330,7 +336,11 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 oL.append('<div class="accordion-group">')
                 oL.append('<div class="accordion-heading">')
 
-                abbrev = "%s [%s]" % (catNameAbbrev, catName)
+                if self.__st.getStyleId() in ["NMR_CHEMICAL_SHIFT_VALIDATION_REPORT_V1"]:
+                    abbrev = catNameAbbrev
+                else:
+                    abbrev = "%s [%s]" % (catNameAbbrev, catName)
+                #
 
                 if isMulti:
                     oL.append('<a class="accordion-toggle" data-toggle="collapse" href="#%s"> <h4>%s</h4></a>' % (idSection, abbrev))

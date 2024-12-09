@@ -2,6 +2,7 @@
 # File:  ValidateXml.py
 # Date:  14-Aug-2014
 # Updates:
+#  07-Dec-2024:  zf  added getChemicalShiftStatistics() method.
 ##
 """
 Parse validation XML report
@@ -40,10 +41,20 @@ class ValidateXml(object):
         self.__outlierMap = {}
         self.__outlierResult = {}
         self.__calculated_completeness = ""
+        # Total number of shifts
+        self.__total_number_of_shifts = 0
+        # Number of shifts mapped to atoms
+        self.__number_of_mapped_shifts = 0
+        # Number of unparsed shifts
+        self.__number_of_unparsed_shifts = 0
+        # Number of shifts with mapping errors
         self.__number_of_errors_while_mapping = 0
+        # Number of shifts with mapping warnings
         self.__number_of_warnings_while_mapping = 0
+        # List of chemical shifts with no matching atom found in the structure
         self.__not_found_in_structure_cs_list = []
         self.__not_found_residue_in_structure_cs_list = []
+        # Number of shifts outliers (ShiftChecker)
         self.__cs_outlier_list = []
         self.__cs_referencing_offset_list = []
         self.__has_cs_referencing_offset_flag = False
@@ -52,46 +63,63 @@ class ValidateXml(object):
         self.__parse()
 
     def getOutlier(self, Type):
-        """ """
+        """
+        """
         if Type in self.__outlierResult:
             return self.__outlierResult[Type]
         #
         return []
 
     def getClashOutliers(self):
-        """ """
+        """
+        """
         return self.clashOutliers
 
     def getCalculatedCompleteness(self):
-        """ """
+        """
+        """
         return self.__calculated_completeness
 
+    
+    def getChemicalShiftStatistics(self):
+        """ get information for "The number of nuclei with statistically unusual chemical shifts"
+        """
+        return (self.__total_number_of_shifts, self.__number_of_mapped_shifts, self.__number_of_unparsed_shifts, \
+                self.__number_of_errors_while_mapping, self.__number_of_warnings_while_mapping, len(self.__cs_outlier_list))
+                
     def getCsMappingErrorNumber(self):
-        """ """
+        """
+        """
         return self.__number_of_errors_while_mapping
 
     def getCsMappingWarningNumber(self):
-        """ """
+        """
+        """
         return self.__number_of_warnings_while_mapping
 
     def getNotFoundInStructureCsList(self):
-        """ """
+        """
+        """
         return self.__not_found_in_structure_cs_list
 
     def getNotFoundResidueInStructureCsList(self):
-        """ """
+        """
+        """
         return self.__not_found_residue_in_structure_cs_list
 
     def getCsOutliers(self):
-        """ """
+        """
+        """
         return self.__cs_outlier_list
 
     def getCsReferencingOffsetFlag(self):
-        """ """
+        """
+        """
         return self.__has_cs_referencing_offset_flag
 
     def __getOutlierDefinition(self):
-        """ """
+        """
+        """
         self.__outlierMap["torsion-outlier"] = ["phi", "psi"]
         self.__outlierMap["mog-ring-outlier"] = ["atoms", "mean", "mindiff", "stdev", "numobs"]
         self.__outlierMap["mog-angle-outlier"] = ["atoms", "mean", "mindiff", "stdev", "numobs", "Zscore", "obsval"]
@@ -104,7 +132,8 @@ class ValidateXml(object):
         self.__outlierMap["clash"] = ["atom", "cid", "clashmag", "dist"]
 
     def __parse(self):
-        """ """
+        """
+        """
         self.__processGlobalValues()
         #
         self.__processChemcalShiftList()
@@ -252,7 +281,8 @@ class ValidateXml(object):
         #
 
     def __processGlobalValues(self):
-        """ """
+        """
+        """
         global_values = {}
         Entry = self.__doc.getElementsByTagName("Entry")[0]
         for item in ("DCC_Rfree", "PDB-Rfree", "DCC_R", "PDB-R"):
@@ -290,6 +320,15 @@ class ValidateXml(object):
             return
         #
         for csNode in csList:
+            if csNode.getAttribute("total_number_of_shifts"):
+                self.__total_number_of_shifts += int(csNode.getAttribute("total_number_of_shifts"))
+            #
+            if csNode.getAttribute("number_of_mapped_shifts"):
+                self.__number_of_mapped_shifts += int(csNode.getAttribute("number_of_mapped_shifts"))
+            #
+            if csNode.getAttribute("number_of_unparsed_shifts"):
+                self.__number_of_unparsed_shifts += int(csNode.getAttribute("number_of_unparsed_shifts"))
+            #
             if csNode.getAttribute("number_of_errors_while_mapping"):
                 self.__number_of_errors_while_mapping += int(csNode.getAttribute("number_of_errors_while_mapping"))
             #
@@ -357,7 +396,8 @@ class ValidateXml(object):
         #
 
     def __getMapInfo(self, node, items):
-        """ """
+        """
+        """
         rmap = {}
         for item in items:
             val = ""
@@ -379,11 +419,13 @@ if __name__ == "__main__":
         #       list2 = obj.getOutlier('r_work_diff')
         #       print(list2)
         #       print(obj.getClashOutliers())
-        print((obj.getCsMappingErrorNumber()))
-        print((obj.getCsMappingWarningNumber()))
-        print((len(obj.getNotFoundInStructureCsList())))
-        print((len(obj.getCsOutliers())))
-        print((obj.getCsReferencingOffsetFlag()))
+        print(obj.getChemicalShiftStatistics())
+        print(obj.getCsMappingErrorNumber())
+        print(obj.getCsMappingWarningNumber())
+        print(len(obj.getNotFoundInStructureCsList()))
+        print(obj.getNotFoundInStructureCsList())
+        print(obj.getCsOutliers())
+        print(obj.getCsReferencingOffsetFlag())
     except:  # noqa: E722 pylint: disable=bare-except
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
