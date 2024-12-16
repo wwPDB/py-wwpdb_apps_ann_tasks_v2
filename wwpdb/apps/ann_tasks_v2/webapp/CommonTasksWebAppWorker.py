@@ -2432,7 +2432,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
         # nmr-cs-validation-report
         if validationXmlPath != "":
-            myD["nmr-cs-validation-report"] = "\n".join(pR.makeTabularReport(filePath=validationXmlPath, contentType="nmr-cs-validation-report", \
+            myD["nmr-cs-validation-report"] = "\n".join(pR.makeTabularReport(filePath=validationXmlPath, contentType="nmr-cs-validation-report",
                                                                              idCode=entryId, layout=layout))
         else:
             myD["nmr-cs-validation-report"] = ""

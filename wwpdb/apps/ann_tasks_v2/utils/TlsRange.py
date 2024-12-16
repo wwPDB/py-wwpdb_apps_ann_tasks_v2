@@ -65,7 +65,7 @@ class TlsRange(SessionWebDownloadUtils):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath = os.path.join(self.__sessionPath, entryId + "-tls-range.log")
             retPath = os.path.join(self.__sessionPath, entryId + "-tls-correction.cif")
-            for filePath in ( retPath, logPath ):
+            for filePath in (retPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

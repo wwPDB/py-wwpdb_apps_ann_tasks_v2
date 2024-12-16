@@ -317,7 +317,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         auto_assembly_status = ""
         assembly_inferred = ""
         if bIsWorkflow:
-            hasAssemblyInfo,assembly_inferred = self.__checkAssemblyInfo(os.path.join(self._sessionPath, entryFileName))
+            hasAssemblyInfo, assembly_inferred = self.__checkAssemblyInfo(os.path.join(self._sessionPath, entryFileName))
             if hasAssemblyInfo:
                 auto_assembly_status = "existed"
             method = str(self._reqObj.getValue("method")).strip().upper()
@@ -333,7 +333,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                     assem.autoAssignDefaultAssembly(entryId, entryFileName)
                     #
                     updatedModelPath = os.path.join(self._sessionPath, entryId + "_model-assembly-updated_P1.cif")
-                    hasAssemblyInfo,assembly_inferred = self.__checkAssemblyInfo(updatedModelPath)
+                    hasAssemblyInfo, assembly_inferred = self.__checkAssemblyInfo(updatedModelPath)
                     if hasAssemblyInfo:
                         auto_assembly_status = "updated"
                         os.rename(updatedModelPath, os.path.join(self._sessionPath, entryFileName))
@@ -875,9 +875,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         operList = cifObj.GetValue("pdbx_struct_oper_list")
         assembly_inferred = cifObj.GetSingleValue("pdbx_depui_status_flags", "assembly_inferred")
         if (len(assemblyList) > 0) and (len(genList) > 0) and (len(operList) > 0):
-            return True,assembly_inferred
+            return True, assembly_inferred
         #
-        return False,assembly_inferred
+        return False, assembly_inferred
 
     def __getNmrDiagnosticsHtmlText(self, entryId):
         """Get diagnostics from validation xml and nmr-shift-error-report json files"""
