@@ -24,6 +24,7 @@ import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 
 class SpecialPositionCalc(SessionWebDownloadUtils):
@@ -77,6 +78,28 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
             if os.access(self.__reportPath, os.R_OK):
                 os.remove(self.__reportPath)
             #
+            # We should not run special position check for NMR, EM.  Program detects no unit cell and complains 
+            # Program used to crash - which is why error being reported.
+            try:
+                ioobj = IoAdapterCore()
+                c0 = ioobj.readFile(inputFilePath=modelInputFile, selectList=["exptl"])
+                if c0:
+                    b0 = c0[0]
+                    catObj = b0.getObj("exptl")
+                    if catObj:
+                        methods = catObj.getAttributeValueList("method")
+                        runProcess = False
+                        for m in methods:
+                            if m.upper() in ["X-RAY DIFFRACTION", "NEUTRON DIFFRACTION", "POWDER DIFFRACTION", "ELECTRON CRYSTALLOGRAPHY"]:
+                                runProcess = True
+                                break
+                    
+                        if not runProcess:
+                            return True
+            except:
+                pass
+
+
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)
             # if (self.__dccArgs is not None):
