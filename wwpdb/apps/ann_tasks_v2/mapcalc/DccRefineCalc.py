@@ -67,7 +67,7 @@ class DccRefineCalc(SessionWebDownloadUtils):
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_dcc-refine-calc.log")
             reportPath = os.path.join(self.__sessionPath, entryId + "_dcc-refine-report.cif")
-            for filePath in ( reportPath, logPath ):
+            for filePath in (reportPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

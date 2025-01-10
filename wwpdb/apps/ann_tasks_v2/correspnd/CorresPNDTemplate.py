@@ -86,7 +86,7 @@ class CorresPNDTemplate(object):
         try:
             resultfile = os.path.join(self.__sessionPath, "corres_1.cif")
             logfilename = os.path.join(self.__sessionPath, "corres_1.log")
-            for filePath in ( resultfile, logfilename ):
+            for filePath in (resultfile, logfilename):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

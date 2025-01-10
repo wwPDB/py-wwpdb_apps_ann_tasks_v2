@@ -80,13 +80,12 @@ class ValidateXml(object):
         """
         return self.__calculated_completeness
 
-    
     def getChemicalShiftStatistics(self):
         """ get information for "The number of nuclei with statistically unusual chemical shifts"
         """
-        return (self.__total_number_of_shifts, self.__number_of_mapped_shifts, self.__number_of_unparsed_shifts, \
+        return (self.__total_number_of_shifts, self.__number_of_mapped_shifts, self.__number_of_unparsed_shifts,
                 self.__number_of_errors_while_mapping, self.__number_of_warnings_while_mapping, len(self.__cs_outlier_list))
-                
+
     def getCsMappingErrorNumber(self):
         """
         """

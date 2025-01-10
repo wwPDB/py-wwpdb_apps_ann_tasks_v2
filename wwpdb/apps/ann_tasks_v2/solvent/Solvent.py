@@ -58,7 +58,7 @@ class Solvent(SessionWebDownloadUtils):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             logPath1 = os.path.join(self.__sessionPath, entryId + "-solvent-anal.log")
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
-            for filePath in ( retPath, logPath1 ):
+            for filePath in (retPath, logPath1):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

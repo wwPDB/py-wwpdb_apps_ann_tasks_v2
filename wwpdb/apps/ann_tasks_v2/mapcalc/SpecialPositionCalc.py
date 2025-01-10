@@ -78,7 +78,7 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
             if os.access(self.__reportPath, os.R_OK):
                 os.remove(self.__reportPath)
             #
-            # We should not run special position check for NMR, EM.  Program detects no unit cell and complains 
+            # We should not run special position check for NMR, EM.  Program detects no unit cell and complains
             # Program used to crash - which is why error being reported.
             try:
                 ioobj = IoAdapterCore()
@@ -93,12 +93,11 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
                             if m.upper() in ["X-RAY DIFFRACTION", "NEUTRON DIFFRACTION", "POWDER DIFFRACTION", "ELECTRON CRYSTALLOGRAPHY"]:
                                 runProcess = True
                                 break
-                    
+
                         if not runProcess:
                             return True
-            except:
+            except:  # noqa: E722 pylint: disable=bare-except
                 pass
-
 
             dp = RcsbDpUtility(tmpPath=self.__sessionPath, siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             dp.imp(inpPath)

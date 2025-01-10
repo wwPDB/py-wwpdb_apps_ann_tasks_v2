@@ -66,7 +66,7 @@ class Link(SessionWebDownloadUtils):
             logPath2 = os.path.join(self.__sessionPath, entryId + "-cispeptide-anal.log")
             retPath1 = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
             retPath2 = os.path.join(self.__sessionPath, entryId + "_model-updated_P2.cif")
-            for filePath in ( csvPath, retPath1, retPath2, logPath1, logPath2 ):
+            for filePath in (csvPath, retPath1, retPath2, logPath1, logPath2):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

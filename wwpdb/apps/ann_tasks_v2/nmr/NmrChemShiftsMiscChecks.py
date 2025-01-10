@@ -61,7 +61,7 @@ class NmrChemShiftsMiscChecks(SessionWebDownloadUtils):
             ofpng = os.path.join(self.__sessionPath, entryId + "-nmr-val-slider.png")
             ofsvg = os.path.join(self.__sessionPath, entryId + "-nmr-val-slider.svg")
             logPath = os.path.join(self.__sessionPath, entryId + "-nmr-cs-check-rpt.log")
-            for filePath in ( ofpdf, ofxml, offullpdf, ofpng, ofsvg, logPath ):
+            for filePath in (ofpdf, ofxml, offullpdf, ofpng, ofsvg, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

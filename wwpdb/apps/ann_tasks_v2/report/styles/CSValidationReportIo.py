@@ -15,10 +15,12 @@ __author__ = "Zukang Feng"
 __email__ = "zukang.feng@rcsb.org"
 __license__ = "Apache 2.0"
 
-import sys,traceback
+import sys
+import traceback
 
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.report.styles.CSValidationReport import CSValidationReportStyle
+
 
 class CSValidationReportIo(object):
     """ Methods for reading NMR chemical shifts validation information details.
@@ -95,7 +97,7 @@ class CSValidationReportIo(object):
                 for idx, item in enumerate(itemList):
                     dd[item] = str(stsTupl[idx])
                 #
-                self.__dataDict[categoryList[0]] = [ dd ]
+                self.__dataDict[categoryList[0]] = [dd]
             #
             notFoundList = xmlObj.getNotFoundInStructureCsList()
             if len(notFoundList) > 0:

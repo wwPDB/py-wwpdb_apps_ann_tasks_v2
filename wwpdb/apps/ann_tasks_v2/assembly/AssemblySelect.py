@@ -96,7 +96,7 @@ class AssemblySelect(object):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
             logPath = os.path.join(self.__sessionPath, entryId + "-assembly-report.log")
-            for filePath in ( reportPath, logPath ):
+            for filePath in (reportPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
@@ -281,7 +281,7 @@ class AssemblySelect(object):
             retPath = os.path.join(self.__sessionPath, entryId + "_model-updated_P1.cif")
             logPath = os.path.join(self.__sessionPath, entryId + "_assembly-merge.log")
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
-            for filePath in ( retPath, logPath ):
+            for filePath in (retPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
@@ -327,7 +327,7 @@ class AssemblySelect(object):
             logPath = os.path.join(self.__sessionPath, entryId + "_assembly-merge.log")
             assignPath = os.path.join(self.__sessionPath, entryId + "_assembly-assign_P1.cif")
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
-            for filePath in ( retPath, logPath ):
+            for filePath in (retPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #
@@ -555,7 +555,7 @@ class AssemblySelect(object):
             inpPath = os.path.join(self.__sessionPath, inpFile)
             reportPath = os.path.join(self.__sessionPath, entryId + "_assembly-report_P1.xml")
             logPath = os.path.join(self.__sessionPath, entryId + "_assembly-report.log")
-            for filePath in ( reportPath, logPath ):
+            for filePath in (reportPath, logPath):
                 if os.access(filePath, os.R_OK):
                     os.remove(filePath)
                 #

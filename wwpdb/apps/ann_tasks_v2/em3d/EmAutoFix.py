@@ -53,7 +53,7 @@ class EmAutoFix(object):
     def __mapfix(self, depsetid, emdbid, volin, volout, voxel):
         resultPath = os.path.join(self.__sessionPath, depsetid + "_mapfix-header-report_P1.json")
         logPath = os.path.join(self.__sessionPath, depsetid + "_mapfix-report_P1.txt")
-        for filePath in ( resultPath, logPath ):
+        for filePath in (resultPath, logPath):
             if os.access(filePath, os.R_OK):
                 os.remove(filePath)
             #

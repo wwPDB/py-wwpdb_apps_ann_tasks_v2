@@ -208,7 +208,7 @@ class PdbxReport(object):
                 return oD
 
             pdbxR.setFilePath(localPath, idCode=None)
-            #pdbxR.get()
+            # pdbxR.get()
             oD["blockId"] = pdbxR.getCurrentContainerId()
             if self.__verbose:
                 self.__lfh.write("+PdbxReport.doReport() - category name list %r \n" % pdbxR.getCurrentCategoryNameList())
