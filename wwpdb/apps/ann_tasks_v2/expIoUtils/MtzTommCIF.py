@@ -101,9 +101,9 @@ class MtzTommCIF(SessionWebDownloadUtils):
             + self.__packagePath
             + "; export PACKAGE_DIR; "
             + " SF_PATH=${PACKAGE_DIR}/sf-valid; export SF_PATH; "
-            + " CCP4_PATH=${PACKAGE_DIR}/ccp4; export CCP4_PATH; "
-            + " PHENIX_PATH=${PACKAGE_DIR}/phenix; export PHENIX_PATH; "
-            + " source ${CCP4_PATH}/bin/ccp4.setup.sh; source ${PHENIX_PATH}/phenix_env.sh; "
+            # + " CCP4_PATH=${PACKAGE_DIR}/ccp4; export CCP4_PATH; "
+            # + " PHENIX_PATH=${PACKAGE_DIR}/phenix; export PHENIX_PATH; "
+            # + " source ${CCP4_PATH}/bin/ccp4.setup-sh; source ${PHENIX_PATH}/phenix_env.sh; "
         )
 
         if html:
