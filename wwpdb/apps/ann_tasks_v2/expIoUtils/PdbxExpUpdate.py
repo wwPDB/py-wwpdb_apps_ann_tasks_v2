@@ -195,7 +195,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                         if (mu in [None, "", ".", "?"]) or (mu in modelWvList):
                             continue
                         #
-                        if mu in ["1.0", "1.00", "1.000", "1.0000", "1.00000", "1.000000", "1.0000000"]:
+                        if mu in ["1", "1.0", "1.00", "1.000", "1.0000", "1.00000", "1.000000", "1.0000000"]:
                             if model_wavelength_1:
                                 continue
                             #
@@ -229,7 +229,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                             cleanFlag = True
                             continue
                         #
-                        if mu in ["1.0", "1.00", "1.000", "1.0000", "1.00000", "1.000000", "1.0000000"]:
+                        if mu in ["1", "1.0", "1.00", "1.000", "1.0000", "1.00000", "1.000000", "1.0000000"]:
                             if exp_wavelength_1:
                                 cleanFlag = True
                                 continue
