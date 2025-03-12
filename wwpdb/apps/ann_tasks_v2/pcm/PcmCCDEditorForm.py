@@ -123,11 +123,12 @@ class PcmCCDEditorForm(object):
 
         htmlcontent = self.__tableTemplate % self.__identifier
         htmlcontent += (
-            "<tr>\n<th>Comp Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
+            "<tr>\n<th>Comp Id</th>\n<th>Link Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
         )
         #
         columns = {
             "Comp_id": {"editable": False},
+            "Link_id": {"editable": False},
             "Modified_residue_id": {"editable": False},
             "Type": {"editable": False},
             "Category": {"editable": False},
