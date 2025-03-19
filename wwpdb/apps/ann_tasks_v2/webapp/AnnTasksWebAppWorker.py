@@ -309,7 +309,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             data = ifh.read()
             ifh.close()
             #
-            title = "Comp_id,Modified_residue_id,Type,Category,Position,Polypeptide_position,Comp_id_linking_atom,Modified_residue_id_linking_atom,First_instance_model_db_code"
+            title = "Comp_id,Link_id,Modified_residue_id,Type,Category,Position,Polypeptide_position,Comp_id_linking_atom,Modified_residue_id_linking_atom,First_instance_model_db_code"
             if data.startswith(title):
                 missingpcmstatus = "yes"
             #
