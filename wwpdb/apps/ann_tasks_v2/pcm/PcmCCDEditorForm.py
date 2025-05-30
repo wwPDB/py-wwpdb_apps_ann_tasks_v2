@@ -126,6 +126,8 @@ class PcmCCDEditorForm(object):
             "<tr>\n<th>Comp Id</th>\n<th>Link Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
         )
         #
+        # column change will affect webapp/AnnTasksWebAppWorker.py & /py-wwpdb_utils_wf/wwpdb/utils/wf/plugins/PcmCsvUtils.py files. Both files need to be updated accordlingly.
+        #
         columns = {
             "Comp_id": {"editable": False},
             "Link_id": {"editable": False},

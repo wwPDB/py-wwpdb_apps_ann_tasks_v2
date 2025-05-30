@@ -381,10 +381,10 @@ class ValidateXml(object):
                         #
                     #
                     if csData[2] and csData[3] and csData[4]:
-                        # precision = float(csData[2])
+                        precision = float(csData[2])
                         uncertainty = float(csData[3])
                         value = float(csData[4])
-                        if abs(value) < uncertainty:
+                        if (abs(value) < uncertainty) or (abs(value) < (2.0 * precision)):
                             continue
                         #
                         self.__has_cs_referencing_offset_flag = True
