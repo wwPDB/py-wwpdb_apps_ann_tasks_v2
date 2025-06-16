@@ -128,7 +128,7 @@ class GetCovalentBond(object):
             #
             linkid = tupL[16]
             linkitem = '<a href="#" onclick="inspect(\'%s\'); return false;">%s</a>' % (
-                    linkid.strip(), linkid)
+                linkid.strip(), linkid)
             tablerow += "<td>" + linkitem + "</td><td>" + tupL[0] + "</td><td>" + tupL[1] + "</td><td>" + tupL[2] + tupL[3] + "</td><td>" \
                 + atom + "</td><td>" + tupL[6] + "</td>"
             atom = tupL[11]
