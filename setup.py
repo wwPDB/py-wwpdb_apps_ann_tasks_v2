@@ -47,7 +47,7 @@ setup(
         "wwpdb.io",
         "wwpdb.utils.db[status] >= 0.6",
         "wwpdb.utils.emdb ~= 1.0",
-        "wwpdb.utils.wf ~= 0.13",
+        "wwpdb.utils.wf >= 0.13",
         "wwpdb.utils.session",
         "mmcif >= 0.25",
         "wwpdb.utils.dp ~= 0.54",
