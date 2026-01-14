@@ -134,6 +134,8 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ("entity_branch_list", "table"),
         ("pdbx_struct_ref_seq_depositor_info", "table"),
         ("pdbx_modification_feature", "table"),
+        ("pdbx_molecule", "table"),
+        ("pdbx_molecule_features", "table"),
     ]
     _cDict = {
         "audit_contact_author": [
@@ -1356,7 +1358,19 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_modification_feature.ref_comp_id", "%s", "str", ""),
             ("_pdbx_modification_feature.type", "%s", "str", ""),
             ("_pdbx_modification_feature.category", "%s", "str", ""),
-        ]
+        ],
+        "pdbx_molecule": [
+            ("_pdbx_molecule.instance_id", "%s", "str", ""),
+            ("_pdbx_molecule.prd_id", "%s", "str", ""),
+            ("_pdbx_molecule.asym_id", "%s", "str", ""),
+        ],
+        "pdbx_molecule_features": [
+            ("_pdbx_molecule_features.prd_id", "%s", "str", ""),
+            ("_pdbx_molecule_features.name", "%s", "str", ""),
+            ("_pdbx_molecule_features.type", "%s", "str", ""),
+            ("_pdbx_molecule_features.class", "%s", "str", ""),
+            ("_pdbx_molecule_features.details", "%s", "str", ""),
+        ],
     }
 
     _excludeList = []

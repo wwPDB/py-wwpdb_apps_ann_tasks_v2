@@ -72,6 +72,8 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ("entity", "Entity description", "row-wise"),
                 ("entity_poly", "Polymers", "row-wise"),
                 ("pdbx_entity_branch_list", "Carbohydrate polymers", "row-wise"),
+                ("pdbx_molecule", "PRD", "row-wise"),
+                ("pdbx_molecule_features", "PRD description", "row-wise"),
                 ("entity_src_gen", "Engineered Source", "row-wise"),
                 ("entity_src_nat", "Natural Source", "row-wise"),
                 ("pdbx_entity_src_syn", "Synthetic Source", "row-wise"),
