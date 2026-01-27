@@ -68,6 +68,7 @@ import traceback
 
 from wwpdb.io.file.DataExchange import DataExchange
 from wwpdb.io.file.DataFile import DataFile
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.detach.DetachUtils import DetachUtils
 from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
@@ -2416,6 +2417,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         # validation downloads
 
         validationXmlPath = ""
+        validationCifPath = ""
         for val_file in (("validation-report-full", "pdf"), ("validation-data", "xml"), ("validation-data", "pdbx"), ("validation-report-slider", "png")):
             ok = du.fetchId(entryId, contentType=val_file[0], formatType=val_file[1], fileSource=fileSource, instance=instance)
             if ok:
@@ -2426,6 +2428,8 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 #
                 if val_file[1] == "xml":
                     validationXmlPath = downloadPath
+                elif val_file[1] == "pdbx":
+                    validationCifPath = downloadPath
                 #
             #
         #
@@ -2437,6 +2441,57 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         else:
             myD["nmr-cs-validation-report"] = ""
         #
+
+        # validation software table
+        validationSoftwareTable = ""
+        if validationCifPath != "" and os.path.exists(validationCifPath):
+            try:
+                cifObj = mmCIFUtil(filePath=validationCifPath)
+                softwareList = cifObj.GetValue("pdbx_vrpt_software")
+                if softwareList and len(softwareList) > 0:
+                    # Generate HTML table
+                    tableRows = []
+                    tableRows.append('<div class="container">')
+                    tableRows.append('<table class="table table-striped table-bordered table-condensed">')
+                    tableRows.append('<thead>')
+                    tableRows.append('<tr>')
+                    tableRows.append('<th>Software Name</th>')
+                    tableRows.append('<th>Version</th>')
+                    tableRows.append('<th>Status</th>')
+                    tableRows.append('</tr>')
+                    tableRows.append('</thead>')
+                    tableRows.append('<tbody>')
+                    
+                    for software in softwareList:
+                        name = software.get("_pdbx_vrpt_software.name", "")
+                        version = software.get("_pdbx_vrpt_software.version", "")
+                        success = software.get("_pdbx_vrpt_software.success_y_or_n", "")
+                        
+                        # Format success status
+                        if success == "Y":
+                            statusDisplay = "WORKED"
+                            statusClass = ""
+                        elif success == "N":
+                            statusDisplay = "FAILED"
+                            statusClass = ' style="color: red; font-weight: bold;"'
+                        else:
+                            statusDisplay = success if success else "?"
+                            statusClass = ""
+                        
+                        tableRows.append('<tr>')
+                        tableRows.append('<td>%s</td>' % name)
+                        tableRows.append('<td>%s</td>' % version)
+                        tableRows.append('<td%s>%s</td>' % (statusClass, statusDisplay))
+                        tableRows.append('</tr>')
+                    
+                    tableRows.append('</tbody>')
+                    tableRows.append('</table>')
+                    tableRows.append('</div>')
+                    validationSoftwareTable = '\n'.join(tableRows)
+            except Exception as e:
+                self._lfh.write("Error reading validation software data from %s: %s\n" % (validationCifPath, str(e)))
+        
+        myD["validation-software-table"] = validationSoftwareTable
 
         if len(vTagList) > 0:
             myD["validation-downloads"] = '<div class="container"><p> <span class="url-list">%s</span></p></div>' % "<br />".join(vTagList)
