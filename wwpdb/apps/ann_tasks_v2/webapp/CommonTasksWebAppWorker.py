@@ -2458,15 +2458,15 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                             keyVersion = attr
                         elif attr == "success_y_or_n" or attr.endswith(".success_y_or_n"):
                             keySuccess = attr
-                    # Generate HTML table
+                    # Generate HTML table: left-aligned, columns fit content with comfortable width
                     tableRows = []
-                    tableRows.append('<div class="container">')
-                    tableRows.append('<table class="table table-striped table-bordered table-condensed">')
+                    tableRows.append('<div class="container" style="text-align: left;">')
+                    tableRows.append('<table class="table table-striped table-bordered table-condensed" style="width: auto; table-layout: auto; min-width: 20em;">')
                     tableRows.append('<thead>')
                     tableRows.append('<tr>')
-                    tableRows.append('<th>Software Name</th>')
-                    tableRows.append('<th>Version</th>')
-                    tableRows.append('<th>Status</th>')
+                    tableRows.append('<th style="min-width: 10em;">Software Name</th>')
+                    tableRows.append('<th style="min-width: 6em;">Version</th>')
+                    tableRows.append('<th style="min-width: 6em;">Status</th>')
                     tableRows.append('</tr>')
                     tableRows.append('</thead>')
                     tableRows.append('<tbody>')
@@ -2476,21 +2476,21 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         version = software.get(keyVersion, "") if keyVersion else ""
                         success = software.get(keySuccess, "") if keySuccess else ""
 
-                        # Format success status
-                        if success == "Y":
+                        # Format success status; highlight FAILED in bold red
+                        if str(success).upper() == "Y":
                             statusDisplay = "WORKED"
-                            statusClass = ""
-                        elif success == "N":
+                            statusTdStyle = ' style="min-width: 6em;"'
+                        elif str(success).upper() == "N":
                             statusDisplay = "FAILED"
-                            statusClass = ' style="color: red; font-weight: bold;"'
+                            statusTdStyle = ' style="min-width: 6em; color: red; font-weight: bold;"'
                         else:
                             statusDisplay = success if success else "?"
-                            statusClass = ""
+                            statusTdStyle = ' style="min-width: 6em;"'
 
                         tableRows.append('<tr>')
-                        tableRows.append('<td>%s</td>' % name)
-                        tableRows.append('<td>%s</td>' % version)
-                        tableRows.append('<td%s>%s</td>' % (statusClass, statusDisplay))
+                        tableRows.append('<td style="min-width: 10em;">%s</td>' % name)
+                        tableRows.append('<td style="min-width: 6em;">%s</td>' % version)
+                        tableRows.append('<td%s>%s</td>' % (statusTdStyle, statusDisplay))
                         tableRows.append('</tr>')
 
                     tableRows.append('</tbody>')
