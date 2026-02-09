@@ -2463,9 +2463,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     tableRows.append('<tbody>')
 
                     for software in softwareList:
-                        name = software.get("_pdbx_vrpt_software.name", "")
-                        version = software.get("_pdbx_vrpt_software.version", "")
-                        success = software.get("_pdbx_vrpt_software.success_y_or_n", "")
+                        # mmCIFUtil returns dict keys as short attribute names (name, version, ...)
+                        # not full tags (_pdbx_vrpt_software.name); support both for compatibility
+                        name = software.get("name") or software.get("_pdbx_vrpt_software.name", "")
+                        version = software.get("version") or software.get("_pdbx_vrpt_software.version", "")
+                        success = software.get("success_y_or_n") or software.get("_pdbx_vrpt_software.success_y_or_n", "")
 
                         # Format success status
                         if success == "Y":
