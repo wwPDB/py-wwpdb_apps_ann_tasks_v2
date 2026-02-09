@@ -2447,8 +2447,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if validationCifPath != "" and os.path.exists(validationCifPath):
             try:
                 cifObj = mmCIFUtil(filePath=validationCifPath)
-                softwareList = cifObj.GetValue("pdbx_vrpt_software")
-                if softwareList and len(softwareList) > 0:
+                softwareList, attrList = cifObj.GetValueAndItem("pdbx_vrpt_software")
+                if softwareList and len(softwareList) > 0 and attrList:
+                    # Resolve actual CIF attribute names (reader may use short or full tag names)
+                    keyName = keyVersion = keySuccess = None
+                    for attr in attrList:
+                        if attr == "name" or attr.endswith(".name"):
+                            keyName = attr
+                        elif attr == "version" or attr.endswith(".version"):
+                            keyVersion = attr
+                        elif attr == "success_y_or_n" or attr.endswith(".success_y_or_n"):
+                            keySuccess = attr
                     # Generate HTML table
                     tableRows = []
                     tableRows.append('<div class="container">')
@@ -2463,11 +2472,9 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     tableRows.append('<tbody>')
 
                     for software in softwareList:
-                        # mmCIFUtil returns dict keys as short attribute names (name, version, ...)
-                        # not full tags (_pdbx_vrpt_software.name); support both for compatibility
-                        name = software.get("name") or software.get("_pdbx_vrpt_software.name", "")
-                        version = software.get("version") or software.get("_pdbx_vrpt_software.version", "")
-                        success = software.get("success_y_or_n") or software.get("_pdbx_vrpt_software.success_y_or_n", "")
+                        name = software.get(keyName, "") if keyName else ""
+                        version = software.get(keyVersion, "") if keyVersion else ""
+                        success = software.get(keySuccess, "") if keySuccess else ""
 
                         # Format success status
                         if success == "Y":
