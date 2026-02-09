@@ -2461,12 +2461,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     tableRows.append('</tr>')
                     tableRows.append('</thead>')
                     tableRows.append('<tbody>')
-                    
+
                     for software in softwareList:
                         name = software.get("_pdbx_vrpt_software.name", "")
                         version = software.get("_pdbx_vrpt_software.version", "")
                         success = software.get("_pdbx_vrpt_software.success_y_or_n", "")
-                        
+
                         # Format success status
                         if success == "Y":
                             statusDisplay = "WORKED"
@@ -2477,20 +2477,20 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                         else:
                             statusDisplay = success if success else "?"
                             statusClass = ""
-                        
+
                         tableRows.append('<tr>')
                         tableRows.append('<td>%s</td>' % name)
                         tableRows.append('<td>%s</td>' % version)
                         tableRows.append('<td%s>%s</td>' % (statusClass, statusDisplay))
                         tableRows.append('</tr>')
-                    
+
                     tableRows.append('</tbody>')
                     tableRows.append('</table>')
                     tableRows.append('</div>')
                     validationSoftwareTable = '\n'.join(tableRows)
             except Exception as e:
                 self._lfh.write("Error reading validation software data from %s: %s\n" % (validationCifPath, str(e)))
-        
+
         myD["validation-software-table"] = validationSoftwareTable
 
         if len(vTagList) > 0:
