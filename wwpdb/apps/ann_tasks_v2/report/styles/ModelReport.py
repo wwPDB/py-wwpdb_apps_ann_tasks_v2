@@ -265,10 +265,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_related_exp_data_set.details", "%s", "str", ""),
         ],
         "pdbx_depui_status_flags": [
-            # A subset of interesting flags
-            ("_pdbx_depui_status_flags.dep_dataset_id", "%s", "str", ""),
-            ("_pdbx_depui_status_flags.post_rel_replacement_reason", "%s", "str", ""),
-            ("_pdbx_depui_status_flags.post_rel_replacement_reason_details", "%s", "str", ""),
+            ("_pdbx_depui_status_flags.assembly_inferred", "%s", "str", ""),
         ],
         "database_PDB_rev": [
             ("_database_PDB_rev.num", "%s", "str", ""),
