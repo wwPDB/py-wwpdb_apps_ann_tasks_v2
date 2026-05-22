@@ -2198,7 +2198,13 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     assemblyNotice = self.__buildAssemblyInferredNotice(downloadPath)
-                    leadingHtmlL = [assemblyNotice] if assemblyNotice else None
+                    leadingHtmlL = ["<!-- DAOTHER-10530 entry-report-active -->\n"]
+                    if assemblyNotice:
+                        leadingHtmlL.append(assemblyNotice)
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker DAOTHER-10530 entry=%s model=%s assembly_notice=%s\n"
+                        % (entryId, downloadPath, "yes" if assemblyNotice else "no")
+                    )
                     myD[cT] = "\n".join(
                         pR.makeTabularReport(
                             filePath=downloadPath,
