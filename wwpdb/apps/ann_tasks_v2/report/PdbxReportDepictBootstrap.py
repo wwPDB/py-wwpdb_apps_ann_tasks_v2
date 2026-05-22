@@ -157,7 +157,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         if style in ["tabs"]:
             return self.__doRenderTabs(eD)
         elif style in ["accordion", "multiaccordion"]:
-            return self.__doRenderAccordion(eD)
+            return self.__doRenderAccordion(eD, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
         elif style in ["page-multiaccordion", "page-accordion"]:
             return self.__doRenderPage(eD, leadingHtmlL, trailingHtmlL)
         else:
@@ -268,7 +268,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         #
         return oL
 
-    def __doRenderAccordion(self, eD):
+    def __doRenderAccordion(self, eD, leadingHtmlL=None, trailingHtmlL=None):
         """
         Bootstrap accordion template  --
 
@@ -302,6 +302,10 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         #
         idPrefix = "acc" + str(random.randint(0, 100000))
         oL = []
+        if leadingHtmlL:
+            oL.extend(leadingHtmlL)
+        if trailingHtmlL:
+            oL.extend(trailingHtmlL)
         catList = self.__reportCategories
         self.__requestHost = eD["requestHost"]
         cD = eD["dataDict"]

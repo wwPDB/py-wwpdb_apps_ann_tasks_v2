@@ -54,6 +54,7 @@ except ImportError:
 
 import glob
 import html
+import re
 
 # from json import loads, dumps
 import filecmp
@@ -2196,10 +2197,17 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 if ok:
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
-                    myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="model", idCode=entryId, layout=layout))
                     assemblyNotice = self.__buildAssemblyInferredNotice(downloadPath)
-                    if assemblyNotice:
-                        myD[cT] = assemblyNotice + "\n" + (myD[cT] or "")
+                    leadingHtmlL = [assemblyNotice] if assemblyNotice else None
+                    myD[cT] = "\n".join(
+                        pR.makeTabularReport(
+                            filePath=downloadPath,
+                            contentType="model",
+                            idCode=entryId,
+                            layout=layout,
+                            leadingHtmlL=leadingHtmlL,
+                        )
+                    )
 
                     downloadWebPath = du.getWebPath()
                     myD["model-session"] = downloadWebPath
@@ -2725,6 +2733,12 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if not modelFilePath or not os.path.exists(modelFilePath):
             self._lfh.write("+CommonTasksWebAppWorker assembly_inferred: model file missing %s\n" % modelFilePath)
             return None
+        val = self.__readAssemblyInferredFromModelText(modelFilePath)
+        if val is not None:
+            self._lfh.write(
+                "+CommonTasksWebAppWorker assembly_inferred=%s (text) file=%s\n" % (val, modelFilePath)
+            )
+            return val
         try:
             cifObj = mmCIFUtil(filePath=modelFilePath)
             data_map = getattr(cifObj, "_mmCIFUtil__dataMap", None) or {}
@@ -2747,6 +2761,36 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "+CommonTasksWebAppWorker assembly_inferred: not found in review model %s "
             "(confirm flag is in archive model, not only deposit-ui)\n" % modelFilePath
         )
+        return None
+
+    def __readAssemblyInferredFromModelText(self, modelFilePath):
+        """Parse assembly_inferred directly from mmCIF text (loop or item format)."""
+        try:
+            with open(modelFilePath, "r") as ifh:
+                text = ifh.read()
+            m_loop = re.search(
+                r"loop_\s*\n\s*_pdbx_depui_status_flags\.assembly_inferred\s*\n\s*([^\s#]+)",
+                text,
+                re.MULTILINE,
+            )
+            if m_loop:
+                val = m_loop.group(1).strip().strip("'\"")
+                if val not in ("", ".", "?"):
+                    return val
+            m_item = re.search(
+                r"^_pdbx_depui_status_flags\.assembly_inferred\s+([^\s#]+)",
+                text,
+                re.MULTILINE,
+            )
+            if m_item:
+                val = m_item.group(1).strip().strip("'\"")
+                if val not in ("", ".", "?"):
+                    return val
+        except Exception as e:
+            self._lfh.write(
+                "+CommonTasksWebAppWorker.__readAssemblyInferredFromModelText() error for %s: %s\n"
+                % (modelFilePath, str(e))
+            )
         return None
 
     def __readAssemblyInferredFromMmCifBlock(self, cifObj, block_name):
@@ -2797,6 +2841,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             return ""
         safe_val = html.escape(val)
         tableRows = []
+        tableRows.append("<!-- DAOTHER-10530 assembly-inferred=%s -->" % safe_val)
         tableRows.append('<div class="container" style="text-align: left; margin: 1em 0;">')
         tableRows.append(
             '<table class="table table-striped table-bordered table-condensed" style="width: auto; table-layout: auto; min-width: 20em;">'
