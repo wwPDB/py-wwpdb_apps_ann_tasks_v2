@@ -93,7 +93,6 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                 ("pdbx_struct_oper_list", "Assembly Oper List Details", "row-wise"),
                 ("pdbx_struct_assembly_depositor_info", "Author Assembly Details", "row-wise"),
                 ("pdbx_struct_assembly_auth_evidence", "Author Assembly Evidence", "row-wise"),
-                ("pdbx_depui_status_flags", "Assembly inferred from previous entry", "row-wise"),
                 ("pdbx_SG_project", "Structural genomics", "row-wise"),
                 ("pdbx_database_related", "Related entries", "row-wise"),
                 ("pdbx_initial_refinement_model", "Starting models", "row-wise"),

@@ -2169,6 +2169,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "downloads",
         ]:
             myD[ky] = None
+        myD["assembly-inferred-notice"] = ""
         myD["entry-info"] = {
             "pdb_id": "",
             "struct_title": "",
@@ -2196,6 +2197,11 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="model", idCode=entryId, layout=layout))
+                    myD["assembly-inferred-notice"] = self.__buildAssemblyInferredNotice(downloadPath)
+                    if myD["assembly-inferred-notice"] and self._verbose:
+                        self._lfh.write(
+                            "+CommonTasksWebAppWorker._renderCheckReports() assembly-inferred-notice from %s\n" % downloadPath
+                        )
 
                     downloadWebPath = du.getWebPath()
                     myD["model-session"] = downloadWebPath
@@ -2715,6 +2721,58 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         self._lfh.write("+CommonTasksWebAppWorker._makeCheckReports() complete\n")
 
         return aTagList
+
+    def __readAssemblyInferredFromModel(self, modelFilePath):
+        """Return pdbx_depui_status_flags.assembly_inferred from the review model mmCIF."""
+        if not modelFilePath or not os.path.exists(modelFilePath):
+            return None
+        try:
+            cifObj = mmCIFUtil(filePath=modelFilePath)
+            dlist, _iList = cifObj.GetValueAndItem("pdbx_depui_status_flags")
+            if dlist:
+                row = dlist[0]
+                if "assembly_inferred" in row:
+                    val = str(row["assembly_inferred"]).strip()
+                    if val and val != ".":
+                        return val
+                for key, itemVal in row.items():
+                    if key.endswith("assembly_inferred"):
+                        val = str(itemVal).strip()
+                        if val and val != ".":
+                            return val
+            text = cifObj.GetSingleValue("pdbx_depui_status_flags", "assembly_inferred")
+            if text and str(text).strip() not in ("", "."):
+                return str(text).strip()
+        except Exception as e:
+            self._lfh.write(
+                "+CommonTasksWebAppWorker.__readAssemblyInferredFromModel() error for %s: %s\n" % (modelFilePath, str(e))
+            )
+        return None
+
+    def __buildAssemblyInferredNotice(self, modelFilePath):
+        """HTML table for Review Module (same delivery pattern as validation-software-table)."""
+        val = self.__readAssemblyInferredFromModel(modelFilePath)
+        if val is None:
+            return ""
+        tableRows = []
+        tableRows.append('<div class="container" style="text-align: left; margin: 1em 0;">')
+        tableRows.append(
+            '<table class="table table-striped table-bordered table-condensed" style="width: auto; table-layout: auto; min-width: 20em;">'
+        )
+        tableRows.append("<thead>")
+        tableRows.append("<tr>")
+        tableRows.append('<th colspan="2">Assembly inferred from previous entry</th>')
+        tableRows.append("</tr>")
+        tableRows.append("</thead>")
+        tableRows.append("<tbody>")
+        tableRows.append("<tr>")
+        tableRows.append('<th style="min-width: 14em;">assembly_inferred</th>')
+        tableRows.append('<td style="min-width: 4em;">%s</td>' % val)
+        tableRows.append("</tr>")
+        tableRows.append("</tbody>")
+        tableRows.append("</table>")
+        tableRows.append("</div>")
+        return "\n".join(tableRows)
 
     def __getMessageTextWithMarkup(self, message):
         """Internal methods used by _makeCheckReports()"""
