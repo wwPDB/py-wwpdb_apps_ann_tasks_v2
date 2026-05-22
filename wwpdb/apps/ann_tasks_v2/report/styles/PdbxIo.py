@@ -90,17 +90,35 @@ class PdbxReportIo(PdbxStyleIoUtil):
     def __getAssemblyInferredValueFromFile(self, filePath):
         try:
             cifObj = mmCIFUtil(filePath=filePath)
-            dlist, _iList = cifObj.GetValueAndItem("pdbx_depui_status_flags")
-            if dlist:
-                row = dlist[0]
-                if "assembly_inferred" in row:
-                    return self.__normalizeAssemblyInferredValue(row["assembly_inferred"])
-                for key, itemVal in row.items():
-                    if key.endswith("assembly_inferred"):
-                        return self.__normalizeAssemblyInferredValue(itemVal)
-            text = cifObj.GetSingleValue("pdbx_depui_status_flags", "assembly_inferred")
-            if text:
-                return self.__normalizeAssemblyInferredValue(text)
+            data_map = getattr(cifObj, "_mmCIFUtil__dataMap", None) or {}
+            block_names = list(data_map.keys())
+            if not block_names and cifObj.GetBlockID():
+                block_names = [cifObj.GetBlockID()]
+            for block_name in block_names:
+                dlist, _iList = cifObj.GetValueAndItemByBlock(block_name, "pdbx_depui_status_flags")
+                if dlist:
+                    for row in dlist:
+                        if "assembly_inferred" in row:
+                            val = self.__normalizeAssemblyInferredValue(row["assembly_inferred"])
+                            if val is not None:
+                                return val
+                        for key, itemVal in row.items():
+                            if key.endswith("assembly_inferred"):
+                                val = self.__normalizeAssemblyInferredValue(itemVal)
+                                if val is not None:
+                                    return val
+                try:
+                    container = cifObj._mmCIFUtil__dataList[data_map[block_name]]
+                    cat_obj = container.getObj("pdbx_depui_status_flags")
+                    if cat_obj is not None and "assembly_inferred" in cat_obj.getAttributeList():
+                        idx = cat_obj.getAttributeList().index("assembly_inferred")
+                        for row in cat_obj.getRowList() or []:
+                            if idx < len(row):
+                                val = self.__normalizeAssemblyInferredValue(row[idx])
+                                if val is not None:
+                                    return val
+                except Exception:
+                    pass
         except Exception as err:
             if self.__verbose:
                 self.__lfh.write("PdbxReportIo.__getAssemblyInferredValueFromFile failed: %s\n" % err)

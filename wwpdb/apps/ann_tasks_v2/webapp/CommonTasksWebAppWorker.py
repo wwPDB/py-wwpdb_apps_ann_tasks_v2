@@ -53,6 +53,7 @@ except ImportError:
     import pickle as pickle
 
 import glob
+import html
 
 # from json import loads, dumps
 import filecmp
@@ -2198,12 +2199,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="model", idCode=entryId, layout=layout))
                     assemblyNotice = self.__buildAssemblyInferredNotice(downloadPath)
                     if assemblyNotice:
-                        myD[cT] = myD[cT] + "\n" + assemblyNotice
-                        if self._verbose:
-                            self._lfh.write(
-                                "+CommonTasksWebAppWorker._renderCheckReports() assembly_inferred notice appended from %s\n"
-                                % downloadPath
-                            )
+                        myD[cT] = assemblyNotice + "\n" + (myD[cT] or "")
 
                     downloadWebPath = du.getWebPath()
                     myD["model-session"] = downloadWebPath
@@ -2727,35 +2723,79 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
     def __readAssemblyInferredFromModel(self, modelFilePath):
         """Return pdbx_depui_status_flags.assembly_inferred from the review model mmCIF."""
         if not modelFilePath or not os.path.exists(modelFilePath):
+            self._lfh.write("+CommonTasksWebAppWorker assembly_inferred: model file missing %s\n" % modelFilePath)
             return None
         try:
             cifObj = mmCIFUtil(filePath=modelFilePath)
-            dlist, _iList = cifObj.GetValueAndItem("pdbx_depui_status_flags")
-            if dlist:
-                row = dlist[0]
-                if "assembly_inferred" in row:
-                    val = str(row["assembly_inferred"]).strip()
-                    if val and val != ".":
-                        return val
-                for key, itemVal in row.items():
-                    if key.endswith("assembly_inferred"):
-                        val = str(itemVal).strip()
-                        if val and val != ".":
-                            return val
-            text = cifObj.GetSingleValue("pdbx_depui_status_flags", "assembly_inferred")
-            if text and str(text).strip() not in ("", "."):
-                return str(text).strip()
+            data_map = getattr(cifObj, "_mmCIFUtil__dataMap", None) or {}
+            block_names = list(data_map.keys())
+            if not block_names and cifObj.GetBlockID():
+                block_names = [cifObj.GetBlockID()]
+            for block_name in block_names:
+                val = self.__readAssemblyInferredFromMmCifBlock(cifObj, block_name)
+                if val is not None:
+                    self._lfh.write(
+                        "+CommonTasksWebAppWorker assembly_inferred=%s block=%s file=%s\n"
+                        % (val, block_name, modelFilePath)
+                    )
+                    return val
         except Exception as e:
             self._lfh.write(
                 "+CommonTasksWebAppWorker.__readAssemblyInferredFromModel() error for %s: %s\n" % (modelFilePath, str(e))
             )
+        self._lfh.write(
+            "+CommonTasksWebAppWorker assembly_inferred: not found in review model %s "
+            "(confirm flag is in archive model, not only deposit-ui)\n" % modelFilePath
+        )
+        return None
+
+    def __readAssemblyInferredFromMmCifBlock(self, cifObj, block_name):
+        """Read assembly_inferred from one mmCIF data block."""
+        dlist, _iList = cifObj.GetValueAndItemByBlock(block_name, "pdbx_depui_status_flags")
+        if dlist:
+            for row in dlist:
+                val = self.__extractAssemblyInferredFromRow(row)
+                if val is not None:
+                    return val
+        try:
+            data_map = getattr(cifObj, "_mmCIFUtil__dataMap", None) or {}
+            if block_name not in data_map:
+                return None
+            container = cifObj._mmCIFUtil__dataList[data_map[block_name]]
+            cat_obj = container.getObj("pdbx_depui_status_flags")
+            if cat_obj is None:
+                return None
+            attr_list = cat_obj.getAttributeList()
+            if "assembly_inferred" not in attr_list:
+                return None
+            idx = attr_list.index("assembly_inferred")
+            for row in cat_obj.getRowList() or []:
+                if idx < len(row):
+                    text = str(row[idx]).strip()
+                    if text not in ("", "."):
+                        return text
+        except Exception:
+            pass
+        return None
+
+    def __extractAssemblyInferredFromRow(self, row):
+        if "assembly_inferred" in row:
+            text = str(row["assembly_inferred"]).strip()
+            if text not in ("", "."):
+                return text
+        for key, itemVal in row.items():
+            if key.endswith("assembly_inferred"):
+                text = str(itemVal).strip()
+                if text not in ("", "."):
+                    return text
         return None
 
     def __buildAssemblyInferredNotice(self, modelFilePath):
-        """HTML table for Review Module (same delivery pattern as validation-software-table)."""
+        """HTML table prepended to Entry report in Review Module."""
         val = self.__readAssemblyInferredFromModel(modelFilePath)
         if val is None:
             return ""
+        safe_val = html.escape(val)
         tableRows = []
         tableRows.append('<div class="container" style="text-align: left; margin: 1em 0;">')
         tableRows.append(
@@ -2769,7 +2809,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         tableRows.append("<tbody>")
         tableRows.append("<tr>")
         tableRows.append('<th style="min-width: 14em;">assembly_inferred</th>')
-        tableRows.append('<td style="min-width: 4em;">%s</td>' % val)
+        tableRows.append('<td style="min-width: 4em;">%s</td>' % safe_val)
         tableRows.append("</tr>")
         tableRows.append("</tbody>")
         tableRows.append("</table>")
