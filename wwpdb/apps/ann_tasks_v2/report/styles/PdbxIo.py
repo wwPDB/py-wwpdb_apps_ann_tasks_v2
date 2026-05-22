@@ -30,8 +30,11 @@ __email__ = "john.westbrook@rcsb.org"
 __license__ = "Apache 2.0"
 
 import logging
+import os
 import sys
 import time
+
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 
 from mmcif_utils.style.PdbxEntryInfoCategoryStyle import PdbxEntryInfoCategoryStyle
 from mmcif_utils.style.PdbxGeometryReportCategoryStyle import PdbxGeometryReportCategoryStyle
@@ -56,8 +59,7 @@ class PdbxReportIo(PdbxStyleIoUtil):
     def __init__(self, verbose=True, log=sys.stderr):
         super(PdbxReportIo, self).__init__(styleObject=PdbxReportCategoryStyle(), verbose=verbose, log=log)
 
-        # self.__verbose = verbose
-        # self.__debug = False
+        self.__verbose = verbose
         self.__lfh = log
         #
         self.__filePath = None
@@ -70,29 +72,77 @@ class PdbxReportIo(PdbxStyleIoUtil):
     def getAssemblyInferredReportRows(self):
         """Build review-report rows for pdbx_depui_status_flags.assembly_inferred.
 
-        getItemDictList() can omit this category when only assembly_inferred is styled;
-        read the value directly from the mmCIF container for the Review Module section.
+        getItemDictList() can omit this category when only assembly_inferred is styled.
+        Use mmCIFUtil (same as AnnTasksWebAppWorker) and fall back to the PDBx container API.
         """
         attr = "_pdbx_depui_status_flags.assembly_inferred"
+        filePath = self.__filePath
+        if not filePath or not os.access(filePath, os.R_OK):
+            return []
+
+        val = self.__getAssemblyInferredValueFromFile(filePath)
+        if val is None:
+            val = self.__getAssemblyInferredValueFromContainer()
+        if val is None:
+            return []
+        return [{attr: val}]
+
+    def __getAssemblyInferredValueFromFile(self, filePath):
+        try:
+            cifObj = mmCIFUtil(filePath=filePath)
+            dlist, _iList = cifObj.GetValueAndItem("pdbx_depui_status_flags")
+            if dlist:
+                row = dlist[0]
+                if "assembly_inferred" in row:
+                    return self.__normalizeAssemblyInferredValue(row["assembly_inferred"])
+                for key, itemVal in row.items():
+                    if key.endswith("assembly_inferred"):
+                        return self.__normalizeAssemblyInferredValue(itemVal)
+            text = cifObj.GetSingleValue("pdbx_depui_status_flags", "assembly_inferred")
+            if text:
+                return self.__normalizeAssemblyInferredValue(text)
+        except Exception as err:
+            if self.__verbose:
+                self.__lfh.write("PdbxReportIo.__getAssemblyInferredValueFromFile failed: %s\n" % err)
+        return None
+
+    def __getAssemblyInferredValueFromContainer(self):
         try:
             cObj = self.getCurrentContainer()
             if cObj is None:
-                return []
+                return None
             catObj = cObj.getObj("pdbx_depui_status_flags")
             if catObj is None:
-                return []
+                return None
+            attrList = catObj.getAttributeList()
+            if "assembly_inferred" not in attrList:
+                return None
+            idx = attrList.index("assembly_inferred")
+            rowList = catObj.getRowList()
+            if rowList:
+                for row in rowList:
+                    if idx < len(row):
+                        val = self.__normalizeAssemblyInferredValue(row[idx])
+                        if val is not None:
+                            return val
             nRows = catObj.getRowCount()
-            if nRows < 1:
-                return []
-            rows = []
             for iRow in range(nRows):
-                val = catObj.getValue("assembly_inferred", iRow)
-                if val is None or val == ".":
-                    val = ""
-                rows.append({attr: str(val)})
-            return rows
-        except Exception:
-            return []
+                val = self.__normalizeAssemblyInferredValue(catObj.getValue("assembly_inferred", iRow))
+                if val is not None:
+                    return val
+        except Exception as err:
+            if self.__verbose:
+                self.__lfh.write("PdbxReportIo.__getAssemblyInferredValueFromContainer failed: %s\n" % err)
+        return None
+
+    @staticmethod
+    def __normalizeAssemblyInferredValue(val):
+        if val is None:
+            return None
+        text = str(val).strip()
+        if text in ("", "."):
+            return None
+        return text
 
     def setFilePath(self, filePath, idCode=None):
         """Specify the file path for the target and optionally provide an identifier
