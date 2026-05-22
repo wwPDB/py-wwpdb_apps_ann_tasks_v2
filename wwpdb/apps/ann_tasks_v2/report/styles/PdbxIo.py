@@ -67,6 +67,33 @@ class PdbxReportIo(PdbxStyleIoUtil):
     def getCategory(self, catName="entity"):
         return self.getItemDictList(catName)
 
+    def getAssemblyInferredReportRows(self):
+        """Build review-report rows for pdbx_depui_status_flags.assembly_inferred.
+
+        getItemDictList() can omit this category when only assembly_inferred is styled;
+        read the value directly from the mmCIF container for the Review Module section.
+        """
+        attr = "_pdbx_depui_status_flags.assembly_inferred"
+        try:
+            cObj = self.getCurrentContainer()
+            if cObj is None:
+                return []
+            catObj = cObj.getObj("pdbx_depui_status_flags")
+            if catObj is None:
+                return []
+            nRows = catObj.getRowCount()
+            if nRows < 1:
+                return []
+            rows = []
+            for iRow in range(nRows):
+                val = catObj.getValue("assembly_inferred", iRow)
+                if val is None or val == ".":
+                    val = ""
+                rows.append({attr: str(val)})
+            return rows
+        except Exception:
+            return []
+
     def setFilePath(self, filePath, idCode=None):
         """Specify the file path for the target and optionally provide an identifier
         for the data section within the file.

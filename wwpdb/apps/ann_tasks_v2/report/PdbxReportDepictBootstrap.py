@@ -429,7 +429,11 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             elif itemName in row:
                 itemValue = row[itemName]
             else:
-                itemValue = itemDefault
+                shortName = itemName.rsplit(".", 1)[-1]
+                if shortName in row:
+                    itemValue = row[shortName]
+                else:
+                    itemValue = itemDefault
             itemValue = "<br />".join(itemValue.split("\n"))
 
             oL.append("<td>%s</td>" % (itemValue))

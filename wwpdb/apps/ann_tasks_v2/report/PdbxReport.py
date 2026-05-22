@@ -216,6 +216,9 @@ class PdbxReport(object):
                 oD["dataDict"][catName] = pdbxR.getCategory(catName=catName)
 
             if contentType == "model":
+                assemblyInferredRows = pdbxR.getAssemblyInferredReportRows()
+                if assemblyInferredRows:
+                    oD["dataDict"]["pdbx_depui_status_flags"] = assemblyInferredRows
                 oD["pdb_id"] = pdbxR.getDbCode(dbId="PDB")
                 oD["struct_title"] = pdbxR.getStructTitle()
                 oD["primary_contour_level"] = pdbxR.getContourLevelMap(mapId="primary map")
