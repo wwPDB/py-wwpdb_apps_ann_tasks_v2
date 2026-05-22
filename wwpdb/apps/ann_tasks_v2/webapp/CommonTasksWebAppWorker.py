@@ -2169,7 +2169,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
             "downloads",
         ]:
             myD[ky] = None
-        myD["assembly-inferred-notice"] = ""
         myD["entry-info"] = {
             "pdb_id": "",
             "struct_title": "",
@@ -2197,11 +2196,14 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                     downloadPath = du.getDownloadPath()
                     aTagList.append(du.getAnchorTag())
                     myD[cT] = "\n".join(pR.makeTabularReport(filePath=downloadPath, contentType="model", idCode=entryId, layout=layout))
-                    myD["assembly-inferred-notice"] = self.__buildAssemblyInferredNotice(downloadPath)
-                    if myD["assembly-inferred-notice"] and self._verbose:
-                        self._lfh.write(
-                            "+CommonTasksWebAppWorker._renderCheckReports() assembly-inferred-notice from %s\n" % downloadPath
-                        )
+                    assemblyNotice = self.__buildAssemblyInferredNotice(downloadPath)
+                    if assemblyNotice:
+                        myD[cT] = myD[cT] + "\n" + assemblyNotice
+                        if self._verbose:
+                            self._lfh.write(
+                                "+CommonTasksWebAppWorker._renderCheckReports() assembly_inferred notice appended from %s\n"
+                                % downloadPath
+                            )
 
                     downloadWebPath = du.getWebPath()
                     myD["model-session"] = downloadWebPath

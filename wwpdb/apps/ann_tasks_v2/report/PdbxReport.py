@@ -100,7 +100,6 @@ class PdbxReport(object):
                 if "primary_contour_level" in dd:
                     self.__primary_contour_level = dd["primary_contour_level"]
                 #
-                self.__ensureAssemblyInferredInReportData(dd, filePath)
                 rdd = PdbxReportDepictBootstrap(styleObject=PdbxReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
@@ -139,19 +138,6 @@ class PdbxReport(object):
             #
         #
         return oL
-
-    def __ensureAssemblyInferredInReportData(self, dd, filePath):
-        """Guarantee assembly_inferred is in dataDict before HTML render."""
-        if not filePath or not dd.get("dataDict"):
-            return
-        if dd["dataDict"].get("pdbx_depui_status_flags"):
-            return
-        pdbxR = PdbxReportIo(verbose=self.__verbose, log=self.__lfh)
-        if not pdbxR.setFilePath(filePath, idCode=None):
-            return
-        rows = pdbxR.getAssemblyInferredReportRows()
-        if rows:
-            dd["dataDict"]["pdbx_depui_status_flags"] = rows
 
     def setFilePath(self, filePath, fileFormat="cif", idCode=None):
         self.__filePath = filePath
