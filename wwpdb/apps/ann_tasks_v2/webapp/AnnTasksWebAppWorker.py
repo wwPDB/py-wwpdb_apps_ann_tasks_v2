@@ -873,6 +873,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         assemblyList = cifObj.GetValue("pdbx_struct_assembly")
         genList = cifObj.GetValue("pdbx_struct_assembly_gen")
         operList = cifObj.GetValue("pdbx_struct_oper_list")
+        # DAOTHER-8553
         assembly_inferred = cifObj.GetSingleValue("pdbx_depui_status_flags", "assembly_inferred")
         if (len(assemblyList) > 0) and (len(genList) > 0) and (len(operList) > 0):
             return True, assembly_inferred

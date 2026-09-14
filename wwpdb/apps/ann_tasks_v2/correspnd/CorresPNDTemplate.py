@@ -23,7 +23,7 @@ from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 
-class CorresPNDTemplate(object):
+class CorresPNDTemplate:
     """
     The CorresPNDTemplate class generates correspondence to depositor template.
 
@@ -43,11 +43,13 @@ class CorresPNDTemplate(object):
         self.__letterTemplateMap = {}
         self.__valueMap = {}
         self.__questionList = []
+        self.__em_map_only_questionList = []
         self.__all_items = []
         self.__corres_items = []
         self.__token_question_mapping = {}
         self.__additional_text_mapping = {}
         self.__javascript_text_mapping = ""
+        self.__em_map_only_question_text = ""
         #
         self.__setup()
 
@@ -135,6 +137,9 @@ class CorresPNDTemplate(object):
             #
             if "question" in vdir and vdir["question"]:
                 self.__token_question_mapping[vdir["token"]] = vdir["question"]
+                if "include_in_em_map_only" in vdir and vdir["include_in_em_map_only"] == "y":
+                    self.__em_map_only_questionList.append(vdir["question"])
+                #
             #
             if "additional_text" in vdir and vdir["additional_text"] == "y":
                 self.__additional_text_mapping[vdir["token"]] = "y"
@@ -585,6 +590,9 @@ class CorresPNDTemplate(object):
                 if "text" in qdir:
                     context = qdir["text"] % self.__corresInfo
                     context = context.replace("$$$", str(checked_count))
+                    if qdir["question"] in self.__em_map_only_questionList:
+                        self.__em_map_only_question_text += context + "\n"
+                    #
                 #
                 if (qdir["question"] in additionalD) and ("additional_text" in qdir) and qdir["additional_text"]:
                     context += "\n\n" + qdir["additional_text"]
@@ -692,6 +700,10 @@ class CorresPNDTemplate(object):
                 return self.__letterTemplateMap["header_pdb_em"] % myD
             else:
                 self.__EmMapOnly = True
+                myD["warning"] = ""
+                if self.__em_map_only_question_text != "":
+                    myD["warning"] = "\nWarning:\n\n" + self.__em_map_only_question_text
+                #
                 return self.__letterTemplateMap["letter_em_only"] % myD
         else:
             return self.__letterTemplateMap["header"] % myD
