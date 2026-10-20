@@ -940,7 +940,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         sent = False
         try:
-            from wwpdb.apps.msgmodule.io.MessagingIo import MessagingIo
+            from wwpdb.apps.msgmodule.io.MessagingIo import MessagingIo  # pylint: disable=import-error,no-name-in-module
 
             mio = MessagingIo(self._reqObj, verbose=self._verbose, log=self._lfh)
             sent = bool(mio.sendHoldExtensionNotice(idCode, notifyMonths, notifyDate, sender))
