@@ -17,6 +17,7 @@
 #  02-Feb-2018  ep    Return requested accession codes to end user
 #  23-May-2018  ep    Check status of generating XML header and provide feedback
 #  11-Jun-2018  ep    Return contents of XML header error file for display at UI
+#  20-Oct-2026  dh    DAOTHER-10514  Optional hold extension that also sends the extension letter.
 ##
 """
 Status update tasks tool  -
@@ -914,6 +915,43 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
     #     return retDate
 
+    def _holdExtensionStatusMessage(self, idCode, hasPdb, hasEM, newPdbHoldDate, newEmHoldDate, newAnnotatorInitials):
+        """After a successful other-status save, send the extension letter when requested.
+
+        A plain Go leaves extend-notify-months empty and only reports that the status was updated.
+        """
+        notifyMonths = str(self._reqObj.getValue("extend-notify-months") or "").strip()
+        if notifyMonths not in ("3", "6"):
+            return "Status updated"
+
+        notifyDate = str(self._reqObj.getValue("extend-notify-date") or "").strip()
+        savedDates = []
+        if hasPdb and newPdbHoldDate:
+            savedDates.append(str(newPdbHoldDate).strip())
+        if hasEM and newEmHoldDate:
+            savedDates.append(str(newEmHoldDate).strip())
+        if not savedDates or any(saved != notifyDate for saved in savedDates):
+            logger.error("Hold extension for %s was saved, but the letter date %s did not match %s", idCode, notifyDate, savedDates)
+            return "Status updated. The hold date was saved, but the extension message was not sent."
+
+        sender = str(self._reqObj.getValue("extend-notify-sender") or "").strip() or str(newAnnotatorInitials or "").strip()
+        if not sender:
+            sender = str(self._reqObj.getValue("annotator") or "").strip()
+
+        sent = False
+        try:
+            from wwpdb.apps.msgmodule.io.MessagingIo import MessagingIo
+
+            mio = MessagingIo(self._reqObj, verbose=self._verbose, log=self._lfh)
+            sent = bool(mio.sendHoldExtensionNotice(idCode, notifyMonths, notifyDate, sender))
+        except Exception:
+            logger.exception("Hold extension message failed for %s", idCode)
+            sent = False
+
+        if sent:
+            return "Status updated. Extension message sent."
+        return "Status updated. The hold date was saved, but the extension message was not sent."
+
     def _statusUpdateOtherOp(self):
         """Update header including site, annotator, auth hold requests and date"""
         self._getSession(useContext=True, overWrite=False)
@@ -1028,7 +1066,9 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     du.fetchId(idCode, "model", formatType="pdbx")
                     aTagList.append(du.getAnchorTag())
                     rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-                    rC.setStatus(statusMsg="Status updated")
+                    rC.setStatus(
+                        statusMsg=self._holdExtensionStatusMessage(idCode, hasPdb, hasEM, newPdbHoldDate, newEmHoldDate, newAnnotatorInitials)
+                    )
 
                     myD = {}
                     myD["authrelcode"] = newPdbStatus
