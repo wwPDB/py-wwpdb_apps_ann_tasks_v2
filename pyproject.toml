@@ -1,0 +1,107 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wwpdb.apps.ann_tasks_v2"
+dynamic = ["version"]
+description = "wwPDB annotation/review/status/validation module backend"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Ezra Peisach", email = "ezra.peisach@rcsb.org" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+]
+dependencies = [
+    "matplotlib",
+    "mmcif >= 0.25",
+    "mmcif.utils >= 0.22",
+    "pygal",
+    "wwpdb.apps.wf_engine",
+    "wwpdb.io",
+    "wwpdb.utils.config >= 0.45",
+    "wwpdb.utils.db[status] >= 0.6",
+    "wwpdb.utils.detach",
+    "wwpdb.utils.dp >= 0.54",
+    "wwpdb.utils.emdb ~= 1.0",
+    "wwpdb.utils.nmr >= 0.24",
+    "wwpdb.utils.session",
+    "wwpdb.utils.wf >= 0.13",
+]
+
+requires-python = ">=3.8"
+
+
+[project.urls]
+Homepage = "https://github.com/rcsb/py-wwpdb_apps_ann_tasks_v2"
+
+[tool.hatch.version]
+path = "wwpdb/apps/ann_tasks_v2/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/wwpdb",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wwpdb"]
+
+[tool.ruff]
+target-version = "py38"
+output-format = "concise"
+
+line-length = 120 # 120 is hatch's default via 'hatch init'
+include = [
+  "*.py",           # Source
+  "pyproject.toml", # This file (RUF rules only)
+  "*.ipynb",        # Jupyter notebooks
+]
+
+#=================================== Ruff lint ==============================#
+[tool.ruff.lint]
+
+#
+# ------------------------- Ruff misc. options ----------------------
+preview = false
+explicit-preview-rules = true
+
+# -------------------- default environment scripts ------------------
+[tool.hatch.envs.default]
+# skip-install = true
+dependencies = ["mypy", "ruff >=0.6.9", "wwpdb.utils.testing", "matplotlib", "pygal",
+  "wwpdb.utils.config",
+  "wwpdb.io"]
+
+
+[tool.hatch.envs.default.scripts]
+
+# 'format' formats and fixes issues but does not complain
+format = [
+  "ruff format",
+  "ruff check --fix-only",
+]
+
+# 'format-python' just excludes Prettier
+format-python = ["ruff format", "ruff check --fix-only"]
+
+# 'check' only checks but never fixes
+check = ["ruff check --no-fix .", "mypy --non-interactive --install-types --strict -p wwpdb -p tests"]
+
+# only checks with ruff (mypy has a lot of false positives)
+check-ruff = "ruff check --no-fix . {args}"
+
+# to complement 'check-ruff'
+check-mypy = "mypy --non-interactive --install-types --strict -p wwpdb -p tests {args}"
+
+# only check security via Bandit; we require these rules to pass
+check-security = "ruff check --select S --no-fix ."
+
+
