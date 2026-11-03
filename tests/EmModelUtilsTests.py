@@ -26,7 +26,7 @@ import inspect
 import time
 
 if __package__ is None or __package__ == "":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from commonsetup import HERE  # noqa:  F401 pylint: disable=import-error,unused-import
 else:
     from .commonsetup import HERE  # noqa: F401 pylint: disable=relative-beyond-top-level
