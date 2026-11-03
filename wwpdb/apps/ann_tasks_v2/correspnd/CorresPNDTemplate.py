@@ -74,6 +74,7 @@ class CorresPNDTemplate:
             self.__getCorrespondenceTempltInfo()
             self.__getCorresInfo(resultfile)
             self.__getValidateInfo()
+            self.__getDccLetterInfo()
             if self.__EmMapwithModel or self.__EmFsc143CutOff:
                 self.__getValidateInfoCif()
             #
@@ -172,6 +173,54 @@ class CorresPNDTemplate:
         #
         return text
 
+    def __getDccLetterInfo(self):
+        """DAOTHER-6251: pre-select structure-factor wavelength questions from the DCC report."""
+        depid = self.__reqObj.getValue("entryid")
+        reportPath = os.path.join(self.__sessionPath, depid + "_dcc-report_P1.cif.V1")
+        if not os.access(reportPath, os.F_OK):
+            return
+        #
+        try:
+            cifObj = mmCIFUtil(filePath=reportPath)
+            rows = cifObj.GetValue("pdbx_density")
+        except Exception:
+            traceback.print_exc(file=self.__lfh)
+            return
+        #
+        if not rows:
+            return
+        #
+        text = ""
+        for row in rows:
+            error = row.get("error")
+            if error:
+                text += "\n" + error
+            #
+        #
+        for line in text.splitlines():
+            low = line.lower()
+            if "wavelength value" in low and "abnormal" in low:
+                self.__appendDccLine("sf_wavelength_abnormal", line)
+            elif "wavelength mismatch" in low and "double check" in low:
+                self.__appendDccLine("sf_wavelength_mismatch_check", line)
+            elif "wavelength mismatch" in low:
+                self.__appendDccLine("sf_wavelength_mismatch", line)
+            #
+        #
+
+    def __appendDccLine(self, token, line):
+        """ """
+        line = line.strip()
+        if not line:
+            return
+        #
+        current = self.__corresInfo.get(token) or ""
+        if current:
+            self.__corresInfo[token] = current + "\n" + line
+        else:
+            self.__corresInfo[token] = line
+        #
+
     def __getConcatText(self, cifObj, category):
         """ """
         dlist = cifObj.GetValue(category)
@@ -218,6 +267,14 @@ class CorresPNDTemplate:
         try:
             vobj = ValidateXml(FileName=xmlPath, verbose=self.__verbose, log=self.__lfh)
             self.__corresInfo["calculated_completeness"] = vobj.getCalculatedCompleteness()
+            calculated = self.__corresInfo.get("calculated_completeness")
+            if calculated:
+                try:
+                    if float(calculated) < 65:
+                        self.__corresInfo["calculated_completeness_low"] = calculated
+                except (TypeError, ValueError):
+                    pass
+            #
             if self.__corresInfo["reported_completeness"] and self.__corresInfo["calculated_completeness"]:
                 c1 = float(self.__corresInfo["reported_completeness"])
                 c2 = float(self.__corresInfo["calculated_completeness"])
@@ -227,6 +284,12 @@ class CorresPNDTemplate:
                 #
                 if (abs(c1 - c2) / cmin) > 0.1:
                     self.__corresInfo["completeness_warning"] = "yes"
+                #
+                if abs(c1 - c2) > 20:
+                    self.__corresInfo["completeness_difference"] = "reported %s, calculated %s" % (
+                        self.__corresInfo["reported_completeness"],
+                        self.__corresInfo["calculated_completeness"],
+                    )
                 #
             #
             for item in ("r_free_diff", "r_work_diff"):
