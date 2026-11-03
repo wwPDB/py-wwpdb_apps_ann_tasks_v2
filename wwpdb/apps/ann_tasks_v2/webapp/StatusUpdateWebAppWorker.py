@@ -534,6 +534,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         expMethods = self._reqObj.getValue("experimental_methods")
         orgPostRelRecvdCoord = self._reqObj.getValue("postrelrecvdcoord")
         orgPostRelRecvdCoordDate = self._reqObj.getValue("postrelrecvdcoorddate")
+        struct_title = self._reqObj.getValue("struct_title")
         #
         # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
         logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s", orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode)
@@ -608,6 +609,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 postRelStatusCode=postRelStatusCode,
                 postRelRecvdCoord=orgPostRelRecvdCoord,
                 postRelRecvdCoordDate=orgPostRelRecvdCoordDate,
+                title=struct_title
             )
             if self._verbose:
                 self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() wf load completed %r\n" % ok1)
@@ -714,6 +716,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgPostRelRecvdCoord = self._reqObj.getValue("postrelrecvdcoord")
         orgPostRelRecvdCoordDate = self._reqObj.getValue("postrelrecvdcoorddate")
         #
+        struct_title = self._reqObj.getValue("struct_title")
+
         rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
         rC.setReturnFormat("json")
 
@@ -733,6 +737,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 postRelStatusCode=orgPostRelStatusCode,
                 postRelRecvdCoord=orgPostRelRecvdCoord,
                 postRelRecvdCoordDate=orgPostRelRecvdCoordDate,
+                title=struct_title
             )
             if self._verbose:
                 self._lfh.write("+StatusUpdateWebAppWorker._statusReloadOp() wf load completed %r\n" % ok1)
@@ -974,6 +979,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         # Saved away
         expMethods = self._reqObj.getValue("experimental_methods")
+        struct_title = self._reqObj.getValue("struct_title")
 
         logger.info("New PDB status :%s: Hold :%s:  EMDB status :%s: hold :%s:", newPdbStatus, newPdbHoldDate, newEmStatus, newEmHoldDate)
         logger.info("New annotator :%s: and site :%s:", newAnnotatorInitials, newProcessSite)
@@ -1025,14 +1031,16 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             ok3 = False
 
             if hasPdb:
-                ok1 = sU.wfLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=newPdbStatus)
+                ok1 = sU.wfLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=newPdbStatus, title=struct_title)
                 if self._verbose:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() wf load completed %r\n" % ok1)
             else:
                 ok1 = True
 
             if hasEM and ok1:
-                ok1a = sU.wfEmLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=statusD["em_depui_depositor_hold_instructions"])
+                em_title = self._reqObj.getValue("em_title")
+
+                ok1a = sU.wfEmLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=statusD["em_depui_depositor_hold_instructions"], title=em_title)
                 if self._verbose:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() EM wf load completed %r\n" % ok1a)
             else:
@@ -1136,6 +1144,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgPostRelRecvdCoordDate = self._reqObj.getValue("postrelrecvdcoorddate")
         orgEmStatus = self._reqObj.getValue("em_current_status")
         orgEmAuthStatus = self._reqObj.getValue("em_depui_depositor_hold_instructions")
+        struct_title = self._reqObj.getValue("struct_title")
         #
         expMethods = self._reqObj.getValue("experimental_methods")
         #
@@ -1254,13 +1263,16 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     postRelStatusCode=postRelStatusCode,
                     postRelRecvdCoord=orgPostRelRecvdCoord,
                     postRelRecvdCoordDate=orgPostRelRecvdCoordDate,
+                    title=struct_title
                 )
                 if self._verbose:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateOp() wf load completed %r\n" % ok1)
 
             ok1a = True
             if hasEM:
-                ok1a = sU.wfEmLoad(idCode, statusCode=statusD["em_current_status"], annotatorInitials=annotatorInitials)
+                em_title = self._reqObj.getValue("em_title")
+
+                ok1a = sU.wfEmLoad(idCode, statusCode=statusD["em_current_status"], annotatorInitials=annotatorInitials, title=em_title)
                 if self._verbose:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateEmOp() database status.deposition update completed %r\n" % ok1a)
 

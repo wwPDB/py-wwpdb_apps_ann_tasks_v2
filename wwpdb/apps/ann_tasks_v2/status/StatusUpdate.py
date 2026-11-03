@@ -100,6 +100,7 @@ class StatusUpdate(object):
         postRelStatusCode=None,
         postRelRecvdCoord=None,
         postRelRecvdCoordDate=None,
+        title=None
     ):
         """
         c=WfDbApi(self.__lfh, self.__verbose)
@@ -134,8 +135,10 @@ class StatusUpdate(object):
             if annotatorInitials is not None and len(annotatorInitials) > 1:
                 rd["ANNOTATOR_INITIALS"] = annotatorInitials
 
-            if "TITLE" in rd and (len(rd["TITLE"]) > 0):
+            if title or ("TITLE" in rd and (len(rd["TITLE"]) > 0)):
                 maxlen = 370
+                if title:
+                    rd["TITLE"] = title
                 rd["TITLE"] = str(rd["TITLE"]).replace("'", "''")
                 if len(rd["TITLE"]) > maxlen:
                     rd["TITLE"] = rd["TITLE"][0:maxlen]
@@ -205,7 +208,11 @@ class StatusUpdate(object):
                 rd["DEP_AUTHOR_RELEASE_STATUS_CODE_EMDB"] = authRelCode
 
             if (title is not None) and (len(title) > 2):
+                maxlen = 370
                 rd["TITLE_EMDB"] = title
+                rd["TITLE_EMDB"] = str(rd["TITLE_EMDB"]).replace("'", "''")
+                if len(rd["TITLE_EMDB"]) > maxlen:
+                    rd["TITLE_EMDB"] = rd["TITLE_EMDB"][0:maxlen]
 
             if annotatorInitials is not None and len(annotatorInitials) > 1:
                 rd["ANNOTATOR_INITIALS"] = annotatorInitials
