@@ -12,6 +12,7 @@ Base class for HTML depictions containing common constructs using required
 by BootStrap framework.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -22,13 +23,13 @@ import os
 import sys
 
 
-class PdbxDepictBootstrapBase(object):
+class PdbxDepictBootstrapBase:
     """Base class for HTML depictions contain definitions of common constructs
     using HTML5 and Bootstrap CSS -
 
     """
 
-    def __init__(self, includePath=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, includePath=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         """
 
         :param `verbose`:  boolean flag to activate verbose logging.

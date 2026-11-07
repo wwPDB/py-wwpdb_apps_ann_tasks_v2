@@ -7,6 +7,7 @@
 Update chemical shift cif file
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -16,20 +17,20 @@ __version__ = "V0.07"
 try:
     import cPickle as pickle
 except ImportError:
-    import pickle as pickle
+    import pickle
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
-from mmcif.io.PdbxWriter import PdbxWriter
-from mmcif.api.PdbxContainers import DataContainer
 from mmcif.api.DataCategory import DataCategory
+from mmcif.api.PdbxContainers import DataContainer
+from mmcif.io.PdbxWriter import PdbxWriter
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 
-class CSEditorUpdate(object):
+class CSEditorUpdate:
     """
     The CSEditorUpdate class updates chemical shift cif file.
 
@@ -57,12 +58,12 @@ class CSEditorUpdate(object):
         pickleFile = os.path.join(self.__sessionPath, self.__entryId + "_cs_pickle.db")
         if os.access(pickleFile, os.F_OK):
             fb = open(pickleFile, "rb")
-            cmap = pickle.load(fb)
+            cmap = pickle.load(fb)  # noqa: S301
             fb.close()
         #
         ddir = self.__reqObj.getDictionary()
         for key, value in ddir.items():
-            if key.startswith("RangeNum") or key.startswith("RangeCID"):
+            if key.startswith("RangeNum") or key.startswith("RangeCID"):  # noqa: PIE810
                 if value and value[0]:
                     cmap[key] = value[0]
                 #
@@ -144,6 +145,5 @@ class CSEditorUpdate(object):
                 error += line + "\n"
             #
             return error
-        else:
-            return default_message
+        return default_message
         #

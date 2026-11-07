@@ -14,26 +14,27 @@
 Calculation, selection and depiction of coordinate assemblies.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
-from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
-from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
+from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
+from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
 
-class AssemblyInput(object):
 
+class AssemblyInput:
     """
     AssemblyInput class encapsulates the data input operations for user supplied assemblies.
 
@@ -154,7 +155,7 @@ class AssemblyInput(object):
                 catObj = container.getObj(category)
                 colNames = list(catObj.getAttributeList())
                 nRows = catObj.getRowCount()
-                for iRow in range(0, nRows):
+                for iRow in range(nRows):
                     rD = {}
                     row = catObj.getRow(iRow)
                     for col in attributeList:
@@ -164,9 +165,7 @@ class AssemblyInput(object):
                         #
                         if col in colNames:
                             val = str(row[colNames.index(col)])
-                            if val is None:
-                                val = ""
-                            elif (val == ".") or (val == "?"):
+                            if val is None or (val == ".") or (val == "?"):  # noqa: PLR1714
                                 val = ""
                             #
                             rD[col_out] = val
@@ -289,8 +288,7 @@ class AssemblyInput(object):
                 #
             #
             return "\n".join(oL)
-        else:
-            return not_found_msg
+        return not_found_msg
         #
 
     def makeSymopInfoTable(self, entryId="1ABC", entryFileName=None):
@@ -308,7 +306,15 @@ class AssemblyInput(object):
         if (not c0.exists("cell")) or (not c0.exists("symmetry")):
             return not_found_msg
         #
-        myList = ("space_group_name_H-M", "length_a", "length_b", "length_c", "angle_alpha", "angle_beta", "angle_gamma")
+        myList = (
+            "space_group_name_H-M",
+            "length_a",
+            "length_b",
+            "length_c",
+            "angle_alpha",
+            "angle_beta",
+            "angle_gamma",
+        )
         myD = {}
         #
         sTable = c0.getObj("symmetry")
@@ -319,7 +325,15 @@ class AssemblyInput(object):
         if ("space_group_name_H-M" not in myD) or (not myD["space_group_name_H-M"]):
             return not_found_msg
         #
-        myLabel = {"space_group_name_H-M": "Space Group", "length_a": "a", "length_b": "b", "length_c": "c", "angle_alpha": "alpha", "angle_beta": "beta", "angle_gamma": "gamma"}
+        myLabel = {
+            "space_group_name_H-M": "Space Group",
+            "length_a": "a",
+            "length_b": "b",
+            "length_c": "c",
+            "angle_alpha": "alpha",
+            "angle_beta": "beta",
+            "angle_gamma": "gamma",
+        }
         #
         oL = []
         oL.append('<table class="table table-bordered table-striped">')
@@ -370,7 +384,7 @@ class AssemblyInput(object):
                     continue
                 #
                 tList = line.split(" ")
-                if len(tList) == 2:
+                if len(tList) == 2:  # noqa: PLR2004
                     symList.append(tList)
                 #
             #
@@ -397,9 +411,7 @@ class AssemblyInput(object):
         for col in myList:
             if col in colNames:
                 val = str(row[colNames.index(col)])
-                if val is None:
-                    val = ""
-                elif (val == ".") or (val == "?"):
+                if val is None or (val == ".") or (val == "?"):  # noqa: PLR1714
                     val = ""
                 #
                 myD[col] = val
@@ -446,9 +458,9 @@ class AssemblyInput(object):
         #    return '\n'.join(oL)
         #
         instanceIdList = []
-        for _eId, instL in eD.items():
+        for instL in eD.values():
             for inst in instL:
-                instanceIdList.append(inst)
+                instanceIdList.append(inst)  # noqa: PERF402
             #
         #
         sorted(instanceIdList)
@@ -460,7 +472,12 @@ class AssemblyInput(object):
         #
 
         # pdbx_struct_assembly_auth_evidence
-        attList = [("id", "ID"), ("assembly_id", "Assembly"), ("experimental_support", "Exp. Support"), ("details", "Details")]
+        attList = [
+            ("id", "ID"),
+            ("assembly_id", "Assembly"),
+            ("experimental_support", "Exp. Support"),
+            ("details", "Details"),
+        ]
         self.__displayTable(oL, assemEvidence, "pdbx_struct_assembly_auth_evidence", entryId, "", "", attList)
 
         # pdbx_struct_assembly_auth_classification
@@ -545,12 +562,12 @@ class AssemblyInput(object):
         if len(tableData) > 0:
             oL.append(top_table_template % (tableName, entryId, iC, iS))
             oL.append("<tr>")
-            for ky, label in attrList:
+            for _ky, label in attrList:
                 oL.append("<th>%s</th>" % label)
             oL.append("</tr>")
             for rowD in tableData:
                 oL.append("<tr>")
-                for ky, label in attrList:
+                for ky, _label in attrList:
                     oL.append("<td>%s</td>" % rowD[ky])
             oL.append("</tr>")
             oL.append(bottom_table_template)
@@ -689,7 +706,7 @@ class AssemblyInput(object):
         #
         instanceIdList = []
         allInstanceIdList = []
-        for _eId, instL in eD.items():
+        for instL in eD.values():
             for inst in instL:
                 allInstanceIdList.append(inst)
                 if inst in branch2LinearMap:
@@ -700,14 +717,18 @@ class AssemblyInput(object):
         #
         instanceIdList.sort()
         #
-        provenanceList = ["author_defined_assembly", "software_defined_assembly", "author_and_software_defined_assembly"]
+        provenanceList = [
+            "author_defined_assembly",
+            "software_defined_assembly",
+            "author_and_software_defined_assembly",
+        ]
 
         defautSymOp = "1_555"
         checkInstTemplate = ' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox" checked="checked"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
         chainInstTemplate = ' %s <input id="a_%d_inst_%s" name="a_%d_inst_%s" type="checkbox"></input> OP <span  id="a_%d_symop_%s"  class="ief">%s</span> '
         #
         allMonomerList = []
-        for assemId in range(0, len(instanceIdList)):
+        for assemId in range(len(instanceIdList)):
             instId = "a_%d_inst_%s" % ((assemId + 1), instanceIdList[assemId])
             allMonomerList.append(instId)
             if instanceIdList[assemId] in linear2BranchMap:
@@ -722,8 +743,7 @@ class AssemblyInput(object):
         defaultValue = self.__placeHolderValue
         nRows = 0
         numAssem = len(fD) + 21
-        if numAssem < len(instanceIdList) + 1:
-            numAssem = len(instanceIdList) + 1
+        numAssem = max(numAssem, len(instanceIdList) + 1)
         #
         for assemId in range(1, numAssem):
             if assemId in fD:

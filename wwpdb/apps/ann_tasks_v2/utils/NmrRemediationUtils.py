@@ -7,6 +7,7 @@
 Handle remediation of legacy CS data to make NMR 3.1 compliant for validation
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Ezra Peisach"
 __email__ = "peisacht@rcsb.rutgers.edu"
@@ -16,8 +17,8 @@ __version__ = "V0.01"
 import logging
 import sys
 
-from wwpdb.utils.nmr.CifToNmrStar import CifToNmrStar
 from mmcif.io.IoAdapterPy import IoAdapterPy
+from wwpdb.utils.nmr.CifToNmrStar import CifToNmrStar
 
 logger = logging.getLogger()
 
@@ -43,7 +44,7 @@ def starToPdbx(starPath=None, pdbxPath=None):
             # myIo.writeFile(pdbxPath, containerList=containerList[1:])
             myIo.writeFile(pdbxPath, containerList=containerList)
             return True
-    except Exception as _e:  # noqa: F841
+    except Exception as _e:
         logger.exception("starToPdx - failed with exception")
 
     return False

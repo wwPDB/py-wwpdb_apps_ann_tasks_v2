@@ -10,17 +10,20 @@
 Wrapper utilities for merging replacement coordinates into a model file.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -48,7 +51,7 @@ class MergeXyz(SessionWebDownloadUtils):
         self.__newXyzFilePath = None
         #
 
-    def setReplacementXyzFile(self, newXyzFileName, format="cif"):  # pylint: disable=redefined-builtin
+    def setReplacementXyzFile(self, newXyzFileName, format="cif"):  # noqa: A002 pylint: disable=redefined-builtin
         tPath = os.path.join(self.__sessionPath, newXyzFileName)
         if os.access(tPath, os.F_OK):
             self.__newXyzFilePath = tPath
@@ -105,8 +108,7 @@ class MergeXyz(SessionWebDownloadUtils):
             dp.cleanup()
             if os.access(retPath, os.R_OK):
                 return True
-            else:
-                return False
+            return False
             #
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

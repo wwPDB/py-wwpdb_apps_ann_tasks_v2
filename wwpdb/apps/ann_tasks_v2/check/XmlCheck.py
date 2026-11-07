@@ -8,19 +8,21 @@
 PDBML/XML checking
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
-import traceback
 import inspect
+import os
+import os.path
+import sys
+import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 
 
@@ -28,6 +30,8 @@ class XmlCheck(PublicPdbxFile):
     """
     Encapsulates PDBML/XML checking.
     """
+
+    MAX_XML_CHECK_SIZE = 100000000
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         super(XmlCheck, self).__init__(reqObj=reqObj, verbose=verbose, log=log)
@@ -66,7 +70,14 @@ class XmlCheck(PublicPdbxFile):
             if self._verbose:
                 self._lfh.write(
                     "+%s.%s PDBML XML check completed for entryId %s file %s report %s size %d\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportPath, self.__reportFileSize)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        entryId,
+                        inpPath,
+                        self.__reportPath,
+                        self.__reportFileSize,
+                    )
                 )
             #
         except:  # noqa: E722 pylint: disable=bare-except
@@ -125,7 +136,7 @@ class XmlCheck(PublicPdbxFile):
             #
             if op == "annot-check-xml-xmllint":
                 statinfo = os.stat(self.__xmlPath)
-                if statinfo.st_size > 100000000:
+                if statinfo.st_size > XmlCheck.MAX_XML_CHECK_SIZE:
                     return
                 #
             #
@@ -152,9 +163,9 @@ class XmlCheck(PublicPdbxFile):
                     oth = open(self.__reportPath, "a")
                     for line in data.split("\n"):
                         strip_line = line.strip()
-                        if (strip_line == "") or (strip_line == "input_file_1 validates") or strip_line.startswith("stdin:"):
+                        if (strip_line == "") or (strip_line == "input_file_1 validates") or strip_line.startswith("stdin:"):  # noqa: PLR1714
                             continue
-                        elif strip_line.startswith("input_file_1:") or strip_line.startswith("input_file_1 "):
+                        if strip_line.startswith(("input_file_1:", "input_file_1 ")):
                             oth.write("%s\n" % strip_line[13:])
                         else:
                             oth.write("%s\n" % strip_line)

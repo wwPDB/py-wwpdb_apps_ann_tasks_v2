@@ -12,33 +12,32 @@
 Methods to manage model PDBx database release and progress status updates
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
+import copy
+import logging
 import sys
 import time
 import traceback
-import copy
 
+#
+from mmcif.api.DataCategory import DataCategory
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from wwpdb.utils.db.DbLoadingApi import DbLoadingApi
 from wwpdb.utils.wf.dbapi.WfDbApi import WfDbApi
 
-#
-from mmcif.api.DataCategory import DataCategory
-
-import logging
-
 logger = logging.getLogger()
 
 
-class StatusUpdate(object):
+class StatusUpdate:
     """Update release status items."""
 
-    def __init__(self, reqObj, IoAdapter=IoAdapterCore(), verbose=False, log=sys.stderr):
+    def __init__(self, reqObj, IoAdapter=None, verbose=False, log=sys.stderr):
         """
         :param `verbose`:  boolean flag to activate verbose logging.
         :param `log`:      stream for logging.
@@ -49,7 +48,7 @@ class StatusUpdate(object):
         self.__debug = False
         #
         self.__reqObj = reqObj
-        self.__io = IoAdapter
+        self.__io = IoAdapter if IoAdapter else IoAdapterCore()
         #
         self.__sObj = self.__reqObj.newSessionObj()
         self.__sessionPath = self.__sObj.getPath()
@@ -142,10 +141,10 @@ class StatusUpdate(object):
             if "AUTHOR_LIST" in rd and (len(rd["AUTHOR_LIST"]) > 0):
                 rd["AUTHOR_LIST"] = str(rd["AUTHOR_LIST"]).replace("'", "''")
 
-            if (initialDepositionDate is not None) and (len(initialDepositionDate) > 4):
+            if (initialDepositionDate is not None) and (len(initialDepositionDate) > 4):  # noqa: PLR2004
                 rd["INITIAL_DEPOSITION_DATE"] = initialDepositionDate
 
-            if (authRelCode is not None) and (len(authRelCode) > 2):
+            if (authRelCode is not None) and (len(authRelCode) > 2):  # noqa: PLR2004
                 rd["AUTHOR_RELEASE_STATUS_CODE"] = authRelCode
 
             if postRelRecvdCoord is not None:
@@ -201,10 +200,10 @@ class StatusUpdate(object):
             if "AUTHOR_LIST_EMDB" in rd and rd["AUTHOR_LIST_EMDB"] is not None and (len(rd["AUTHOR_LIST_EMDB"]) > 0):
                 rd["AUTHOR_LIST_EMDB"] = str(rd["AUTHOR_LIST_EMDB"]).replace("'", "''")
 
-            if (authRelCode is not None) and (len(authRelCode) > 2):
+            if (authRelCode is not None) and (len(authRelCode) > 2):  # noqa: PLR2004
                 rd["DEP_AUTHOR_RELEASE_STATUS_CODE_EMDB"] = authRelCode
 
-            if (title is not None) and (len(title) > 2):
+            if (title is not None) and (len(title) > 2):  # noqa: PLR2004
                 rd["TITLE_EMDB"] = title
 
             if annotatorInitials is not None and len(annotatorInitials) > 1:
@@ -558,8 +557,7 @@ class StatusUpdate(object):
                     self.__lfh.write("+StatusUpdate.__set() before writefile \n")
                     dcObj.dumpIt(fh=self.__lfh)
                 return True
-            else:
-                return False
+            return False
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+StatusUpdate.__set() failed statusCode %s approvalType %s\n" % (statusCode, approvalType))
@@ -574,14 +572,12 @@ class StatusUpdate(object):
     def _isEmptyValue(self, val):
         if (val is None) or (len(val) == 0) or (val in [".", "?"]):
             return True
-        else:
-            return False
+        return False
 
     def _firstOrDefault(self, valList, default=""):
         if len(valList) > 0 and not self._isEmptyValue(valList[0]):
             return valList[0]
-        else:
-            return default
+        return default
 
     def getV2(self, inpFilePath):
         """Return selected status items from the input model files."""
@@ -669,8 +665,7 @@ class StatusUpdate(object):
                     self.__lfh.write("+StatusUpdate.__setProcessSite() before writefile \n")
                     dcObj.dumpIt(fh=self.__lfh)
                 return self.__io.writeFile(outFilePath, cList)
-            else:
-                return False
+            return False
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+StatusUpdate.__setProcessSite() failed for input file %s output file %s\n" % (inpFilePath, outFilePath))
@@ -702,7 +697,7 @@ class StatusUpdate(object):
 
         hasPdb = False
         hasEM = False
-        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:
+        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:  # noqa: PLR2004
             hasPdb = True
         if "EMDB" in reqAccTypes:
             hasEM = True

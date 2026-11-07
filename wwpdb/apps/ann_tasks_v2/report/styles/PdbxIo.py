@@ -24,6 +24,7 @@
 Wrapper for reading PDBx data files including style details.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "john.westbrook@rcsb.org"
@@ -41,10 +42,10 @@ from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoUtil
 
 # from mmcif_utils.style.PdbxXrayExpReportCategoryStyle import PdbxXrayExpReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCategoryStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
 
 # from mmcif_utils.style.PdbxReportCategoryStyle import PdbxReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
-from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
 
 logger = logging.getLogger()
@@ -76,10 +77,8 @@ class PdbxReportIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """
@@ -111,7 +110,7 @@ class PdbxReportIo(PdbxStyleIoUtil):
             catObj = cObj.getObj("database_2")
             vals = catObj.selectValuesWhere("database_code", dbId, "database_id")
             return self._firstOrDefault(vals, default="")
-        except Exception as _e:  # noqa: F841
+        except Exception as _e:  # noqa: F841,BLE001
             return ""
 
     def getStructTitle(self):
@@ -120,7 +119,7 @@ class PdbxReportIo(PdbxStyleIoUtil):
             cObj = self.getCurrentContainer()
             catObj = cObj.getObj("struct")
             return catObj.getValue("title", 0)
-        except Exception as _e:  # noqa: F841
+        except Exception as _e:  # noqa: F841,BLE001
             return ""
 
     def getContourLevelMap(self, mapId="primary map"):
@@ -130,8 +129,8 @@ class PdbxReportIo(PdbxStyleIoUtil):
             catObj = cObj.getObj("em_map")
             vals = catObj.selectValuesWhere("contour_level", mapId, "type")
             return self._firstOrDefault(vals, default="")
-        except Exception as e:
-            logging.error(e)
+        except Exception as e:  # noqa: BLE001
+            logger.error(e)
             return ""
 
 
@@ -156,10 +155,8 @@ class PdbxLinksReportIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """
@@ -211,10 +208,8 @@ class PdbxGeometryReportIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """
@@ -266,10 +261,8 @@ class PdbxXrayExpReportIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """
@@ -321,10 +314,8 @@ class PdbxStatusHistoryIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """
@@ -377,10 +368,8 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """
@@ -412,7 +401,7 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
             catObj = cObj.getObj("database_2")
             vals = catObj.selectValuesWhere("database_code", dbId, "database_id")
             return self._firstOrDefault(vals, default="")
-        except Exception as _e:  # noqa: F841
+        except Exception as _e:  # noqa: F841,BLE001
             return ""
 
     def getStructTitle(self):
@@ -421,7 +410,7 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
             cObj = self.getCurrentContainer()
             catObj = cObj.getObj("struct")
             return catObj.getValue("title", 0)
-        except Exception as _e:  # noqa: F841
+        except Exception as _e:  # noqa: F841,BLE001
             return ""
 
     def getExperimentalMethods(self):
@@ -434,7 +423,7 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
             for iRow in range(nRows):
                 rL.append(catObj.getValue("method", iRow))
             return rL
-        except Exception as _e:  # noqa: F841
+        except Exception as _e:  # noqa: F841,BLE001
             pass
         return rL
 
@@ -481,11 +470,11 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                 for ky in kys:
                     emKy = "em_" + ky
                     oD[emKy] = catObj.getValueOrDefault(attributeName=ky, rowIndex=0, defaultValue="")
-        except Exception as e:
+        except Exception:
             if self.__verbose:
                 logger.info("+PdbxEntryInfoIo.getEmStatusDetails() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s", str(e))
+                logger.exception("Failing in __getEmStatusDetails")
 
         return oD
 
@@ -511,11 +500,11 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                         dcObj.appendAttribute(ky)
                     dcObj.setValue(statusD[emKy], attributeName=ky, rowIndex=0)
             return True
-        except Exception as e:
+        except Exception:
             if self.__verbose:
                 logger.info("+PdbxEntryInfoIo.setEmStatusDetails() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s", str(e))
+                logger.exception("Failing int setEmStatusDetails")
         return False
 
     def __getStatusDetails(self):
@@ -550,11 +539,11 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                         oD[ky] = catObj.getValueOrDefault(attributeName=lookup, rowIndex=0, defaultValue="")
             else:
                 return oD
-        except Exception as e:
+        except Exception:
             if self.__verbose:
                 logger.info("+PdbxEntryInfoIo.getStatusDetails() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s", str(e))
+                logger.exception("Failing in __getStatusDetail")
 
         return oD
 
@@ -624,13 +613,17 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                     dcObj.removeAttribute("rcsb_annotator")
 
                 return True
-            else:
-                return False
-        except Exception as e:
+            return False
+        except Exception:
             if self.__verbose:
-                logger.info("+PdbxEntryInfo.setStatusDetails() failed for status code %s approval type %s initials %s", statusCode, approvalType, annotatorInitials)
+                logger.info(
+                    "+PdbxEntryInfo.setStatusDetails() failed for status code %s approval type %s initials %s",
+                    statusCode,
+                    approvalType,
+                    annotatorInitials,
+                )
             if self.__debug:
-                logger.exception("Failing with %s", str(e))
+                logger.exception("Failing in setStatusDetails")
         return False
 
     def getCurrentStatusDetails(self):
@@ -647,7 +640,17 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
         beginProcessingDate = sD["begin_processing_date"]
         authorApprovalDate = sD["author_approval_date"]
         releaseDate = sD["release_date"]
-        return entryId, pdbId, statusCode, authReleaseCode, annotatorInitials, initialDepositionDate, beginProcessingDate, authorApprovalDate, releaseDate
+        return (
+            entryId,
+            pdbId,
+            statusCode,
+            authReleaseCode,
+            annotatorInitials,
+            initialDepositionDate,
+            beginProcessingDate,
+            authorApprovalDate,
+            releaseDate,
+        )
 
     def getInfoD(self, contextType="info"):
         """Convenience method returning a dictionary of data item values for the input "content" area -
@@ -660,12 +663,11 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
         #
         if contextType == "info":
             return self.__getInfoGeneral()
-        elif contextType == "history":
+        if contextType == "history":
             return self.__getInfoHistory()
-        elif contextType == "em_admin":
+        if contextType == "em_admin":
             return self.__getEmStatusDetails()
-        else:
-            return self.__getInfoGeneral()
+        return self.__getInfoGeneral()
 
     def __getInfoGeneral(self):
         """Return a dictionary of selected items commonly used to identify an entry with a bit of context."""
@@ -703,11 +705,11 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
             oD.update(sD)
             oD["reqacctypes"] = self.__getRequestedAccessionTypes()
 
-        except Exception as e:
+        except Exception:
             if self.__verbose:
                 logger.info("+PdbxEntryInfoIo.__getInfoGeneral() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s", str(e))
+                logger.exception("Failing with _getInfoGeneral")
         return oD
 
     def __getInfoHistory(self):
@@ -820,11 +822,11 @@ class PdbxEntryInfoIo(PdbxStyleIoUtil):
                 oD["release_date"] = releaseDate
                 oD["process_site"] = processSite
                 oD["deposit_site"] = depositSite
-        except Exception as e:
+        except Exception:
             if self.__verbose:
                 logger.info("+PdbxEntryInfoIo.__getInfoHistory() failed for file %s", self.__filePath)
             if self.__debug:
-                logger.exception("Failing with %s", str(e))
+                logger.exception("Failing in _getHistoryInfo")
         return oD
 
 
@@ -848,8 +850,7 @@ class PdbxLocalMapIndexIo(PdbxStyleIoUtil):
         self.__filePath = filePath
         if self.readFile(self.__filePath):
             return self.setContainer(containerIndex=0)
-        else:
-            return False
+        return False
 
     def get(self):
         """
@@ -901,10 +902,8 @@ class EmInfoReportIo(PdbxStyleIoUtil):
         if self.readFile(self.__filePath):
             if self.__idCode is not None:
                 return self.setContainer(containerName=self.__idCode)
-            else:
-                return self.setContainer(containerIndex=0)
-        else:
-            return False
+            return self.setContainer(containerIndex=0)
+        return False
 
     def get(self):
         """

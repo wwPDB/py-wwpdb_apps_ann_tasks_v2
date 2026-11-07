@@ -10,6 +10,7 @@
 Utility methods model and map 3d visualization.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -19,13 +20,13 @@ __version__ = "V0.07"
 import sys
 
 
-class ModelViewer3D(object):
+class ModelViewer3D:
     """
     ModelViewer3D class encapsulates depiction of coordinate models and maps.
 
     """
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         self.__verbose = verbose
         self.__lfh = log
         #

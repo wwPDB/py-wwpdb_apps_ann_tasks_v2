@@ -7,28 +7,30 @@
 Chemical shift nomenclature checking and update tools --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
 import json
 import os
 import shutil
 import sys
 import time
-import inspect
 import traceback
 
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.utils.nmr.NmrDpUtility import NmrDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.NmrRemediationUtils import remediate_cs_file, starToPdbx
 
 
-class NmrChemShiftProcessUtils(object):
+class NmrChemShiftProcessUtils:
     """
     NmrChemShiftProcessUtils class encapsulates chemical shift nomenclature checking and update tools
 
@@ -96,7 +98,13 @@ class NmrChemShiftProcessUtils(object):
             ("validation-report-images", "tar"),
             ("validation-data", "pdbx"),
         ):
-            fileName = pI.getFileName(identifier, contentType=contentFormatType[0], formatType=contentFormatType[1], versionId="none", partNumber="1")
+            fileName = pI.getFileName(
+                identifier,
+                contentType=contentFormatType[0],
+                formatType=contentFormatType[1],
+                versionId="none",
+                partNumber="1",
+            )
             self.__validationResultPath.append(os.path.join(self.__workingDirPath, fileName))
         #
 
@@ -144,8 +152,7 @@ class NmrChemShiftProcessUtils(object):
         self.__outputReportFile()
 
     def runNefProcess(self, identifier=""):
-        """ Run ref file checking & updating process
-        """
+        """Run ref file checking & updating process"""
         self.__moveBestRepresentativeModel()
         #
         if not self.__inNefFilePath:
@@ -185,7 +192,10 @@ class NmrChemShiftProcessUtils(object):
             dp.imp(self.__inModelFilePath)
             dp.op("annot-reorder-models")
             #
-            logPath = os.path.join(self.__workingDirPath, "nmr-rep-model-update-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log")
+            logPath = os.path.join(
+                self.__workingDirPath,
+                "nmr-rep-model-update-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log",
+            )
             dp.expLog(logPath)
             ok, logMessage = self.__processLogFile("RcsbDpUtility.op='annot-reorder-models'", logPath)
             if ok:
@@ -223,7 +233,10 @@ class NmrChemShiftProcessUtils(object):
                 xyzFilePath = self.__outModelFilePath
             #
             self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
-            self.__checkReportFilePath = os.path.join(self.__workingDirPath, "chem-shifts-update-checking-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif")
+            self.__checkReportFilePath = os.path.join(
+                self.__workingDirPath,
+                "chem-shifts-update-checking-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif",
+            )
             #
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=True)
             #
@@ -232,7 +245,10 @@ class NmrChemShiftProcessUtils(object):
             dp.addInput(name="coordinate_file_path", value=xyzFilePath)
             dp.op("annot-chem-shifts-update-with-check")
             #
-            logPath = os.path.join(self.__workingDirPath, "chem-shifts-update-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log")
+            logPath = os.path.join(
+                self.__workingDirPath,
+                "chem-shifts-update-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log",
+            )
             dp.expLog(logPath)
             ok, logMessage = self.__processLogFile("RcsbDpUtility.op='annot-chem-shifts-update'", logPath)
             if ok:
@@ -253,7 +269,10 @@ class NmrChemShiftProcessUtils(object):
         """
         try:
             self.__lfh.write("\nStarting %s %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
-            self.__checkReportFilePath = os.path.join(self.__workingDirPath, "nef-update-checking-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif")
+            self.__checkReportFilePath = os.path.join(
+                self.__workingDirPath,
+                "nef-update-checking-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".cif",
+            )
             #
             dp = RcsbDpUtility(tmpPath=self.__workingDirPath, siteId=self.__siteId, verbose=True)
             #
@@ -280,8 +299,7 @@ class NmrChemShiftProcessUtils(object):
         #
 
     def __updateNefFileWithNmrDpUtility(self, xyzFilePath, identifier=""):
-        """ Run NmrDpUtility's 'nmr-str2cif-annotate' option to update nmr-data file.
-        """
+        """Run NmrDpUtility's 'nmr-str2cif-annotate' option to update nmr-data file."""
         try:
             if identifier == "":
                 cifObj = mmCIFUtil(filePath=xyzFilePath)
@@ -340,26 +358,26 @@ class NmrChemShiftProcessUtils(object):
             ndp.setVerbose(False)
             ndp.op("nmr-str2cif-annotate")
             #
-#           if os.access(self.__outReportFilePath, os.R_OK):
-#               with open(self.__outReportFilePath, "r") as ith:
-#                   report = json.loads(ith.read())
-#               #
-#               if ("error" in report) and (report["error"] is not None):
-#                   errMsg = ""
-#                   if "format_issue" in report["error"]:
-#                       errMsg = "%s: %s\n format_issue: %s" % (identifier, report["information"]["status"], report["error"]["format_issue"][0]["description"])
-#                   elif "missing_mandatory_content" in report["error"]:
-#                       errMsg = "%s: %s\n missing_mandatory_content: %s" % (identifier, report["information"]["status"], \
-#                                       report["error"]["missing_mandatory_content"][0]["description"])
-#                   else:
-#                       error_type = {str(k): len(v) for k, v in report["error"].items() if str(k) != "total"}
-#                       errMsg = "%s: %s, %s" % (identifier, report["information"]["status"], error_type)
-#                   #
-#                   if errMsg:
-#                       self.__insertSystemLogMessage(errMsg)
-#                   #
-#               #
-#           #
+            #           if os.access(self.__outReportFilePath, os.R_OK):
+            #               with open(self.__outReportFilePath, "r") as ith:
+            #                   report = json.loads(ith.read())
+            #               #
+            #               if ("error" in report) and (report["error"] is not None):
+            #                   errMsg = ""
+            #                   if "format_issue" in report["error"]:
+            #                       errMsg = "%s: %s\n format_issue: %s" % (identifier, report["information"]["status"], report["error"]["format_issue"][0]["description"])
+            #                   elif "missing_mandatory_content" in report["error"]:
+            #                       errMsg = "%s: %s\n missing_mandatory_content: %s" % (identifier, report["information"]["status"], \
+            #                                       report["error"]["missing_mandatory_content"][0]["description"])
+            #                   else:
+            #                       error_type = {str(k): len(v) for k, v in report["error"].items() if str(k) != "total"}
+            #                       errMsg = "%s: %s, %s" % (identifier, report["information"]["status"], error_type)
+            #                   #
+            #                   if errMsg:
+            #                       self.__insertSystemLogMessage(errMsg)
+            #                   #
+            #               #
+            #           #
             if os.access(updatedNmrDataFilePath, os.R_OK):
                 shutil.copyfile(updatedNmrDataFilePath, self.__outNefFilePath)
             #
@@ -406,7 +424,10 @@ class NmrChemShiftProcessUtils(object):
             dp.addInput(name="cs_file_path", value=csFilePath)
             dp.op("annot-wwpdb-validate-all")
             #
-            logPath = os.path.join(self.__workingDirPath, "nmr-cs-check-rpt-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log")
+            logPath = os.path.join(
+                self.__workingDirPath,
+                "nmr-cs-check-rpt-" + str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + ".log",
+            )
             dp.expLog(logPath)
             dp.expList(dstPathList=self.__validationResultPath)
             #
@@ -428,7 +449,10 @@ class NmrChemShiftProcessUtils(object):
             jsonObj["system_msg"] = self.__systemLogMessage
         #
         cifObj = mmCIFUtil(filePath=self.__checkReportFilePath)
-        for msg_type in (("warning_msg", "pdbx_shift_check_warning_message"), ("error_msg", "pdbx_shift_check_error_message")):
+        for msg_type in (
+            ("warning_msg", "pdbx_shift_check_warning_message"),
+            ("error_msg", "pdbx_shift_check_error_message"),
+        ):
             msg = self.__getMsgFromCifObj(cifObj, msg_type[1])
             if msg:
                 jsonObj[msg_type[0]] = msg
@@ -488,7 +512,7 @@ class NmrChemShiftProcessUtils(object):
         #
         msg = ""
         for Dict in dList:
-            if ("text" in Dict) and Dict["text"]:
+            if Dict.get("text"):
                 if msg:
                     msg += "\n\n"
                 #

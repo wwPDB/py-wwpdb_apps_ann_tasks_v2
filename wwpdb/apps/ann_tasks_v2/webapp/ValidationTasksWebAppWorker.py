@@ -19,25 +19,25 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
 import os
 import sys
-import inspect
 
-from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.session.WebRequest import ResponseContent
 
 from wwpdb.apps.ann_tasks_v2.correspnd.CorresPNDTemplate import CorresPNDTemplate
 from wwpdb.apps.ann_tasks_v2.utils.PdbFile import PdbFile
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
-
-from wwpdb.utils.session.WebRequest import ResponseContent
-from wwpdb.io.file.DataExchange import DataExchange
-from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
 
 class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
@@ -139,9 +139,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
             wfStatusUpdate = False
         else:
             skipStatus = str(self._reqObj.getValue("skipstatus")).strip()
-            if skipStatus.lower() in ["yes", "y"]:
-                wfStatusUpdate = False
-            elif skipStatus.lower() in ["no", "n"]:
+            if skipStatus.lower() in ["yes", "y"] or skipStatus.lower() in ["no", "n"]:
                 wfStatusUpdate = False
         #
         #
@@ -152,7 +150,14 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() -- fileSource: %s identifier %s instance %s standalonemode %s\n"
-                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
+                % (
+                    self.__class__.__name__,
+                    inspect.currentframe().f_code.co_name,
+                    fileSource,
+                    identifier,
+                    instanceWf,
+                    standaloneMode,
+                )
             )
         if bIsWorkflow:
             # save wf state for status update --
@@ -181,9 +186,8 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
                 self._lfh.write(
                     "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
-            else:
-                if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
+            elif self._verbose:
+                self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             if bSuccess:
                 wfStatus = "completed"
@@ -211,7 +215,7 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         #  By convention we leave the volumes in archive directory rather than copying them around -
         pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
         entryVolFilePath = pI.getEmVolumeFilePath(entryId, wfInstanceId=None, fileSource="archive", versionId="latest", mileStone=None)
-        self._lfh.write("entryVolFilePath {}".format(entryVolFilePath))
+        self._lfh.write(f"entryVolFilePath {entryVolFilePath}")
         _dd, entryVolFileName = os.path.split(entryVolFilePath)
         #
         sfOk = False
@@ -249,24 +253,24 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         htmlList.append("<title>Validation Tasks Module</title>")
 
         plist = [
-            "sessionid={}".format(sessionId),
-            "entryid={}".format(entryId),
-            "entryfilename={}".format(entryFileName),
-            "wfstatus={}".format(wfStatus),
-            "standalonemode={}".format(standaloneMode),
+            f"sessionid={sessionId}",
+            f"entryid={entryId}",
+            f"entryfilename={entryFileName}",
+            f"wfstatus={wfStatus}",
+            f"standalonemode={standaloneMode}",
         ]
         if sfOk:
-            plist.append("entryexpfilename={}".format(entryExpFileName))
+            plist.append(f"entryexpfilename={entryExpFileName}")
         if csOk:
-            plist.append("entrycsfilename={}".format(entryCsFileName))
+            plist.append(f"entrycsfilename={entryCsFileName}")
         if fscOk:
-            plist.append("entryfscfilename={}".format(entryFscFileName))
+            plist.append(f"entryfscfilename={entryFscFileName}")
         if volOk:
-            plist.append("entryvolfilename={}".format(entryVolFileName))
+            plist.append(f"entryvolfilename={entryVolFileName}")
 
         query = "&".join(plist)
 
-        htmlList.append('<meta http-equiv="REFRESH" content="0;url=/validation_tasks_v2/wf-startup-template.html?{}"></head>'.format(query))
+        htmlList.append(f'<meta http-equiv="REFRESH" content="0;url=/validation_tasks_v2/wf-startup-template.html?{query}"></head>')
 
         rC.setHtmlText("\n".join(htmlList))
         return rC
@@ -332,7 +336,14 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(pdbxPath, os.F_OK):
             filelist.append([entryId + "_correspondence-to-depositor_P1.txt", "correspondence-to-depositor", "txt"])
         #
-        dE = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource, verbose=self._verbose, log=self._lfh)
+        dE = DataExchange(
+            reqObj=self._reqObj,
+            depDataSetId=identifier,
+            wfInstanceId=instanceWf,
+            fileSource=fileSource,
+            verbose=self._verbose,
+            log=self._lfh,
+        )
         #
         for flist in filelist:
             pdbxPath = os.path.join(self._sessionPath, flist[0])
@@ -358,9 +369,8 @@ class ValidationTasksWebAppWorker(CommonTasksWebAppWorker):
                 self._lfh.write(
                     "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
-            else:
-                if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
+            elif self._verbose:
+                self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         #
         else:
             bSuccess = True

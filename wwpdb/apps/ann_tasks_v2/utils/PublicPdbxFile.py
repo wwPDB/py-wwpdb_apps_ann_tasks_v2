@@ -11,17 +11,18 @@
 Generate public pdbx cif file.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
 import os
 import os.path
 import sys
 import traceback
-import inspect
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 

@@ -10,21 +10,23 @@
 Run DCC/Tool calculation of special symmetry positions -
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
 import inspect
+import os
+import os.path
+import sys
 import traceback
 
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 from mmcif.io.IoAdapterCore import IoAdapterCore
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
+from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
 class SpecialPositionCalc(SessionWebDownloadUtils):
@@ -90,7 +92,12 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
                         methods = catObj.getAttributeValueList("method")
                         runProcess = False
                         for m in methods:
-                            if m.upper() in ["X-RAY DIFFRACTION", "NEUTRON DIFFRACTION", "POWDER DIFFRACTION", "ELECTRON CRYSTALLOGRAPHY"]:
+                            if m.upper() in [
+                                "X-RAY DIFFRACTION",
+                                "NEUTRON DIFFRACTION",
+                                "POWDER DIFFRACTION",
+                                "ELECTRON CRYSTALLOGRAPHY",
+                            ]:
                                 runProcess = True
                                 break
 
@@ -114,7 +121,13 @@ class SpecialPositionCalc(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s special position check completed for entryId %s file %s report size %d\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        entryId,
+                        inpPath,
+                        self.__reportFileSize,
+                    )
                 )
 
             if self.__cleanup:

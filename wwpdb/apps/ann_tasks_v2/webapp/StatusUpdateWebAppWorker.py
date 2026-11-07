@@ -31,41 +31,38 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import contextlib
+import inspect
+import logging
 import os
+import shutil
 import sys
 import traceback
-import shutil
-import logging
-import inspect
 
-# import datetime
-# from dateutil.relativedelta import relativedelta, WE, FR
-
-#
-from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
-
-# from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
-from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
-from wwpdb.apps.ann_tasks_v2.status.StatusUpdate import StatusUpdate
-from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
-from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
-from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
-
-# from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
-from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.io.file.DataExchange import DataExchange
-from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
-from wwpdb.utils.session.WebRequest import ResponseContent
-
-#
 from wwpdb.apps.wf_engine.engine.WFEapplications import killAllWF
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.db.StatusHistoryUtils import StatusHistoryUtils
+from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
+from wwpdb.utils.session.WebRequest import ResponseContent
+from wwpdb.utils.session.WebUploadUtils import WebUploadUtils
+
+from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
+from wwpdb.apps.ann_tasks_v2.status.StatusUpdate import StatusUpdate
+from wwpdb.apps.ann_tasks_v2.utils.MergeXyz import MergeXyz
+from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
+
+with contextlib.suppress(ImportError):
+    from wwpdb.apps.msgmodule.io.MessagingIo import MessagingIo  # pylint: disable=import-error,no-name-in-module
+
+from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
 logger = logging.getLogger(__name__)
 
@@ -203,11 +200,17 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             if self._verbose:
                 self._lfh.write(
                     "\n+%s.%s starting with identifier %s statusCode %r authRelCode %r annotatorId %r\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier, statusCode, authRelCode, annotatorId)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        identifier,
+                        statusCode,
+                        authRelCode,
+                        annotatorId,
+                    )
                 )
         else:
-            self._lfh.write("\n+%s.%s ERROR failing to fetchId %s\n"
-                            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier))
+            self._lfh.write("\n+%s.%s ERROR failing to fetchId %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, identifier))
             rC = ResponseContent(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
             rC.setError("Unable to decipher identifier")
             return rC
@@ -469,19 +472,24 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
                 rC.setStatus(statusMsg="PDBx format with public data subset file created")
             elif operation == "assembly":
-                archivePath = pI.getDirPath(dataSetId=idCode, wfInstanceId=None, fileSource="archive", contentType="assembly-model", formatType="pdbx")
+                archivePath = pI.getDirPath(
+                    dataSetId=idCode,
+                    wfInstanceId=None,
+                    fileSource="archive",
+                    contentType="assembly-model",
+                    formatType="pdbx",
+                )
                 dfa = DataFileAdapter(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                 indexFilePath = os.path.join(self._sessionPath, "assembly-index.txt")
                 dfa.pdbx2Assemblies(idCode, filePath, archivePath, indexFilePath=indexFilePath)
                 fCount = 0
                 try:
-                    ifh = open(indexFilePath, "r")
-                    for line in ifh:
-                        fCount += 1
-                        fp = os.path.join(archivePath, line[:-1])
-                        du.copyToDownload(fp)
-                        aTagList.append(du.getAnchorTag())
-                    ifh.close()
+                    with open(indexFilePath, "r") as ifh:
+                        for line in ifh:
+                            fCount += 1
+                            fp = os.path.join(archivePath, line[:-1])
+                            du.copyToDownload(fp)
+                            aTagList.append(du.getAnchorTag())
                 except:  # noqa: E722 pylint: disable=bare-except
                     pass
                 #
@@ -536,7 +544,13 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         orgPostRelRecvdCoordDate = self._reqObj.getValue("postrelrecvdcoorddate")
         #
         # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
-        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s", orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode)
+        logger.info(
+            "Status code change: statuscode %s -> %s, postrel %s -> %s",
+            orgStatusCode,
+            statusCode,
+            orgPostRelStatusCode,
+            postRelStatusCode,
+        )
         #
         try:
             #   Update status history - first create a new history file if required.
@@ -658,7 +672,11 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                         okShLoad = False
                         shu = StatusHistoryUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                         okShUpdate = shu.updateEntryStatusHistory(
-                            entryIdList=[idCode], statusCode=statusCode, annotatorInitials=annotatorInitials, details="Update by status module", statusCodePrior=orgStatusCode
+                            entryIdList=[idCode],
+                            statusCode=statusCode,
+                            annotatorInitials=annotatorInitials,
+                            details="Update by status module",
+                            statusCodePrior=orgStatusCode,
                         )
                         if self._verbose:
                             self._lfh.write(
@@ -688,8 +706,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             # do nothing
 
         return rC
-
-    #
 
     def _statusReloadOp(self):
         """Status data reload/updates on data files identified by id."""
@@ -757,8 +773,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         return rC
 
-    #
-
     def _mergeXyzCalcAltOp(self):
         """Alternative merge coordinate operation"""
         if self._verbose:
@@ -807,10 +821,8 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             rC.setError(errMsg="Merge failed.")
             if self._verbose:
                 self._lfh.write("+CommonTasksWebAppWorker._mergeXyzCalcOp() no merge file provided\n")
-        #
         aTagList = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-        #
 
         return rC
 
@@ -909,7 +921,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
     #             trg = nxtWed
     #         #
     #         retDate = trg.strftime("%Y-%m-%d")
-    #     except:  # noqa: E722 pylint: disable=bare-except
+    #     except:
     #         traceback.print_exc(file=self._lfh)
     #         retDate = None
 
@@ -931,7 +943,12 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         if hasEM and newEmHoldDate:
             savedDates.append(str(newEmHoldDate).strip())
         if not savedDates or any(saved != notifyDate for saved in savedDates):
-            logger.error("Hold extension for %s was saved, but the letter date %s did not match %s", idCode, notifyDate, savedDates)
+            logger.error(
+                "Hold extension for %s was saved, but the letter date %s did not match %s",
+                idCode,
+                notifyDate,
+                savedDates,
+            )
             return "Status updated. The hold date was saved, but the extension message was not sent."
 
         sender = str(self._reqObj.getValue("extend-notify-sender") or "").strip() or str(newAnnotatorInitials or "").strip()
@@ -940,8 +957,6 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         sent = False
         try:
-            from wwpdb.apps.msgmodule.io.MessagingIo import MessagingIo  # pylint: disable=import-error,no-name-in-module
-
             mio = MessagingIo(self._reqObj, verbose=self._verbose, log=self._lfh)
             sent = bool(mio.sendHoldExtensionNotice(idCode, notifyMonths, notifyDate, sender))
         except Exception:
@@ -975,13 +990,19 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
         # Saved away
         expMethods = self._reqObj.getValue("experimental_methods")
 
-        logger.info("New PDB status :%s: Hold :%s:  EMDB status :%s: hold :%s:", newPdbStatus, newPdbHoldDate, newEmStatus, newEmHoldDate)
+        logger.info(
+            "New PDB status :%s: Hold :%s:  EMDB status :%s: hold :%s:",
+            newPdbStatus,
+            newPdbHoldDate,
+            newEmStatus,
+            newEmHoldDate,
+        )
         logger.info("New annotator :%s: and site :%s:", newAnnotatorInitials, newProcessSite)
         logger.info("Req is %s", reqAccTypes)
 
         hasPdb = False
         hasEM = False
-        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:
+        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:  # noqa: PLR2004
             hasPdb = True
         if "EMDB" in reqAccTypes:
             hasEM = True
@@ -1012,7 +1033,10 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             # filePath is session directory
 
             # Setup em status setting
-            kyPairListEm = [("em_map_hold_date", "em_map_hold_date"), ("em_depui_depositor_hold_instructions", "em_depui_depositor_hold_instructions")]
+            kyPairListEm = [
+                ("em_map_hold_date", "em_map_hold_date"),
+                ("em_depui_depositor_hold_instructions", "em_depui_depositor_hold_instructions"),
+            ]
             statusD = {}
             for kyPair in kyPairListEm:
                 statusD[kyPair[0]] = self._reqObj.getValue(kyPair[0])
@@ -1032,7 +1056,11 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                 ok1 = True
 
             if hasEM and ok1:
-                ok1a = sU.wfEmLoad(idCode, annotatorInitials=newAnnotatorInitials, authRelCode=statusD["em_depui_depositor_hold_instructions"])
+                ok1a = sU.wfEmLoad(
+                    idCode,
+                    annotatorInitials=newAnnotatorInitials,
+                    authRelCode=statusD["em_depui_depositor_hold_instructions"],
+                )
                 if self._verbose:
                     self._lfh.write("+StatusUpdateWebAppWorker._statusUpdateotherOp() EM wf load completed %r\n" % ok1a)
             else:
@@ -1066,9 +1094,7 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                     du.fetchId(idCode, "model", formatType="pdbx")
                     aTagList.append(du.getAnchorTag())
                     rC.setHtmlLinkText('<span class="url-list">Download: %s</span>' % ",".join(aTagList))
-                    rC.setStatus(
-                        statusMsg=self._holdExtensionStatusMessage(idCode, hasPdb, hasEM, newPdbHoldDate, newEmHoldDate, newAnnotatorInitials)
-                    )
+                    rC.setStatus(statusMsg=self._holdExtensionStatusMessage(idCode, hasPdb, hasEM, newPdbHoldDate, newEmHoldDate, newAnnotatorInitials))
 
                     myD = {}
                     myD["authrelcode"] = newPdbStatus
@@ -1152,14 +1178,20 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         #
         # For already released entries, statusCode will be '', but orgStatusCode will = 'REL'
-        logger.info("Status code change: statuscode %s -> %s, postrel %s -> %s", orgStatusCode, statusCode, orgPostRelStatusCode, postRelStatusCode)
+        logger.info(
+            "Status code change: statuscode %s -> %s, postrel %s -> %s",
+            orgStatusCode,
+            statusCode,
+            orgPostRelStatusCode,
+            postRelStatusCode,
+        )
 
         if self._verbose:
             self._lfh.write("+StatusUpdateWebAppWorker._statusCodeUpdateV2Op() statusD %r\n" % statusD.items())
 
         hasPdb = False
         hasEM = False
-        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:
+        if len(reqAccTypes) < 2 or "PDB" in reqAccTypes:  # noqa: PLR2004
             hasPdb = True
         if "EMDB" in reqAccTypes:
             hasEM = True
@@ -1268,7 +1300,15 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             ok3 = False
             if ok1 and ok1a:
                 ok2 = sU.setBoth(
-                    filePath, filePath, reqAccTypes, statusCode, statusD, approvalType, annotatorInitials=None, expMethods=expMethods, postRelStatusCode=postRelStatusCode
+                    filePath,
+                    filePath,
+                    reqAccTypes,
+                    statusCode,
+                    statusD,
+                    approvalType,
+                    annotatorInitials=None,
+                    expMethods=expMethods,
+                    postRelStatusCode=postRelStatusCode,
                 )
                 if ok2:
                     shutil.copyfile(filePath, pdbxArchivePath)
@@ -1306,7 +1346,11 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
                         okShLoad = False
                         shu = StatusHistoryUtils(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
                         okShUpdate = shu.updateEntryStatusHistory(
-                            entryIdList=[idCode], statusCode=statusCode, annotatorInitials=annotatorInitials, details="Update by status module", statusCodePrior=orgStatusCode
+                            entryIdList=[idCode],
+                            statusCode=statusCode,
+                            annotatorInitials=annotatorInitials,
+                            details="Update by status module",
+                            statusCodePrior=orgStatusCode,
                         )
                         if self._verbose:
                             self._lfh.write(
@@ -1336,7 +1380,13 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
             # If no errors and EM - check header
             if ok1 and ok1a and ok2 and ok3 and hasEM:
                 self._lfh.write("About to do xml header\n")
-                emdFilePath = du.getFilePath(idCode, contentType="model-emd", formatType="pdbx", fileSource="session-download", versionId="latest")
+                emdFilePath = du.getFilePath(
+                    idCode,
+                    contentType="model-emd",
+                    formatType="pdbx",
+                    fileSource="session-download",
+                    versionId="latest",
+                )
                 emdbLogPath = os.path.join(self._sessionPath, "cif2emdbxml.log")
                 emdbFilePath = du.getFilePath(idCode, contentType="em-volume-header", formatType="xml", fileSource="session", versionId="latest")
                 #
@@ -1393,19 +1443,16 @@ class StatusUpdateWebAppWorker(CommonTasksWebAppWorker):
 
         return rC
 
-    #
-
     def __getFileTextWithMarkup(self, downloadPath):
         """Internal methods used by _makeCheckReports()"""
         try:
             oL = []
-            ifh = open(downloadPath, "r")
-            oL.append('<div class="highlight">')
-            oL.append("<pre>")
-            oL.append(ifh.read())
-            oL.append("</pre>")
-            oL.append("</div>")
-            ifh.close()
+            with open(downloadPath, "r") as ifh:
+                oL.append('<div class="highlight">')
+                oL.append("<pre>")
+                oL.append(ifh.read())
+                oL.append("</pre>")
+                oL.append("</div>")
             return "\n".join(oL)
         except:  # noqa: E722 pylint: disable=bare-except
             if self._verbose:

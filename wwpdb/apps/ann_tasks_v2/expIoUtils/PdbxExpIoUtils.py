@@ -11,6 +11,7 @@ categories  -
 
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -20,15 +21,15 @@ __version__ = "V0.07"
 
 import os
 import sys
-import traceback
 import tempfile
+import traceback
 
-from mmcif.io.IoAdapterCore import IoAdapterCore
-from mmcif.api.PdbxContainers import DataContainer
 from mmcif.api.DataCategory import DataCategory
+from mmcif.api.PdbxContainers import DataContainer
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 
-class PdbxExpFileIo(object):
+class PdbxExpFileIo:
     """Read PDBx data files and package content as PDBx container object or container object list
 
     Write PDBx data using source PDBx container object list source content.
@@ -38,12 +39,12 @@ class PdbxExpFileIo(object):
 
     """
 
-    def __init__(self, ioObj=IoAdapterCore(), verbose=True, log=sys.stderr):
+    def __init__(self, ioObj=None, verbose=True, log=sys.stderr):
         """Input processing can be performed using either native Python or C++ Io libraries
         by choosing the appropriate input adapter.
         """
 
-        self.__ioObj = ioObj
+        self.__ioObj = ioObj if ioObj else IoAdapterCore()
         self.__verbose = verbose
         self.__lfh = log
 
@@ -52,6 +53,7 @@ class PdbxExpFileIo(object):
         for dp in [os.path.dirname(fPath), ".", tempfile.gettempdir()]:
             if os.access(dp, os.W_OK):
                 return dp
+        return None
 
     def getContainer(self, fPath, index=0):
         outDirPath = self.__getOutDir(fPath)
@@ -83,7 +85,17 @@ class PdbxExpFileIo(object):
             return False
 
     def __orderContainer(self, container):
-        stdList = ["audit", "cell", "diffrn", "diffrn_radiation_wavelength", "diffrn_reflns", "entry", "exptl_crystal", "reflns_scale", "symmetry"]
+        stdList = [
+            "audit",
+            "cell",
+            "diffrn",
+            "diffrn_radiation_wavelength",
+            "diffrn_reflns",
+            "entry",
+            "exptl_crystal",
+            "reflns_scale",
+            "symmetry",
+        ]
         tailList = ["refln", "diffrn_refln"]
         #
         dC = DataContainer(name=container.getName())
@@ -113,7 +125,34 @@ class PdbxExpFileIo(object):
         return False
 
     def __getUniqueList(self, num):
-        letterList = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+        letterList = [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+        ]
         #
         uniqueList = []
         uniqueList.append("")
@@ -202,7 +241,7 @@ class PdbxExpFileIo(object):
         return False
 
 
-class PdbxExpIoUtils(object):
+class PdbxExpIoUtils:
     """
     Extract selected items from model or reflection data file -
     """
@@ -239,7 +278,7 @@ class PdbxExpIoUtils(object):
         try:
             catObj = self.__currentContainer.getObj("diffrn_source")
             nRows = catObj.getRowCount()
-            for ii in range(0, nRows):
+            for ii in range(nRows):
                 idList.append(catObj.getValue(attributeName="diffrn_id", rowIndex=ii))
         except:  # noqa: E722 pylint: disable=bare-except
             pass
@@ -251,7 +290,7 @@ class PdbxExpIoUtils(object):
         try:
             catObj = self.__currentContainer.getObj("diffrn")
             nRows = catObj.getRowCount()
-            for ii in range(0, nRows):
+            for ii in range(nRows):
                 idList.append(catObj.getValue(attributeName="id", rowIndex=ii))
         except:  # noqa: E722 pylint: disable=bare-except
             pass
@@ -300,7 +339,7 @@ class PdbxExpIoUtils(object):
         try:
             catObj = self.__currentContainer.getObj("diffrn_radiation_wavelength")
             nRows = catObj.getRowCount()
-            for ii in range(0, nRows):
+            for ii in range(nRows):
                 muId = str(catObj.getValue(attributeName="id", rowIndex=ii))
                 mu = catObj.getValue(attributeName="wavelength", rowIndex=ii)
                 if self.__isEmptyValue(mu):
@@ -317,14 +356,12 @@ class PdbxExpIoUtils(object):
     def __isEmptyValue(self, val):
         if (val is None) or (len(val) == 0) or (val in [".", "?"]):
             return True
-        else:
-            return False
+        return False
 
     def __firstOrDefault(self, valList, default=""):
         if len(valList) > 0 and not self.__isEmptyValue(valList[0]):
             return valList[0]
-        else:
-            return default
+        return default
 
     # def __getFirstValueFromList(self, attributeNameList, catObj=None, rowIndex=0):
     #     """Return the value from the first non null attribute found in the input attribute list

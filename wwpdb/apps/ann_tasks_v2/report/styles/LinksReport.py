@@ -3,15 +3,23 @@ Report style details for PDBx struct_conn category.
 
 """
 
-from mmcif_utils.style.PdbxCategoryStyleBase import PdbxCategoryStyleBase
+from typing import ClassVar
+
+from mmcif_utils.style.PdbxCategoryStyleBase import (
+    PdbxCategoryStyleBase,
+    PdbxStyleCatExL,
+    PdbxStyleCatInfoL,
+    PdbxStyleCatItemD,
+    PdbxStyleCatSupL,
+)
 
 
 class PdbxLinksReportCategoryStyle(PdbxCategoryStyleBase):
     _styleId = "PDBX_LINKS_REPORT_V1"
-    _categoryInfo = [
+    _categoryInfo: ClassVar[PdbxStyleCatInfoL] = [
         ("struct_conn", "table"),
     ]
-    _cDict = {
+    _cDict: ClassVar[PdbxStyleCatItemD] = {
         "struct_conn": [
             ("_struct_conn.id", "%s", "str", ""),
             ("_struct_conn.pdbx_leaving_atom_flag", "%s", "str", ""),
@@ -32,8 +40,8 @@ class PdbxLinksReportCategoryStyle(PdbxCategoryStyleBase):
             ("_struct_conn.pdbx_dist_value", "%s", "str", ""),
         ],
     }
-    _excludeList = []
-    _suppressList = []
+    _excludeList: ClassVar[PdbxStyleCatExL] = []
+    _suppressList: ClassVar[PdbxStyleCatSupL] = []
     #
 
     def __init__(self):

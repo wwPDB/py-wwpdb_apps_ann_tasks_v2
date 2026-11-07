@@ -11,6 +11,7 @@ Utility methods for accessing model for assembly info.
 Content specific classes operate on PDBx container object input.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -20,26 +21,26 @@ __version__ = "V0.07"
 
 import os
 import sys
-import traceback
 import tempfile
+import traceback
 
 from mmcif.io.IoAdapterPy import IoAdapterPy
 
 # from mmcif.api.PdbxContainers import *
 
 
-class PdbxFileIo(object):
+class PdbxFileIo:
     """Read PDBx data files and package content as PDBx container object or container object list
     Write PDBx data using source PDBx container object list source content.
 
     PDBx container object represents
     """
 
-    def __init__(self, ioObj=IoAdapterPy(), verbose=True, log=sys.stderr):
+    def __init__(self, ioObj=None, verbose=True, log=sys.stderr):
         """Input processing can be performed using either native Python or C++ Io libraries
         by choosing the appropriate input adapter.
         """
-        self.__ioObj = ioObj
+        self.__ioObj = ioObj if ioObj else IoAdapterPy()
         self.__verbose = verbose
         self.__lfh = log
 
@@ -48,6 +49,7 @@ class PdbxFileIo(object):
         for dp in [os.path.dirname(fPath), ".", tempfile.gettempdir()]:
             if os.access(dp, os.W_OK):
                 return dp
+        return None
 
     def getContainer(self, fPath, index=0):
         outDirPath = self.__getOutDir(fPath)
@@ -78,7 +80,7 @@ class PdbxFileIo(object):
             return False
 
 
-class ModelFileIo(object):
+class ModelFileIo:
     """
     Assemble sample and coordinate sequence details from model coordinate data file.
 
@@ -100,14 +102,12 @@ class ModelFileIo(object):
     def __isEmptyValue(self, val):
         if (val is None) or (len(val) == 0) or (val in [".", "?"]):
             return True
-        else:
-            return False
+        return False
 
     def __firstOrDefault(self, valList, default=""):
         if len(valList) > 0 and not self.__isEmptyValue(valList[0]):
             return valList[0]
-        else:
-            return default
+        return default
 
     def getPolymerEntityList(self):
         """Returns a list of polymer entity id's  of 'type=polymer' or 'type=branched')"""
@@ -165,7 +165,7 @@ class ModelFileIo(object):
         nRows = catObj.getRowCount()
 
         eList = []
-        for ii in range(0, nRows):
+        for ii in range(nRows):
             eId = catObj.getValue("entity_id", ii)
             eList.append(eId)
         return eList
@@ -317,15 +317,13 @@ class ModelFileIo(object):
         try:
             colNames = list(catObj.getAttributeList())
             nRows = catObj.getRowCount()
-            for iRow in range(0, nRows):
+            for iRow in range(nRows):
                 rD = {}
                 row = catObj.getRow(iRow)
                 for col in attributeList:
                     if col in colNames:
                         val = str(row[colNames.index(col)])
-                        if val is None:
-                            val = ""
-                        elif (val == ".") or (val == "?"):
+                        if val is None or (val == ".") or (val == "?"):  # noqa: PLR1714
                             val = ""
                         rD[col] = val
                     else:
@@ -349,19 +347,47 @@ class ModelFileIo(object):
 
     def getDepositorAssemblyDetails(self):
         """Returns a dictionary of assembly details provided at deposition."""
-        myList = ["id", "details", "matrix_flag", "method_details", "oligomeric_count", "oligomeric_details", "upload_file_name"]
+        myList = [
+            "id",
+            "details",
+            "matrix_flag",
+            "method_details",
+            "oligomeric_count",
+            "oligomeric_details",
+            "upload_file_name",
+        ]
 
         return self.__getDepositorDetails("pdbx_struct_assembly_depositor_info", myList)
 
     def getDepositorAssemblyDetailsRcsb(self):
         """Returns a dictionary of assembly details provided at deposition (for current system)"""
-        myList = ["id", "details", "rcsb_description", "method_details", "pdbx_aggregation_state", "pdbx_assembly_method", "pdbx_formula_weight", "pdbx_formula_weight_method"]
+        myList = [
+            "id",
+            "details",
+            "rcsb_description",
+            "method_details",
+            "pdbx_aggregation_state",
+            "pdbx_assembly_method",
+            "pdbx_formula_weight",
+            "pdbx_formula_weight_method",
+        ]
 
         return self.__getDepositorDetails("struct_biol", myList)
 
     def getDepositorAssemblyGen(self):
         """Returns a dictionary of assembly details provided at deposition (for current system)"""
-        myList = ["id", "asym_id_list", "assembly_id", "oper_expression", "full_matrices", "at_unit_matrix", "chain_id_list", "all_chains", "helical_rotation", "helical_rise"]
+        myList = [
+            "id",
+            "asym_id_list",
+            "assembly_id",
+            "oper_expression",
+            "full_matrices",
+            "at_unit_matrix",
+            "chain_id_list",
+            "all_chains",
+            "helical_rotation",
+            "helical_rise",
+        ]
 
         return self.__getDepositorDetails("pdbx_struct_assembly_gen_depositor_info", myList)
 

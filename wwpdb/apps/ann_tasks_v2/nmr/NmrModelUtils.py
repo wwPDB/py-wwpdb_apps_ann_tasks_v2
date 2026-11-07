@@ -8,17 +8,20 @@
 Various NMR model update tasks. --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
+
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -98,8 +101,7 @@ class NmrModelUtils(SessionWebDownloadUtils):
             dp.cleanup()
             if self.__status == "ok":
                 return True
-            else:
-                return False
+            return False
             #
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=self.__lfh)

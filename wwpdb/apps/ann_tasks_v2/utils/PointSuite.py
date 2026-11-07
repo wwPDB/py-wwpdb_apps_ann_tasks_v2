@@ -8,6 +8,7 @@
 Manage utility to run the programs defined in the suite.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -27,9 +28,8 @@ except ImportError:
 #
 
 
-class PointSuite(object):
-    """ PointSuite class encapsulates running the programs defined in the suite.
-    """
+class PointSuite:
+    """PointSuite class encapsulates running the programs defined in the suite."""
 
     def __init__(self, reqObj=None, verbose=False, log=sys.stderr):
         self.__reqObj = reqObj
@@ -44,13 +44,19 @@ class PointSuite(object):
         self.__sessionPath = self.__sObj.getPath()
 
     def importMats(self, inputMatFilePath, logPath):
-        """ Run PointSuite's "importmats" program
-        """
-        exportList = [os.path.join(self.__sessionPath, "import.biomt"), os.path.join(self.__sessionPath, "import.cif"),
-                      os.path.join(self.__sessionPath, "import.matrix")]
+        """Run PointSuite's "importmats" program"""
+        exportList = [
+            os.path.join(self.__sessionPath, "import.biomt"),
+            os.path.join(self.__sessionPath, "import.cif"),
+            os.path.join(self.__sessionPath, "import.matrix"),
+        ]
         #
-        allFileList = [os.path.join(self.__sessionPath, "import.biomt"), os.path.join(self.__sessionPath, "import.cif"),
-                       os.path.join(self.__sessionPath, "import.matrix"), logPath]
+        allFileList = [
+            os.path.join(self.__sessionPath, "import.biomt"),
+            os.path.join(self.__sessionPath, "import.cif"),
+            os.path.join(self.__sessionPath, "import.matrix"),
+            logPath,
+        ]
         #
         for filePath in allFileList:
             if os.access(filePath, os.F_OK):
@@ -95,8 +101,7 @@ class PointSuite(object):
         return num_of_matrices
 
     def findFrame(self, modelCifPath, biomtFilePath, logPath):
-        """ Run PointSuite's "findframe" program
-        """
+        """Run PointSuite's "findframe" program"""
         frameCifPath = os.path.join(self.__sessionPath, "findframe.cif")
         #
         for filePath in (frameCifPath, logPath):
@@ -113,8 +118,7 @@ class PointSuite(object):
         dp.cleanup()
 
     def makeAssembly(self, modelCifPath, transmtFilePath, logPath):
-        """ Run PointSuite's "makeassembly" program
-        """
+        """Run PointSuite's "makeassembly" program"""
         assemblyCifPath = os.path.join(self.__sessionPath, "assembly.cif")
         #
         for filePath in (assemblyCifPath, logPath):
@@ -131,8 +135,7 @@ class PointSuite(object):
         dp.cleanup()
 
     def mergeAssemblyInfo(self, inModelCifPath, assemblyCifPath, outModelCifPath, logPath):
-        """ Run annotation-pack's "MergePointSuiteResult" program
-        """
+        """Run annotation-pack's "MergePointSuiteResult" program"""
         modifiedAssemblyCifPath = os.path.join(self.__sessionPath, "assembly-with-data-block.cif")
         #
         for filePath in (outModelCifPath, modifiedAssemblyCifPath, logPath):

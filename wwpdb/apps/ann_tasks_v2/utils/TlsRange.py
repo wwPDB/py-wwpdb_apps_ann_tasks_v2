@@ -8,18 +8,20 @@
 Manage utility to correct TLS problems
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -120,4 +122,8 @@ if __name__ == "__main__":
     myReqObj.setValue("sessionid", "579d030a7d3cbfa1365c88e2da66702fd2f95d7d")
     #
     calc = TlsRange(reqObj=myReqObj, verbose=True, log=sys.stderr)
-    calc.run("D_1000223249", "/wwpdb_da/da_top/data_test/archive/D_1000223249/D_1000223249_model-upload_P1.pdb.V3", "D_1000223249_model_P1.cif")
+    calc.run(
+        "D_1000223249",
+        "/wwpdb_da/da_top/data_test/archive/D_1000223249/D_1000223249_model-upload_P1.pdb.V3",
+        "D_1000223249_model_P1.cif",
+    )

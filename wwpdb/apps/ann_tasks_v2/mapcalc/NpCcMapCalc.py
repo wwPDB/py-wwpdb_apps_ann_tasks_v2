@@ -9,18 +9,20 @@
 Manage local electon density map calculations around individual non-polymer chemical components --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -49,7 +51,7 @@ class NpCcMapCalc(SessionWebDownloadUtils):
     def setArguments(self, mapArgs):
         self.__mapArgs = mapArgs
 
-    def run(self, entryId, modelInputFile=None, expInputFile=None, updateInput=True, doOmit=False):  # pylint: disable=unused-argument
+    def run(self, entryId, modelInputFile=None, expInputFile=None, updateInput=True, doOmit=False):  # noqa: ARG002 pylint: disable=unused-argument
         """Run map calculations operation -"""
         try:
             if modelInputFile is None:

@@ -16,6 +16,7 @@
 Manage invoking validation processing -
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -27,10 +28,11 @@ import shutil
 import sys
 import traceback
 
-from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
 from wwpdb.io.locator.PathInfo import PathInfo
-from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+from wwpdb.utils.dp.ValidationWrapper import ValidationWrapper
+
 from wwpdb.apps.ann_tasks_v2.utils.NmrRemediationUtils import remediate_cs_file, starToPdbx
+from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
 class Validate(SessionWebDownloadUtils):
@@ -66,14 +68,14 @@ class Validate(SessionWebDownloadUtils):
     def runAll(
         self,
         entryId,
-        pdb_id=None,
+        pdb_id=None,  # noqa: ARG002  pylint: disable=unused-argument
         modelInputFile=None,
         reflnInputFile=None,
         csInputFile=None,
         volInputFile=None,
         authorFscFile=None,
         restraintInputFile=None,
-        updateInput=True,
+        updateInput=True,  # noqa: ARG002  pylint: disable=unused-argument
         annotationContext=False,
         validation_mode="annotate",
     ):  # pylint: disable=unused-argument
@@ -88,7 +90,13 @@ class Validate(SessionWebDownloadUtils):
                 inpPath = os.path.join(self.__sessionPath, modelInputFile)
 
             if reflnInputFile is None:
-                reflnFileName = pI.getFileName(entryId, contentType="structure-factors", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+                reflnFileName = pI.getFileName(
+                    entryId,
+                    contentType="structure-factors",
+                    formatType="pdbx",
+                    versionId=uploadVersionOp,
+                    partNumber="1",
+                )
                 sfPath = os.path.join(self.__sessionPath, reflnFileName)
             else:
                 sfPath = os.path.join(self.__sessionPath, reflnInputFile)
@@ -100,7 +108,13 @@ class Validate(SessionWebDownloadUtils):
                 nmrdata = True
                 if not os.access(csPath, os.R_OK):
                     # Fallback on cs file
-                    csFileName = pI.getFileName(entryId, contentType="nmr-chemical-shifts", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+                    csFileName = pI.getFileName(
+                        entryId,
+                        contentType="nmr-chemical-shifts",
+                        formatType="pdbx",
+                        versionId=uploadVersionOp,
+                        partNumber="1",
+                    )
                     csPath = os.path.join(self.__sessionPath, csFileName)
                     nmrdata = False
             else:
@@ -134,28 +148,64 @@ class Validate(SessionWebDownloadUtils):
             fName = pI.getFileName(entryId, contentType="validation-report", formatType="pdf", versionId=uploadVersionOp, partNumber="1")
             resultPdfPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-full", formatType="pdf", versionId=uploadVersionOp, partNumber="1")
+            fName = pI.getFileName(
+                entryId,
+                contentType="validation-report-full",
+                formatType="pdf",
+                versionId=uploadVersionOp,
+                partNumber="1",
+            )
             resultFullPdfPath = os.path.join(self.__sessionPath, fName)
 
             fName = pI.getFileName(entryId, contentType="validation-data", formatType="xml", versionId=uploadVersionOp, partNumber="1")
             resultXmlPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="png", versionId=uploadVersionOp, partNumber="1")
+            fName = pI.getFileName(
+                entryId,
+                contentType="validation-report-slider",
+                formatType="png",
+                versionId=uploadVersionOp,
+                partNumber="1",
+            )
             resultPngPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-slider", formatType="svg", versionId=uploadVersionOp, partNumber="1")
+            fName = pI.getFileName(
+                entryId,
+                contentType="validation-report-slider",
+                formatType="svg",
+                versionId=uploadVersionOp,
+                partNumber="1",
+            )
             resultSvgPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-images", formatType="tar", versionId=uploadVersionOp, partNumber="1")
+            fName = pI.getFileName(
+                entryId,
+                contentType="validation-report-images",
+                formatType="tar",
+                versionId=uploadVersionOp,
+                partNumber="1",
+            )
             resultImageTarPath = os.path.join(self.__sessionPath, fName)
 
             fName = pI.getFileName(entryId, contentType="validation-data", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
             resultCifPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-2fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+            fName = pI.getFileName(
+                entryId,
+                contentType="validation-report-2fo-map-coef",
+                formatType="pdbx",
+                versionId=uploadVersionOp,
+                partNumber="1",
+            )
             result2FoPath = os.path.join(self.__sessionPath, fName)
 
-            fName = pI.getFileName(entryId, contentType="validation-report-fo-map-coef", formatType="pdbx", versionId=uploadVersionOp, partNumber="1")
+            fName = pI.getFileName(
+                entryId,
+                contentType="validation-report-fo-map-coef",
+                formatType="pdbx",
+                versionId=uploadVersionOp,
+                partNumber="1",
+            )
             resultFoPath = os.path.join(self.__sessionPath, fName)
             #
             logPath = os.path.join(self.__sessionPath, entryId + "_val-report.log")
@@ -197,7 +247,19 @@ class Validate(SessionWebDownloadUtils):
                 dp.addInput(name="validate_arguments", value=self.__validateArgs)
             dp.op("annot-wwpdb-validate-all-sf")
             dp.expLog(logPath)
-            dp.expList(dstPathList=[resultPdfPath, resultXmlPath, resultFullPdfPath, resultPngPath, resultSvgPath, resultImageTarPath, resultCifPath, resultFoPath, result2FoPath])
+            dp.expList(
+                dstPathList=[
+                    resultPdfPath,
+                    resultXmlPath,
+                    resultFullPdfPath,
+                    resultPngPath,
+                    resultSvgPath,
+                    resultImageTarPath,
+                    resultCifPath,
+                    resultFoPath,
+                    result2FoPath,
+                ]
+            )
 
             self.addDownloadPath(resultFullPdfPath)
             self.addDownloadPath(resultPdfPath)

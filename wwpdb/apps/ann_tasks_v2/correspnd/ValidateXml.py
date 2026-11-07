@@ -16,25 +16,26 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-from xml.dom import minidom
 import sys
 import traceback
+from xml.dom import minidom
 
 
-class ValidateXml(object):
+class ValidateXml:
     """Class responsible for parsing validation XML report"""
 
-    def __init__(self, FileName=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, FileName=None, verbose=False, log=sys.stderr):  # noqa ARG002 pylint: disable=unused-argument
         # self.__verbose = verbose
         # self.__lfh = log
         self.__xmlFile = FileName
-        self.__doc = minidom.parse(self.__xmlFile)
+        self.__doc = minidom.parse(self.__xmlFile)  # noqa: S318
         #
         self.clashMap = {}
         self.clashOutliers = []
@@ -63,62 +64,57 @@ class ValidateXml(object):
         self.__parse()
 
     def getOutlier(self, Type):
-        """
-        """
+        """ """
         if Type in self.__outlierResult:
             return self.__outlierResult[Type]
         #
         return []
 
     def getClashOutliers(self):
-        """
-        """
+        """ """
         return self.clashOutliers
 
     def getCalculatedCompleteness(self):
-        """
-        """
+        """ """
         return self.__calculated_completeness
 
     def getChemicalShiftStatistics(self):
-        """ get information for "The number of nuclei with statistically unusual chemical shifts"
-        """
-        return (self.__total_number_of_shifts, self.__number_of_mapped_shifts, self.__number_of_unparsed_shifts,
-                self.__number_of_errors_while_mapping, self.__number_of_warnings_while_mapping, len(self.__cs_outlier_list))
+        """get information for "The number of nuclei with statistically unusual chemical shifts" """
+        return (
+            self.__total_number_of_shifts,
+            self.__number_of_mapped_shifts,
+            self.__number_of_unparsed_shifts,
+            self.__number_of_errors_while_mapping,
+            self.__number_of_warnings_while_mapping,
+            len(self.__cs_outlier_list),
+        )
 
     def getCsMappingErrorNumber(self):
-        """
-        """
+        """ """
         return self.__number_of_errors_while_mapping
 
     def getCsMappingWarningNumber(self):
-        """
-        """
+        """ """
         return self.__number_of_warnings_while_mapping
 
     def getNotFoundInStructureCsList(self):
-        """
-        """
+        """ """
         return self.__not_found_in_structure_cs_list
 
     def getNotFoundResidueInStructureCsList(self):
-        """
-        """
+        """ """
         return self.__not_found_residue_in_structure_cs_list
 
     def getCsOutliers(self):
-        """
-        """
+        """ """
         return self.__cs_outlier_list
 
     def getCsReferencingOffsetFlag(self):
-        """
-        """
+        """ """
         return self.__has_cs_referencing_offset_flag
 
     def __getOutlierDefinition(self):
-        """
-        """
+        """ """
         self.__outlierMap["torsion-outlier"] = ["phi", "psi"]
         self.__outlierMap["mog-ring-outlier"] = ["atoms", "mean", "mindiff", "stdev", "numobs"]
         self.__outlierMap["mog-angle-outlier"] = ["atoms", "mean", "mindiff", "stdev", "numobs", "Zscore", "obsval"]
@@ -131,13 +127,19 @@ class ValidateXml(object):
         self.__outlierMap["clash"] = ["atom", "cid", "clashmag", "dist"]
 
     def __parse(self):
-        """
-        """
+        """ """
         self.__processGlobalValues()
         #
         self.__processChemcalShiftList()
         #
-        items = ["model", "ent", "chain", "resname", "resnum", "icode"]  # , 'ligand_geometry_outlier', 'ligand_density_outlier' ]
+        items = [
+            "model",
+            "ent",
+            "chain",
+            "resname",
+            "resnum",
+            "icode",
+        ]  # , 'ligand_geometry_outlier', 'ligand_density_outlier' ]
         #
         for node in self.__doc.getElementsByTagName("ModelledSubgroup"):
             if node.nodeType != node.ELEMENT_NODE:
@@ -164,7 +166,7 @@ class ValidateXml(object):
             #
             if node.hasAttribute("rsrz"):
                 val = node.getAttribute("rsrz").strip()
-                if float(val) > 5:
+                if float(val) > 5:  # noqa: PLR2004
                     if not residueInfo:
                         residueInfo = self.__getMapInfo(node, items)
                     #
@@ -181,7 +183,7 @@ class ValidateXml(object):
             #
             if node.hasAttribute("ligRSRZ"):
                 val = node.getAttribute("ligRSRZ").strip()
-                if float(val) > 5:
+                if float(val) > 5:  # noqa: PLR2004
                     if not residueInfo:
                         residueInfo = self.__getMapInfo(node, items)
                     #
@@ -220,8 +222,8 @@ class ValidateXml(object):
                     if tdir["atom0"] in ("C", "O3'") and tdir["atom1"] in ("N", "P"):
                         continue
 
-                if childnode.tagName == "mog-angle-outlier" or childnode.tagName == "mog-bond-outlier":
-                    if abs(float(tdir["Zscore"])) <= 10:
+                if childnode.tagName == "mog-angle-outlier" or childnode.tagName == "mog-bond-outlier":  # noqa: PLR1714
+                    if abs(float(tdir["Zscore"])) <= 10:  # noqa: PLR2004
                         continue
                     #
                 #
@@ -236,7 +238,7 @@ class ValidateXml(object):
                         "resnum": node.getAttribute("resnum").strip(),
                         "resname": node.getAttribute("resname").strip(),
                     }
-                    if float(tdir["dist"]) < 2.2:
+                    if float(tdir["dist"]) < 2.2:  # noqa: PLR2004
                         self.clashMap.setdefault(tdir["cid"], []).append(atom_dict)
 
                 outlier = residueInfo.copy()
@@ -280,8 +282,7 @@ class ValidateXml(object):
         #
 
     def __processGlobalValues(self):
-        """
-        """
+        """ """
         global_values = {}
         Entry = self.__doc.getElementsByTagName("Entry")[0]
         for item in ("DCC_Rfree", "PDB-Rfree", "DCC_R", "PDB-R"):
@@ -294,7 +295,7 @@ class ValidateXml(object):
         #
         for global_list in (("r_free_diff", "DCC_Rfree", "PDB-Rfree"), ("r_work_diff", "DCC_R", "PDB-R")):
             if (global_list[1] in global_values) and (global_list[2] in global_values):
-                if abs(float(global_values[global_list[1]]) - float(global_values[global_list[2]])) > 0.05:
+                if abs(float(global_values[global_list[1]]) - float(global_values[global_list[2]])) > 0.05:  # noqa: PLR2004
                     r_map = {}
                     r_map["diff"] = str(abs(float(global_values[global_list[1]]) - float(global_values[global_list[2]])))
                     r_map[global_list[1]] = global_values[global_list[1]]
@@ -395,8 +396,7 @@ class ValidateXml(object):
         #
 
     def __getMapInfo(self, node, items):
-        """
-        """
+        """ """
         rmap = {}
         for item in items:
             val = ""
@@ -418,13 +418,13 @@ if __name__ == "__main__":
         #       list2 = obj.getOutlier('r_work_diff')
         #       print(list2)
         #       print(obj.getClashOutliers())
-        print(obj.getChemicalShiftStatistics())
-        print(obj.getCsMappingErrorNumber())
-        print(obj.getCsMappingWarningNumber())
-        print(len(obj.getNotFoundInStructureCsList()))
-        print(obj.getNotFoundInStructureCsList())
-        print(obj.getCsOutliers())
-        print(obj.getCsReferencingOffsetFlag())
+        print(obj.getChemicalShiftStatistics())  # noqa: T201
+        print(obj.getCsMappingErrorNumber())  # noqa: T201
+        print(obj.getCsMappingWarningNumber())  # noqa: T201
+        print(len(obj.getNotFoundInStructureCsList()))  # noqa: T201
+        print(obj.getNotFoundInStructureCsList())  # noqa: T201
+        print(obj.getCsOutliers())  # noqa: T201
+        print(obj.getCsReferencingOffsetFlag())  # noqa: T201
     except:  # noqa: E722 pylint: disable=bare-except
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)

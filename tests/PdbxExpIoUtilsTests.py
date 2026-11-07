@@ -9,30 +9,33 @@
 Test cases for IO and edit operation of reflection data files ...
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import unittest
-import traceback
-import time
-import os
-import os.path
 import inspect
 import logging
+import os
+import os.path
+import re
+import sys
+import time
+import traceback
+import unittest
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from commonsetup import HERE, TESTOUTPUT  # noqa:  F401 pylint: disable=import-error,unused-import
+    from commonsetup import HERE, TESTOUTPUT
 else:
-    from .commonsetup import HERE, TESTOUTPUT  # noqa: F401 pylint: disable=relative-beyond-top-level
+    from .commonsetup import HERE, TESTOUTPUT
+
+from mmcif.api.DataCategory import DataCategory
+from mmcif.api.PdbxContainers import DataContainer
 
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
-from mmcif.api.PdbxContainers import DataContainer
-from mmcif.api.DataCategory import DataCategory
 
 # Create logger
 logger = logging.getLogger()
@@ -47,7 +50,6 @@ l2.setLevel(logging.INFO)
 
 class PdbxExpIoUtilsTests(unittest.TestCase):
     def setUp(self):
-        #
         self.__verbose = True
         self.__lfh = sys.stdout
 
@@ -65,23 +67,26 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
     @staticmethod
     def __insertComments(inpFn, outFn):
         """Insert end of block/file comments in the input file --"""
-        import re
-
-        #
         pattern = r"[\r\n]+data_"
         replacement = r"\n#END\ndata_"
         reObj = re.compile(pattern, re.MULTILINE | re.DOTALL | re.VERBOSE)
         # Flush changes made to the in-memory copy of the file back to disk
-        with open(outFn, "w") as ofh:
-            with open(inpFn, "r") as ifh:
-                ofh.write(reObj.sub(replacement, ifh.read()) + "\n#END OF REFLECTIONS\n")
+        with open(outFn, "w") as ofh, open(inpFn) as ifh:
+            ofh.write(reObj.sub(replacement, ifh.read()) + "\n#END OF REFLECTIONS\n")
         return True
 
     def testInsertComments(self):
         """Read and write operations --"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write(
+            "Starting %s %s at %s\n"
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            )
+        )
         try:
             fnInp = self.__examFileRegex
             fnOut = os.path.join(TESTOUTPUT, "test-regex-sf.cif")
@@ -93,14 +98,26 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                endTime - startTime,
+            )
         )
 
     def testReadWriteSF(self):
         """Read and write reflection data files adding comment terminators  ----"""
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write(
+            "Starting %s %s at %s\n"
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            )
+        )
         try:
             pIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
             for ii, f in enumerate(self.__examSFFileList):
@@ -125,7 +142,12 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                endTime - startTime,
+            )
         )
 
     def testReadExpItems(self):
@@ -135,7 +157,14 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         """
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write(
+            "Starting %s %s at %s\n"
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            )
+        )
         try:
             # get model data --
             pIo = PdbxExpFileIo(verbose=self.__verbose, log=self.__lfh)
@@ -159,11 +188,8 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     self.__lfh.write(
                         " +++ container name %r  entryId %r pdbId %r Source diffrnIdList %r diffrnIdList %r\n" % (cName, entryId, pdbId, diffrnSourceIdList, diffrnIdList)
                     )
-                    #
-                    #
                     muD = pE.getDiffrnRadiationWavelengthList()
                     self.__lfh.write(" +++ muD %r\n" % muD)
-                    #
                     for diffrnId in diffrnIdList:
                         mu = pE.getDiffrnSourceWavelength(diffrnId=diffrnId)
                         muListS = pE.getDiffrnSourceWavelengthList(diffrnId=diffrnId)
@@ -183,7 +209,12 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                endTime - startTime,
+            )
         )
 
     def testUpdateExpItems(self):
@@ -193,7 +224,14 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         """
         startTime = time.time()
         self.__lfh.write("\n\n========================================================================================================\n")
-        self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write(
+            "Starting %s %s at %s\n"
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            )
+        )
         try:
             for _ii, (mFn, sfFn) in enumerate(self.__examPairFileList):
                 # First get the get model data --
@@ -207,7 +245,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 #  Read relevant data items in the first container --
                 #
                 mE = PdbxExpIoUtils(dataContainer=mcList[0], verbose=self.__verbose, log=self.__lfh)
-                _entryId = mE.getEntryId()  # noqa: F841
+                _entryId = mE.getEntryId()
                 pdbId = mE.getDbCode(dbId="PDB")
                 modelDiffrnSourceIdList = mE.getDiffrnSourceIds()
                 modelWavelengthD = {}
@@ -225,7 +263,6 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 # ---- simple updates ----
                 sfIo.updateContainerNames(idCode=pdbId, containerList=containerList)
                 sfIo.updateEntryIds(idCode=pdbId, containerList=containerList)
-                #
                 for container in containerList:
                     self.__lfh.write("In file %s found data set %s\n" % (sfPath, container.getName()))
                     #
@@ -240,12 +277,10 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                     if len(diffrnIdList) > 1:
                         self.__lfh.write("+ERROR multiple diffrn_id codes %r in reflection data section %r\n" % (diffrnIdList, curContainerName))
                         continue
-                    #
                     if len(diffrnIdList) < 1:
                         dId = "1"
                     else:
                         dId = diffrnIdList[0]
-                    #
                     if dId in modelWavelengthD:
                         muList = modelWavelengthD[dId]
                         muD = {}
@@ -266,11 +301,9 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                             updMuList.append((muId, tmu, twt))
                         else:
                             updMuList.append((muId, mu, wt))
-                            #
                     self.__lfh.write(" +++ updating wavelength setting in container %r updMuList %r\n" % (curContainerName, updMuList))
-                    ok = sfIo.updateRadiationWavelength(updMuList, container)  # noqa: F841
+                    ok = sfIo.updateRadiationWavelength(updMuList, container)
                     self.assertTrue(ok)
-                #
                 sfOutPath = os.path.join(TESTOUTPUT, sfFn + "-out")
                 sfIo.writeContainerList(sfOutPath, containerList)
                 fnCmt = os.path.join(TESTOUTPUT, sfFn + "-out-comment")
@@ -282,7 +315,12 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                endTime - startTime,
+            )
         )
 
     def testBlockNames(self):

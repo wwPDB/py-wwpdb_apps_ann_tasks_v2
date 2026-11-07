@@ -12,22 +12,23 @@
 Tests for model update using map header data  -
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
+import inspect
 import os
 import sys
-import unittest
-import traceback
-import inspect
 import time
+import traceback
+import unittest
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from commonsetup import HERE  # noqa:  F401 pylint: disable=import-error,unused-import
+    from commonsetup import HERE
 else:
     from .commonsetup import HERE  # noqa: F401 pylint: disable=relative-beyond-top-level
 
@@ -51,7 +52,14 @@ class EmModelUtilsTests(unittest.TestCase):
     def testUpdateModel(self):
         """Test case -  model file update with map header data"""
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write(
+            "\nStarting %s %s at %s\n"
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            )
+        )
         try:
             emmu = EmModelUtils(verbose=self.__verbose, log=self.__lfh)
             mD = emmu.setMapHeaderFilePath(self.__pathEmHeaderFile)
@@ -67,7 +75,6 @@ class EmModelUtilsTests(unittest.TestCase):
             for k in sorted(mD["output_header_long"].keys()):
                 v = mD["output_header_long"][k]
                 self.__lfh.write("'%s': %r,\n" % (k, v))
-            #
             emmu.updateModelFromHeader(entryId=self.__entryId, outModelFilePath="t-out.cif", mapType="primary map", partition="1")
         except:  # noqa: E722 pylint: disable=bare-except
             traceback.print_exc(file=sys.stdout)
@@ -76,7 +83,12 @@ class EmModelUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                endTime - startTime,
+            )
         )
 
 

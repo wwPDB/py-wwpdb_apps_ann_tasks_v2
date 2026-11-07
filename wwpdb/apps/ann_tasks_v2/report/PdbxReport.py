@@ -10,6 +10,7 @@
 PDBx general report generator -
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -27,13 +28,19 @@ from wwpdb.apps.ann_tasks_v2.report.PdbxReportDepictBootstrap import PdbxReportD
 from wwpdb.apps.ann_tasks_v2.report.styles.CSValidationReport import CSValidationReportStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.CSValidationReportIo import CSValidationReportIo
 from wwpdb.apps.ann_tasks_v2.report.styles.DCCReport import PdbxXrayExpReportCategoryStyle
-from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.LinksReport import PdbxLinksReportCategoryStyle
+from wwpdb.apps.ann_tasks_v2.report.styles.ModelReport import PdbxReportCategoryStyle
 from wwpdb.apps.ann_tasks_v2.report.styles.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
-from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import PdbxReportIo, PdbxGeometryReportIo, PdbxXrayExpReportIo, PdbxLinksReportIo, EmInfoReportIo
+from wwpdb.apps.ann_tasks_v2.report.styles.PdbxIo import (
+    EmInfoReportIo,
+    PdbxGeometryReportIo,
+    PdbxLinksReportIo,
+    PdbxReportIo,
+    PdbxXrayExpReportIo,
+)
 
 
-class PdbxReport(object):
+class PdbxReport:
     """PDBx report generator functions."""
 
     def __init__(self, reqObj, verbose=False, log=sys.stderr):
@@ -100,37 +107,67 @@ class PdbxReport(object):
                 if "primary_contour_level" in dd:
                     self.__primary_contour_level = dd["primary_contour_level"]
                 #
-                rdd = PdbxReportDepictBootstrap(styleObject=PdbxReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                rdd = PdbxReportDepictBootstrap(
+                    styleObject=PdbxReportCategoryStyle(),
+                    includePath=includePath,
+                    verbose=self.__verbose,
+                    log=self.__lfh,
+                )
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
             if contentType in ["dcc-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
-                rdd = PdbxReportDepictBootstrap(styleObject=PdbxXrayExpReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                rdd = PdbxReportDepictBootstrap(
+                    styleObject=PdbxXrayExpReportCategoryStyle(),
+                    includePath=includePath,
+                    verbose=self.__verbose,
+                    log=self.__lfh,
+                )
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
             if contentType in ["geometry-check-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
-                rdd = PdbxReportDepictBootstrap(styleObject=PdbxGeometryReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                rdd = PdbxReportDepictBootstrap(
+                    styleObject=PdbxGeometryReportCategoryStyle(),
+                    includePath=includePath,
+                    verbose=self.__verbose,
+                    log=self.__lfh,
+                )
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
             if contentType in ["links-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
-                rdd = PdbxReportDepictBootstrap(styleObject=PdbxLinksReportCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                rdd = PdbxReportDepictBootstrap(
+                    styleObject=PdbxLinksReportCategoryStyle(),
+                    includePath=includePath,
+                    verbose=self.__verbose,
+                    log=self.__lfh,
+                )
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
             if contentType in ["em-map-info-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
-                rdd = PdbxReportDepictBootstrap(styleObject=PdbxEmExtensionCategoryStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                rdd = PdbxReportDepictBootstrap(
+                    styleObject=PdbxEmExtensionCategoryStyle(),
+                    includePath=includePath,
+                    verbose=self.__verbose,
+                    log=self.__lfh,
+                )
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
             if contentType in ["nmr-cs-validation-report"]:
                 self.setFilePath(filePath, fileFormat=fileFormat, idCode=idCode)
                 dd = self.doReport(contentType)
-                rdd = PdbxReportDepictBootstrap(styleObject=CSValidationReportStyle(), includePath=includePath, verbose=self.__verbose, log=self.__lfh)
+                rdd = PdbxReportDepictBootstrap(
+                    styleObject=CSValidationReportStyle(),
+                    includePath=includePath,
+                    verbose=self.__verbose,
+                    log=self.__lfh,
+                )
                 oL = rdd.render(dd, style=layout, leadingHtmlL=leadingHtmlL, trailingHtmlL=trailingHtmlL)
             #
             if self.__debug:

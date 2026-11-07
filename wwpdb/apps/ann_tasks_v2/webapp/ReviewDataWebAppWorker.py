@@ -18,6 +18,7 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -27,27 +28,24 @@ __version__ = "V0.07"
 import os
 import sys
 
-#
-from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
-
-# from wwpdb.utils.rcsb.WebAppWorkerBase                        import WebAppWorkerBase
-
-from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
-from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
+# from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
+# from wwpdb.apps.ann_tasks_v2.check.GeometryCheck import GeometryCheck
+# from wwpdb.apps.ann_tasks_v2.mapcalc.DccCalc import DccCalc
+# from wwpdb.utils.config.ConfigInfo import ConfigInfo
+# from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.utils.session.WebRequest import ResponseContent
 
 #
 from wwpdb.apps.ann_tasks_v2.check.Check import Check
 from wwpdb.apps.ann_tasks_v2.check.ExtraCheck import ExtraCheck
 
-# from wwpdb.apps.ann_tasks_v2.check.FormatCheck import FormatCheck
-# from wwpdb.apps.ann_tasks_v2.check.GeometryCheck import GeometryCheck
-# from wwpdb.apps.ann_tasks_v2.mapcalc.DccCalc import DccCalc
+# from wwpdb.utils.rcsb.WebAppWorkerBase                        import WebAppWorkerBase
+from wwpdb.apps.ann_tasks_v2.report.PdbxReport import PdbxReport
+from wwpdb.apps.ann_tasks_v2.utils.SessionDownloadUtils import SessionDownloadUtils
 
-
-# from wwpdb.utils.config.ConfigInfo import ConfigInfo
-# from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.io.file.DataExchange import DataExchange
-from wwpdb.utils.session.WebRequest import ResponseContent
+#
+from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
 #
 
@@ -211,8 +209,21 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
             if (idCode is None) or (len(idCode) < 1) or (contentType is None) or (len(contentType) < 1) or (contentFormat is None) or (len(contentFormat) < 1):
                 rC.setError(errMsg="File update failed - unrecognized file name ")
             else:
-                dE = DataExchange(reqObj=self._reqObj, depDataSetId=idCode, wfInstanceId=None, fileSource="archive", verbose=self._verbose, log=self._lfh)
-                ok = dE.export(inpFilePath=filePath, contentType=contentType, formatType=contentFormat, version="next", partitionNumber=partitionNumber)
+                dE = DataExchange(
+                    reqObj=self._reqObj,
+                    depDataSetId=idCode,
+                    wfInstanceId=None,
+                    fileSource="archive",
+                    verbose=self._verbose,
+                    log=self._lfh,
+                )
+                ok = dE.export(
+                    inpFilePath=filePath,
+                    contentType=contentType,
+                    formatType=contentFormat,
+                    version="next",
+                    partitionNumber=partitionNumber,
+                )
                 if ok:
                     rC.setStatus(statusMsg="File update completed")
                 else:
@@ -242,7 +253,14 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
 
         return self._generateModelReportHTML(idCodeList=idCodeList, templateFilePath=templateFilePath, webIncludePath=webIncludePath)
 
-    def _generateModelReportHTML(self, idCodeList, fileSource="wf-archive", instance=None, templateFilePath=None, webIncludePath=None):  # pylint: disable=unused-argument
+    def _generateModelReportHTML(
+        self,
+        idCodeList,
+        fileSource="wf-archive",
+        instance=None,  # noqa: ARG002 pylint: disable=unused-argument
+        templateFilePath=None,
+        webIncludePath=None,
+    ):
         """Prepare a response object contaiing a model report rendered in HTML for the entries in input idCodeList.
 
         Returns a full HTML page derived from the input template file -
@@ -294,7 +312,13 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
         templateFilePath = os.path.join(self._reqObj.getValue("TemplatePath"), "consolidated_report_template.html")
         webIncludePath = os.path.join(self._reqObj.getValue("TopPath"), "htdocs")
 
-        return self._generateFullCheckReportHtml(idCode, fileSource=fileSource, instance=instance, templateFilePath=templateFilePath, webIncludePath=webIncludePath)
+        return self._generateFullCheckReportHtml(
+            idCode,
+            fileSource=fileSource,
+            instance=instance,
+            templateFilePath=templateFilePath,
+            webIncludePath=webIncludePath,
+        )
 
     def _generateFullCheckReportHtml(self, idCode, fileSource="wf-archive", instance=None, templateFilePath=None, webIncludePath=None):
         """Create a full check report in HTML format integrating content to input template file using web include path.
@@ -323,7 +347,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 "check-emd-xml",
                 "check-em-map",
             ]
-            _aTagList = self._makeCheckReports([idCode], operationList=opList)  # noqa: F841
+            _aTagList = self._makeCheckReports([idCode], operationList=opList)
         #
         #
         if self._verbose:

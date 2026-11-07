@@ -10,13 +10,14 @@ Manage the update of pdbx_database_related if they appear to be deposition ids
 
 """
 
-
 import logging
-import sys
 import os.path
+import sys
+
+from wwpdb.io.file.DataFile import DataFile
+
 from wwpdb.apps.ann_tasks_v2.related.UpdateRelated import UpdateRelated
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
-from wwpdb.io.file.DataFile import DataFile
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +62,6 @@ class Related(SessionWebDownloadUtils):
             logger.info("Completed with updated status %s", updated)
 
             return True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.traceback("Failed to updated related %s", str(e))
             return False

@@ -10,18 +10,21 @@
 Manage calculation of secondary structure.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.io.file.DataFile import DataFile
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -53,9 +56,8 @@ class TransformCoord(SessionWebDownloadUtils):
             self.__transFilePath = tPath
             if self.__verbose:
                 self.__lfh.write("+TransformCoord.setTransformFile file path %s\n" % self.__transFilePath)
-        else:
-            if self.__verbose:
-                self.__lfh.write("+TransformCoord.setTransformFile ERROR read failed for file %s\n" % tPath)
+        elif self.__verbose:
+            self.__lfh.write("+TransformCoord.setTransformFile ERROR read failed for file %s\n" % tPath)
 
     def run(self, entryId, inpFile, fileType="symop", updateInput=True):
         """Run the coordinate transform calculation on the input model file."""

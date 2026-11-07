@@ -12,21 +12,22 @@ __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import unittest
 import os
 import sys
+import unittest
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from commonsetup import TESTOUTPUT  # noqa:  F401 pylint: disable=import-error,unused-import
+    from commonsetup import TESTOUTPUT
 else:
-    from .commonsetup import TESTOUTPUT  # noqa: F401 pylint: disable=relative-beyond-top-level
+    from .commonsetup import TESTOUTPUT
 
 
-from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
-from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebApp import AnnTasksWebApp  # noqa: F401 pylint: disable=unused-import
-from wwpdb.apps.ann_tasks_v2.em3d.EmAutoFix import EmAutoFix  # noqa: F401 pylint: disable=unused-import
 from wwpdb.utils.session.WebRequest import InputRequest
+
+from wwpdb.apps.ann_tasks_v2.em3d.EmAutoFix import EmAutoFix
+from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebApp import AnnTasksWebApp
+from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
 
 class ImportTests(unittest.TestCase):
@@ -36,6 +37,6 @@ class ImportTests(unittest.TestCase):
     def testInstantiate(self):
         """Tests simple instantiation"""
         # Needs a reqobj
-        _ctw = CommonTasksWebAppWorker(self.__reqObj)  # noqa: F841
-        _atw = AnnTasksWebApp(self.__reqObj)  # noqa: F841
-        _emaut = EmAutoFix(os.path.join(TESTOUTPUT, "sess"))  # noqa: F841
+        _ctw = CommonTasksWebAppWorker(self.__reqObj)
+        _atw = AnnTasksWebApp(self.__reqObj)
+        _emaut = EmAutoFix(os.path.join(TESTOUTPUT, "sess"))

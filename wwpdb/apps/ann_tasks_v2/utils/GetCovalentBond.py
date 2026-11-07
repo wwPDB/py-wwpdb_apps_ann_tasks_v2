@@ -8,6 +8,7 @@
 Manage utility to correct covalent bond problems
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -22,7 +23,7 @@ import traceback
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 
-class GetCovalentBond(object):
+class GetCovalentBond:
     """
     GetCovalentBond class encapsulates correcting covalent bond problems.
     """
@@ -127,23 +128,21 @@ class GetCovalentBond(object):
                 atom += "(" + tupL[5] + ")"
             #
             linkid = tupL[16]
-            linkitem = '<a href="#" onclick="inspect(\'%s\'); return false;">%s</a>' % (
-                linkid.strip(), linkid)
-            tablerow += "<td>" + linkitem + "</td><td>" + tupL[0] + "</td><td>" + tupL[1] + "</td><td>" + tupL[2] + tupL[3] + "</td><td>" \
-                + atom + "</td><td>" + tupL[6] + "</td>"
+            linkitem = '<a href="#" onclick="inspect(\'%s\'); return false;">%s</a>' % (linkid.strip(), linkid)
+            tablerow += "<td>" + linkitem + "</td><td>" + tupL[0] + "</td><td>" + tupL[1] + "</td><td>" + tupL[2] + tupL[3] + "</td><td>" + atom + "</td><td>" + tupL[6] + "</td>"
             atom = tupL[11]
             if tupL[12]:
                 atom += "(" + tupL[12] + ")"
             #
-            tablerow += "<td>" + tupL[7] + "</td><td>" + tupL[8] + "</td><td>" + tupL[9] + tupL[10] + "</td><td>" + atom + "</td><td>" \
-                + tupL[13] + "</td><td>" + tupL[14] + "</td>"
+            tablerow += "<td>" + tupL[7] + "</td><td>" + tupL[8] + "</td><td>" + tupL[9] + tupL[10] + "</td><td>" + atom + "</td><td>" + tupL[13] + "</td><td>" + tupL[14] + "</td>"
             #
             tupL[6] = tupL[6].replace("_", "-")
             tupL[13] = tupL[13].replace("_", "-")
             bond_id = "covalent_bond_" + str(count)
             #
-            tablerow += "<td>" + tupL[15] + '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + bond_id + '" name="' + bond_id \
-                + '" value="' + "_".join(tupL[:16]) + '"/></td>'
+            tablerow += (
+                "<td>" + tupL[15] + '&nbsp; &nbsp; &nbsp; &nbsp; <input type="checkbox" id="' + bond_id + '" name="' + bond_id + '" value="' + "_".join(tupL[:16]) + '"/></td>'
+            )
             #
             tablerow += "</tr>\n"
             count += 1
@@ -152,8 +151,8 @@ class GetCovalentBond(object):
 
 
 def main():
-    from wwpdb.utils.config.ConfigInfo import ConfigInfo
-    from wwpdb.utils.session.WebRequest import InputRequest
+    from wwpdb.utils.config.ConfigInfo import ConfigInfo  # noqa: PLC0415
+    from wwpdb.utils.session.WebRequest import InputRequest  # noqa: PLC0415
 
     #
     siteId = os.getenv("WWPDB_SITE_ID")
@@ -168,7 +167,7 @@ def main():
     calc = GetCovalentBond(reqObj=myReqObj, verbose=True, log=sys.stderr)
     retD = calc.run("D_1000001900", "D_1000001900_model_P1.cif")
     for k, v in retD.items():
-        print(k + "=" + v)
+        print(k + "=" + v)  # noqa: T201
 
 
 if __name__ == "__main__":

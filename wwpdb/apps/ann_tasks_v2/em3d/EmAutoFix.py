@@ -8,24 +8,26 @@
 Auto runs mapfix on maps specified in em_map category
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Ezra Peisach"
 __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 
-import sys
-import os.path
-import os
 import json
 import logging
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+import os
+import os.path
+import sys
+
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 logger = logging.getLogger()
 
 
-class EmAutoFix(object):
+class EmAutoFix:
     def __init__(self, sessionPath, siteId=None, verbose=True, log=sys.stderr):
         self.__verbose = verbose
         self.__lfh = log
@@ -33,7 +35,13 @@ class EmAutoFix(object):
         self.__sessionPath = sessionPath
         self.__cleanup = True
         self.__pI = PathInfo(sessionPath=sessionPath, verbose=self.__verbose, log=self.__lfh)
-        self.__mD = {"primary map": "em-volume", "mask": "em-mask-volume", "additional map": "em-additional-volume", "half map": "em-half-volume", "map header": "em-volume-header"}
+        self.__mD = {
+            "primary map": "em-volume",
+            "mask": "em-mask-volume",
+            "additional map": "em-additional-volume",
+            "half map": "em-half-volume",
+            "map header": "em-volume-header",
+        }
 
     @staticmethod
     def __getEmdDbCode(blockobj):
@@ -125,11 +133,25 @@ class EmAutoFix(object):
                 logger.error("Unknown map type %s", map_type)
                 continue
 
-            volin = self.__pI.getFilePath(dataSetId=datasetid, contentType=ctxtype, formatType="map", fileSource=vollocation, partNumber=partition, versionId="latest")
-            volout = self.__pI.getFilePath(dataSetId=datasetid, contentType=ctxtype, formatType="map", fileSource=vollocation, partNumber=partition, versionId="next")
+            volin = self.__pI.getFilePath(
+                dataSetId=datasetid,
+                contentType=ctxtype,
+                formatType="map",
+                fileSource=vollocation,
+                partNumber=partition,
+                versionId="latest",
+            )
+            volout = self.__pI.getFilePath(
+                dataSetId=datasetid,
+                contentType=ctxtype,
+                formatType="map",
+                fileSource=vollocation,
+                partNumber=partition,
+                versionId="next",
+            )
             logger.debug("Updating %s to %s", volin, volout)
             ####
-            rep = self.__mapfix(datasetid, emdbid, volin, volout, "{} {} {}".format(pixel_x, pixel_y, pixel_z))
+            rep = self.__mapfix(datasetid, emdbid, volin, volout, f"{pixel_x} {pixel_y} {pixel_z}")
             if not os.path.exists(volout):
                 logger.error("Output path %s does not exist", volout)
                 continue
@@ -139,7 +161,14 @@ class EmAutoFix(object):
                 labelnew = mrep["output_header_long"]["label"]
                 tobj.setValue(value=labelnew, attributeName="label", rowIndex=row)
                 # Update filename in em_map
-                newname = self.__pI.getFileName(dataSetId=datasetid, contentType=ctxtype, formatType="map", fileSource=vollocation, partNumber=partition, versionId="latest")
+                newname = self.__pI.getFileName(
+                    dataSetId=datasetid,
+                    contentType=ctxtype,
+                    formatType="map",
+                    fileSource=vollocation,
+                    partNumber=partition,
+                    versionId="latest",
+                )
                 tobj.setValue(value=newname, attributeName="file", rowIndex=row)
 
             updated = True
@@ -160,11 +189,11 @@ if __name__ == "__main__":
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    pI = PathInfo(sessionPath="/tmp")
+    pI = PathInfo(sessionPath="/tmp")  # noqa: S108
 
     dep = "D_800037"
     modellocation = "archive"
     modin = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation)
     modout = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation, versionId="next")
-    ema = EmAutoFix(sessionPath="/tmp")
+    ema = EmAutoFix(sessionPath="/tmp")  # noqa: S108
     ema.autoFixMapLabels(datasetid=dep, modelin=modin, modelout=modout)

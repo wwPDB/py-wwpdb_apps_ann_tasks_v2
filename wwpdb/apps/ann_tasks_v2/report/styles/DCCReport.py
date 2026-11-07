@@ -10,19 +10,26 @@
 Report style details for PDBx X-ray experimental validation data categories.
 
 """
-from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "john.westbrook@rcsb.org"
 __license__ = "Apache 2.0"
 
-from mmcif_utils.style.PdbxCategoryStyleBase import PdbxCategoryStyleBase
+from typing import ClassVar
+
+from mmcif_utils.style.PdbxCategoryStyleBase import (
+    PdbxCategoryStyleBase,
+    PdbxStyleCatExL,
+    PdbxStyleCatInfoL,
+    PdbxStyleCatItemD,
+    PdbxStyleCatSupL,
+)
 
 
 class PdbxXrayExpReportCategoryStyle(PdbxCategoryStyleBase):
     _styleId = "PDBX_DCC_REPORT_V1"
-    _categoryInfo = [
+    _categoryInfo: ClassVar[PdbxStyleCatInfoL] = [
         ("pdbx_density", "table"),
         ("pdbx_density_corr", "table"),
         ("pdbx_dcc_software", "table"),
@@ -30,7 +37,7 @@ class PdbxXrayExpReportCategoryStyle(PdbxCategoryStyleBase):
         ("pdbx_rscc_mapman_overall", "table"),
         ("pdbx_rscc_mapman", "table"),
     ]
-    _cDict = {
+    _cDict: ClassVar[PdbxStyleCatItemD] = {
         "pdbx_rscc_mapman": [
             ("_pdbx_rscc_mapman.model_id", "%s", "str", ""),
             ("_pdbx_rscc_mapman.pdb_id", "%s", "str", ""),
@@ -152,8 +159,8 @@ class PdbxXrayExpReportCategoryStyle(PdbxCategoryStyleBase):
         ],
     }
 
-    _excludeList = []
-    _suppressList = []
+    _excludeList: ClassVar[PdbxStyleCatExL] = []
+    _suppressList: ClassVar[PdbxStyleCatSupL] = []
     #
 
     def __init__(self):

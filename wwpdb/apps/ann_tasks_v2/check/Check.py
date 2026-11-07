@@ -14,19 +14,21 @@
 Dictionary-level PDBx/mmCIF checking
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
-import traceback
 import inspect
+import os
+import os.path
+import sys
+import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.PublicPdbxFile import PublicPdbxFile
 
 
@@ -51,8 +53,7 @@ class Check(PublicPdbxFile):
         if version.upper() in ["V6", "V5", "V4", "DEPOSIT", "ARCHIVE_NEXT", "ARCHIVE_CURRENT"]:
             self.__dictionaryVersion = version.upper()
             return True
-        else:
-            return False
+        return False
 
     def setCheckFirstBlock(self, flag):
         self.__firstBlock = flag
@@ -127,7 +128,15 @@ class Check(PublicPdbxFile):
             if self._verbose:
                 self._lfh.write(
                     "+%s.%s dictionary check version %s completed for entryId %s file %s report %s size %d\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self.__dictionaryVersion, entryId, inpPath, self.__reportPath, self.__reportFileSize)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        self.__dictionaryVersion,
+                        entryId,
+                        inpPath,
+                        self.__reportPath,
+                        self.__reportFileSize,
+                    )
                 )
             #
             if self._cleanup:

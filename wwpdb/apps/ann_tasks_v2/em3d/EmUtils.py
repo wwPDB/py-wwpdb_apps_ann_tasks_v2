@@ -18,28 +18,27 @@ Manage mapfix (view and edit) and em2m operations.
     'img-emdb-report': (['txt'], 'img-emdb-report'),
     'layer-lines': (['any'], 'layer-lines'),
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
 import json
 import math
+import os
+import os.path
+import sys
 import traceback
 
+import matplotlib as mpl
 from wwpdb.io.file.DataExchange import DataExchange
 
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
-import matplotlib
-
-matplotlib.use("Agg")  # Not sure if safe to move down
+mpl.use("Agg")  # Not sure if safe to move down
 import matplotlib.pyplot as plt  # noqa: E402
-
 import pygal  # noqa: E402
 from pygal.style import LightGreenStyle  # noqa: E402
 
@@ -72,7 +71,14 @@ class EmUtils(SessionWebDownloadUtils):
         oL = []
         tupL = []
         try:
-            de = DataExchange(reqObj=self.__reqObj, depDataSetId=entryId, wfInstanceId=None, fileSource=fileSource, verbose=self.__verbose, log=self.__lfh)
+            de = DataExchange(
+                reqObj=self.__reqObj,
+                depDataSetId=entryId,
+                wfInstanceId=None,
+                fileSource=fileSource,
+                verbose=self.__verbose,
+                log=self.__lfh,
+            )
             tupL = de.getPartitionFileList(fileSource=fileSource, contentType=contentType, formatType=formatType, mileStone=None)
             if self.__verbose:
                 self.__lfh.write("+EmUtils.renderEmMapFileList - tupL %r\n" % tupL)
@@ -101,7 +107,14 @@ class EmUtils(SessionWebDownloadUtils):
 
     def renderMapFileList(self, entryId):
         self.__lfh.write("+EmUtils.renderMapFileList for %r\n" % entryId)
-        de = DataExchange(reqObj=self.__reqObj, depDataSetId=entryId, wfInstanceId=None, fileSource="archive", verbose=self.__verbose, log=self.__lfh)
+        de = DataExchange(
+            reqObj=self.__reqObj,
+            depDataSetId=entryId,
+            wfInstanceId=None,
+            fileSource="archive",
+            verbose=self.__verbose,
+            log=self.__lfh,
+        )
         tupL = de.getVersionFileList(contentType="em-volume", formatType="map", partitionNumber="1", mileStone=None)
         self.__lfh.write("+EmUtils.renderMapFileList path list %r\n" % (tupL))
         oL = []
@@ -125,7 +138,14 @@ class EmUtils(SessionWebDownloadUtils):
 
     def renderMaskFileList(self, entryId):
         self.__lfh.write("+EmUtils.renderMaskFileList for %r\n" % entryId)
-        de = DataExchange(reqObj=self.__reqObj, depDataSetId=entryId, wfInstanceId=None, fileSource="archive", verbose=self.__verbose, log=self.__lfh)
+        de = DataExchange(
+            reqObj=self.__reqObj,
+            depDataSetId=entryId,
+            wfInstanceId=None,
+            fileSource="archive",
+            verbose=self.__verbose,
+            log=self.__lfh,
+        )
         tupL = de.getVersionFileList(contentType="em-mask-volume", formatType="map", partitionNumber="1", mileStone=None)
         self.__lfh.write("+EmUtils.renderMaskFileList path list %r\n" % (tupL))
         oL = []
@@ -147,7 +167,14 @@ class EmUtils(SessionWebDownloadUtils):
 
     def renderAdditionalMapFileList(self, entryId):
         self.__lfh.write("+EmUtils.renderAdditionalVolumeFileList for %r\n" % entryId)
-        de = DataExchange(reqObj=self.__reqObj, depDataSetId=entryId, wfInstanceId=None, fileSource="archive", verbose=self.__verbose, log=self.__lfh)
+        de = DataExchange(
+            reqObj=self.__reqObj,
+            depDataSetId=entryId,
+            wfInstanceId=None,
+            fileSource="archive",
+            verbose=self.__verbose,
+            log=self.__lfh,
+        )
         tupL = de.getPartitionFileList(contentType="em-additional-volume", formatType="map", mileStone=None)
         tupL.extend(de.getPartitionFileList(contentType="em-half-volume", formatType="map", mileStone=None))
         self.__lfh.write("+EmUtils.renderAdditionalMapFileList path list %r\n" % (tupL))
@@ -189,10 +216,9 @@ class EmUtils(SessionWebDownloadUtils):
     def plotMapDensity(self, mapHeaderFilePath, mapDensityPlotFile, plotFormat="svg", plotPack="pygal"):
         if plotPack in ["pygal"]:
             return self.plotMapDensityPygal(mapHeaderFilePath, mapDensityPlotFile)
-        elif plotPack in ["mpl"]:
+        if plotPack in ["mpl"]:
             return self.plotMapDensityMpl(mapHeaderFilePath, mapDensityPlotFile, plotFormat=plotFormat)
-        else:
-            return False, None, None
+        return False, None, None
 
     def plotMapDensityMpl(self, mapHeaderFilePath, mapDensityPlotFile, plotFormat="svg"):
         try:
@@ -222,7 +248,11 @@ class EmUtils(SessionWebDownloadUtils):
 
             mapDensityPlotPath = os.path.join(self.__sessionPath, mapDensityPlotFile)
             plt.savefig(mapDensityPlotPath, format=plotFormat)
-            urlPath = '<img src="/sessions/%s/%s" alt="%s">' % (self.__sessionId, mapDensityPlotFile, "Density histogram")
+            urlPath = '<img src="/sessions/%s/%s" alt="%s">' % (
+                self.__sessionId,
+                mapDensityPlotFile,
+                "Density histogram",
+            )
             return True, mapDensityPlotPath, urlPath
 
         except:  # noqa: E722 pylint: disable=bare-except
@@ -262,14 +292,17 @@ class EmUtils(SessionWebDownloadUtils):
             bar_chart.title = "Map density distribution"
 
             bar_chart.x_labels = list(map(str, x))
-            bar_chart.x_labels_major = list(map(str, [t for t in x[::nL]]))
+            bar_chart.x_labels_major = list(map(str, [t for t in x[::nL]]))  # noqa: C416
 
             bar_chart.add("Voxels (log(10)", logy)
 
             mapDensityPlotPath = os.path.join(self.__sessionPath, mapDensityPlotFile)
             bar_chart.render_to_file(mapDensityPlotPath)
 
-            urlPath = '<figure> <embed type="image/svg+xml" src="/sessions/%s/%s" /></figure>' % (self.__sessionId, mapDensityPlotFile)
+            urlPath = '<figure> <embed type="image/svg+xml" src="/sessions/%s/%s" /></figure>' % (
+                self.__sessionId,
+                mapDensityPlotFile,
+            )
 
             return True, mapDensityPlotPath, urlPath
 

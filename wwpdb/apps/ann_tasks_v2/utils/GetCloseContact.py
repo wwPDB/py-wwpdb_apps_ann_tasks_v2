@@ -8,6 +8,7 @@
 Manage utility to correct close contact problems
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -22,7 +23,7 @@ import traceback
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 
-class GetCloseContact(object):
+class GetCloseContact:
     """
     GetCloseContact class encapsulates correcting close contact problems.
     """
@@ -151,15 +152,15 @@ class GetCloseContact(object):
         if (green_count > 0) and (green_count < len(jsonObj["close_contact"])):
             select_green_button = (
                 '<th><input id="close_contact_select_all_green" class="btn btn-primary my-task-form-submit" value="Select All green" type="button" '
-                + "onClick=\"select_close_contact_covalent_bond('update-close-contact-form', 'close_contact_', 'close_contact_select_all_green', 'green');\" /></th>"
+                "onClick=\"select_close_contact_covalent_bond('update-close-contact-form', 'close_contact_', 'close_contact_select_all_green', 'green');\" /></th>"
             )
         #
         return htmlTemplate % (str(count), select_green_button, tablerow)
 
 
 def main():
-    from wwpdb.utils.config.ConfigInfo import ConfigInfo
-    from wwpdb.utils.session.WebRequest import InputRequest
+    from wwpdb.utils.config.ConfigInfo import ConfigInfo  # noqa: PLC0415
+    from wwpdb.utils.session.WebRequest import InputRequest  # noqa: PLC0415
 
     #
     siteId = os.getenv("WWPDB_SITE_ID")
@@ -174,7 +175,7 @@ def main():
     calc = GetCloseContact(reqObj=myReqObj, verbose=True, log=sys.stderr)
     retD = calc.run("D_1000001900", "D_1000001900_model_P1.cif")
     for k, v in retD.items():
-        print(k + "=" + v)
+        print(k + "=" + v)  # noqa: T201
 
 
 if __name__ == "__main__":
