@@ -23,7 +23,7 @@ import unittest
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from commonsetup import HERE
+    from commonsetup import HERE  # pylint: disable=import-error
 else:
     from .commonsetup import HERE
 

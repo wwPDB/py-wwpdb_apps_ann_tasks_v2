@@ -79,7 +79,7 @@ class SessionWebDownloadUtils:
             pass
         return False
 
-    def getAnchorTagList(self, label=None, target="_blank", cssClass=""):  # noqa: ARG002
+    def getAnchorTagList(self, label=None, target="_blank", cssClass=""):  # noqa: ARG002 pylint: disable=unused-argument
         """Return the anchor tag corresponding the current download file selection."""
         tagList = []
         try:

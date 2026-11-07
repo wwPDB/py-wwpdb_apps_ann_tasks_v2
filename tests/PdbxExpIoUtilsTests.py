@@ -28,7 +28,7 @@ import unittest
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from commonsetup import HERE, TESTOUTPUT
+    from commonsetup import HERE, TESTOUTPUT  # pylint: disable=import-error
 else:
     from .commonsetup import HERE, TESTOUTPUT
 
@@ -245,7 +245,7 @@ class PdbxExpIoUtilsTests(unittest.TestCase):
                 #  Read relevant data items in the first container --
                 #
                 mE = PdbxExpIoUtils(dataContainer=mcList[0], verbose=self.__verbose, log=self.__lfh)
-                _entryId = mE.getEntryId()
+                mE.getEntryId()
                 pdbId = mE.getDbCode(dbId="PDB")
                 modelDiffrnSourceIdList = mE.getDiffrnSourceIds()
                 modelWavelengthD = {}

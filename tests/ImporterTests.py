@@ -18,7 +18,7 @@ import unittest
 
 if __package__ is None or __package__ == "":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from commonsetup import TESTOUTPUT
+    from commonsetup import TESTOUTPUT  # pylint: disable=import-error
 else:
     from .commonsetup import TESTOUTPUT
 
@@ -37,6 +37,6 @@ class ImportTests(unittest.TestCase):
     def testInstantiate(self):
         """Tests simple instantiation"""
         # Needs a reqobj
-        _ctw = CommonTasksWebAppWorker(self.__reqObj)
-        _atw = AnnTasksWebApp(self.__reqObj)
-        _emaut = EmAutoFix(os.path.join(TESTOUTPUT, "sess"))
+        CommonTasksWebAppWorker(self.__reqObj)
+        AnnTasksWebApp(self.__reqObj)
+        EmAutoFix(os.path.join(TESTOUTPUT, "sess"))

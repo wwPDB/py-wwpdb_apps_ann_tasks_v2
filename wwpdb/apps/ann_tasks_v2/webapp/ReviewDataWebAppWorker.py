@@ -347,7 +347,7 @@ class ReviewDataWebAppWorker(CommonTasksWebAppWorker):
                 "check-emd-xml",
                 "check-em-map",
             ]
-            _aTagList = self._makeCheckReports([idCode], operationList=opList)
+            self._makeCheckReports([idCode], operationList=opList)
         #
         #
         if self._verbose:

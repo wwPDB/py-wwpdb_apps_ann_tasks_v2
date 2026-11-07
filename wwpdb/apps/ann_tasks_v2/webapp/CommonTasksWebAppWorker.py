@@ -1220,7 +1220,6 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         if self._verbose:
             self._lfh.write("+CommonTasksWebAppWorker._secondaryStructureCalcOp() status %r\n" % ok)
 
-        _warnFlag = calc.getLastStatus() != "ok"
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
@@ -3260,7 +3259,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
         self,
         entryIdList,
         contentType="model",
-        formatType="pdbx",  # noqa: ARG002
+        formatType="pdbx",  # noqa: ARG002 pylint: disable=unused-argument
         fileSource="archive",
         useFileVersions=True,
     ):
@@ -3631,7 +3630,7 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
                 pI = PathInfo(siteId=self._siteId, sessionPath=self._sessionPath, verbose=self._verbose, log=self._lfh)
                 modelFilePath = pI.getModelPdbxFilePath(dataSetId=entryId, fileSource="session", versionId="none")
                 emx = EmModelUtils(verbose=self._verbose, log=self._lfh)
-                _ok1 = emx.setModelFilePath(modelFilePath)
+                emx.setModelFilePath(modelFilePath)
                 emx.setMapHeaderFilePath(nextJsonPath)
                 modelD = {}
                 for tky in ["annotation_details", "contour_level", "contour_level_source"]:
@@ -4530,7 +4529,18 @@ class CommonTasksWebAppWorker(WebAppWorkerBase):
 
     ##
     ##
-    def __uploadConversion(self, entryId, inpFileName, inpContentType, inpFormatType, cnvOp, outFileName, outContentType, outFormatType, timeOut=0):  # noqa: ARG002 pylint: disable=unused-argument
+    def __uploadConversion(
+        self,
+        entryId,
+        inpFileName,
+        inpContentType,
+        inpFormatType,
+        cnvOp,
+        outFileName,
+        outContentType,  # noqa: ARG002 pylint: disable=unused-argument
+        outFormatType,  # noqa: ARG002 pylint: disable=unused-argument
+        timeOut=0,
+    ):
         """Worker method supporting the conversion operations for uploaded in current session ..."""
         if self._verbose:
             self._lfh.write(

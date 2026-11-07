@@ -44,7 +44,7 @@ def starToPdbx(starPath=None, pdbxPath=None):
             # myIo.writeFile(pdbxPath, containerList=containerList[1:])
             myIo.writeFile(pdbxPath, containerList=containerList)
             return True
-    except Exception as _e:
+    except Exception:
         logger.exception("starToPdx - failed with exception")
 
     return False
