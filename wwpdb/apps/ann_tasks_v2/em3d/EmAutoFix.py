@@ -185,6 +185,8 @@ class EmAutoFix:
 
 
 if __name__ == "__main__":
+    from wwpdb.io.locator.PathInfo import PathInfoStorageType
+
     ch = logging.StreamHandler()
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
@@ -192,7 +194,7 @@ if __name__ == "__main__":
     pI = PathInfo(sessionPath="/tmp")  # noqa: S108
 
     dep = "D_800037"
-    modellocation = "archive"
+    modellocation: PathInfoStorageType = "archive"
     modin = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation)
     modout = pI.getModelPdbxFilePath(dataSetId=dep, fileSource=modellocation, versionId="next")
     ema = EmAutoFix(sessionPath="/tmp")  # noqa: S108

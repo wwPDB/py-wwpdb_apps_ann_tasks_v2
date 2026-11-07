@@ -1,0 +1,17 @@
+# Requirements for testing
+pytest
+mock; python_version < '3'
+
+# Stubs.....
+lxml-stubs
+pandas-stubs
+scipy-stubs; python_version > '3.10'
+types-antlr4-python3-runtime
+types-defusedxml
+types-greenlet
+types-mysqlclient
+types-simplejson
+types-six
+types-openpyxl
+types-python-dateutil
+types-xlrd

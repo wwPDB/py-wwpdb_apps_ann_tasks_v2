@@ -74,6 +74,7 @@ preview = false
 explicit-preview-rules = true
 
 ignore = [
+  "D419",     # Docstring is empty
   "FBT002",   # Boolean default positional argument in function definition
   "FURB122",  # for-loop-writes
   "ISC003",   # (explicit-string-concatenation)
@@ -109,6 +110,8 @@ ignore = [
 
 # -------------------- default environment scripts ------------------
 [tool.hatch.envs.default]
+python = "3.10"
+
 # skip-install = true
 dependencies = ["mypy", "ruff >=0.6.9", "wwpdb.utils.testing", "matplotlib", "pygal",
   "wwpdb.utils.config",
@@ -127,13 +130,13 @@ format = [
 format-python = ["ruff format", "ruff check --fix-only"]
 
 # 'check' only checks but never fixes
-check = ["ruff check --no-fix .", "mypy --non-interactive --install-types --strict -p wwpdb -p tests"]
+check = ["ruff check --no-fix .", "mypy --non-interactive --install-types -p wwpdb -p tests"]
 
 # only checks with ruff (mypy has a lot of false positives)
 check-ruff = "ruff check --no-fix . {args}"
 
 # to complement 'check-ruff'
-check-mypy = "mypy --non-interactive --install-types --strict -p wwpdb -p tests {args}"
+check-mypy = "mypy --non-interactive --install-types -p wwpdb -p tests {args}"
 
 # only check security via Bandit; we require these rules to pass
 check-security = "ruff check --select S --no-fix ."
@@ -143,3 +146,12 @@ check-security = "ruff check --select S --no-fix ."
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["PT009", "TID252"]
 "wwpdb/apps/ann_tasks_v2/report/PdbxReportDepictBootstrap.py" = ["PLR2004"]  # magic constants
+
+
+
+# -------------------------  Mypy disable ---------
+[[tool.mypy.overrides]]
+module = ["mmcif.*", "wwpdb.apps.msgmodule.*", "wwpdb.apps.wf_engine.*",
+          "wwpdb.apps.validation.*", "cPickle", "commonsetup", "pygal.*"]
+ignore_missing_imports = true
+

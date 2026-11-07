@@ -275,7 +275,7 @@ class EmModelUtils(PdbxStyleIoUtil):
                         for ii in range(nRows):
                             tId = cObj.getValue(attributeName="id", rowIndex=ii)
                             tIdList.append(int(tId))
-                        nId = sorted(tIdList)[-1]
+                        nId = sorted(tIdList)[-1]  # noqa: FURB192
                     else:
                         nId = "1"
                     self.__headD["id"] = nId

@@ -131,13 +131,13 @@ jobs:
       #
     - task: Cache@2
       inputs:
-        key: 'python | "$(Agent.OS)" | "${{ parameters.python }}" | requirements.txt'
+        key: 'python | "$(Agent.OS)" | "${{ parameters.python }}" | requirements.txt | requirements-test.txt'
         restoreKeys: | 
           python | "$(Agent.OS)" | "${{ parameters.python }}"
         path: $(PIP_CACHE_DIR)
       displayName: Cache pip packages
 
-    - script: pip install -r requirements.txt
+    - script: pip install -r requirements.txt -r requirements-test.txt
       displayName: 'Install dependencies'
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
@@ -193,6 +193,7 @@ jobs:
         displayName: "Acquire build tools"
       - script: python -m build --outdir "$(System.DefaultWorkingDirectory)/dist"
         displayName: "Build source distributions"
+    #
       # Check the install artifacts
       - script: ls -lR "$(System.DefaultWorkingDirectory)/dist"
         displayName: "Listing of installed software"
