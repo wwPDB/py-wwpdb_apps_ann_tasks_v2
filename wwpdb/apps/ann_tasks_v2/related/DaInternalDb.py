@@ -8,13 +8,14 @@
 Retrives data from da_internal pertaining lookup data
 """
 
-from wwpdb.utils.db.MyConnectionBase import MyConnectionBase
 import logging
+
+from wwpdb.utils.db.MyConnectionBase import MyConnectionBase
 
 logger = logging.getLogger(__name__)
 
 
-class DaInternalDb(object):
+class DaInternalDb:
     def __init__(self, siteId=None):
         self.__mydb = None
         self.__siteId = siteId
@@ -61,6 +62,6 @@ class DaInternalDb(object):
 if __name__ == "__main__":
     da = DaInternalDb()
     dt = da.getDatabase2("D_800012")
-    print(dt)
+    print(dt)  # noqa: T201
     dt = da.getDatabase2("D_800099")
-    print(dt)
+    print(dt)  # noqa: T201

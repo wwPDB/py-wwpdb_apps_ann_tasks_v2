@@ -25,6 +25,7 @@
 Calculation, selection and depiction of coordinate assemblies.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -34,25 +35,26 @@ __version__ = "V0.07"
 try:
     import cPickle as pickle
 except ImportError:
-    import pickle as pickle
+    import pickle
 
-import sys
-import os.path
 import os
-import traceback
+import os.path
 import shutil
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
-from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
-from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import PdbxFileIo, ModelFileIo
-from mmcif.api.PdbxContainers import DataContainer
+import sys
+import traceback
+
 from mmcif.api.DataCategory import DataCategory
+from mmcif.api.PdbxContainers import DataContainer
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
+from wwpdb.utils.dp.DataFileAdapter import DataFileAdapter
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
+from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
+from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
 
 
-class AssemblySelect(object):
-
+class AssemblySelect:
     """
     AssemblySelect class encapsulates the calculation, selection and display of
     calculated assemblies.
@@ -150,8 +152,7 @@ class AssemblySelect(object):
                 _assemD, _assemSetD = self.__readAssemblyReport(reportPath)
                 self.__contextEntryId = entryId
                 return True
-            else:
-                return False
+            return False
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 traceback.print_exc(file=self.__lfh)
@@ -404,12 +405,24 @@ class AssemblySelect(object):
         sS, _pS, _aD, _eD = self.__readSelection(entryId)
         if sS is not None:
             return sS
-        else:
-            return ""
+        return ""
 
     def renderAssemblyDataTable(self, entryId, maxAssems=100):
         """ """
-        colList = ["set_ser_no", "select", "provenance", "view", "serial_no", "composition", "score", "asa", "bsa", "int_energy", "diss_energy", "op_list"]
+        colList = [
+            "set_ser_no",
+            "select",
+            "provenance",
+            "view",
+            "serial_no",
+            "composition",
+            "score",
+            "asa",
+            "bsa",
+            "int_energy",
+            "diss_energy",
+            "op_list",
+        ]
         colDisplayD = {
             "set_ser_no": "Set",
             "select": "Select",
@@ -490,12 +503,11 @@ class AssemblySelect(object):
     def __setAssemblyModelRelativePath(self, assemblyUid, entryId, generated=False):
         if generated:
             modelPathRel = os.path.join(self.__rltvSessionPath, entryId + "_assembly-model_P" + assemblyUid + ".cif.V1")
+        elif assemblyUid == "0":
+            # self.__modelPathRel=os.path.join(self.__rltvSessionPath,entryId+'_model-deposit.cif')
+            modelPathRel = os.path.join(self.__rltvSessionPath, entryId + "_model_P1.cif")
         else:
-            if assemblyUid == "0":
-                # self.__modelPathRel=os.path.join(self.__rltvSessionPath,entryId+'_model-deposit.cif')
-                modelPathRel = os.path.join(self.__rltvSessionPath, entryId + "_model_P1.cif")
-            else:
-                modelPathRel = os.path.join(self.__rltvSessionPath, entryId + "_assembly-model-xyz_P" + assemblyUid + ".cif")
+            modelPathRel = os.path.join(self.__rltvSessionPath, entryId + "_assembly-model-xyz_P" + assemblyUid + ".cif")
 
         return modelPathRel
 
@@ -509,8 +521,8 @@ class AssemblySelect(object):
         # setupCmds="background black; wireframe off; spacefill 0.75; labels off; slab 100; depth 40; slab on;"
         if generated:
             # setupCmds = "select *; background white; wireframe off; ribbons off;cartoons off; labels off; rockets only; color rockets structure; slab 100; depth 40; slab on; "
-            setupCmds = (
-                setupCmds
+            setupCmds = (  # noqa: PLW0127
+                setupCmds  # noqa: PLW0128
             ) = " select *; background white; wireframe off; ribbons off; cartoons on; labels off; spacefill off; color property modelindex; select ligands; spacefill on; slab 100; depth 10; slab on; "  # noqa: E501
         else:
             setupCmds = " background black; wireframe off; spacefill on; color chain; labels off; slab 100; depth 40; slab on; "
@@ -683,9 +695,9 @@ class AssemblySelect(object):
         assemInstIdList = []
         if not self.__allMonomerFlag:
             instanceIdList = []
-            for _eId, instL in eD.items():
+            for instL in eD.values():
                 for inst in instL:
-                    instanceIdList.append(inst)
+                    instanceIdList.append(inst)  # noqa: PERF402
                 #
             #
             instanceIdList.sort()
@@ -720,7 +732,7 @@ class AssemblySelect(object):
                 #
             #
             linearInstIdList = []
-            for _eId, instL in eD.items():
+            for instL in eD.values():
                 for inst in instL:
                     if inst in branch2LinearMap:
                         continue
@@ -775,10 +787,10 @@ class AssemblySelect(object):
 
         try:
             fb = open(ifh, "rb")
-            sS = pickle.load(fb)
-            pS = pickle.load(fb)
-            aD = pickle.load(fb)
-            eD = pickle.load(fb)
+            sS = pickle.load(fb)  # noqa: S301
+            pS = pickle.load(fb)  # noqa: S301
+            aD = pickle.load(fb)  # noqa: S301
+            eD = pickle.load(fb)  # noqa: S301
             fb.close()
             if (sS is not None) and (len(sS) > 0):
                 r1 = sS
@@ -818,7 +830,20 @@ class AssemblySelect(object):
         Prior selection details and view options are added to each dictionary.
         """
         rowD = {}
-        colList = ["set_ser_no", "select", "provenance", "view", "serial_no", "composition", "score", "asa", "bsa", "int_energy", "diss_energy", "op_list"]
+        colList = [
+            "set_ser_no",
+            "select",
+            "provenance",
+            "view",
+            "serial_no",
+            "composition",
+            "score",
+            "asa",
+            "bsa",
+            "int_energy",
+            "diss_energy",
+            "op_list",
+        ]
         #
         if self.__contextEntryId != entryId:
             self.setReportContext(entryId)
@@ -827,7 +852,11 @@ class AssemblySelect(object):
         #
         #
         selectList, provSelectD, _assemFormD, _extraD = self.__getAssemblySelectionDetails(entryId)
-        provenanceOptList = [("author_defined_assembly", "author"), ("software_defined_assembly", "software"), ("author_and_software_defined_assembly", "author+software")]
+        provenanceOptList = [
+            ("author_defined_assembly", "author"),
+            ("software_defined_assembly", "software"),
+            ("author_and_software_defined_assembly", "author+software"),
+        ]
         if len(provSelectD) < 1:
             for uid in self.__assemblyD.keys():
                 provSelectD[uid] = "software_defined_assembly"
@@ -854,7 +883,11 @@ class AssemblySelect(object):
                 checkOpt = "checked"
             else:
                 checkOpt = ""
-            inputText = '<input id="%s" type="checkbox" value="%s" class="assem_select" %s />' % (uid, selectId, checkOpt)
+            inputText = '<input id="%s" type="checkbox" value="%s" class="assem_select" %s />' % (
+                uid,
+                selectId,
+                checkOpt,
+            )
 
             #
             # Provenance selection pulldown --
@@ -907,7 +940,7 @@ class AssemblySelect(object):
 
                 elif col in ["set_ser_no", "serial_no"]:
                     cD[col] = int(assem[col])
-                elif col in ["score"] and (uid == "0" or uid == 0):
+                elif col in ["score"] and (uid == "0" or uid == 0):  # noqa: PLR1714
                     cD[col] = "Deposited coordinates<br /><i>as is</i>"
                 elif col in ["score"] and ("not revealed any" in str(assem[col])):
                     cD[col] = "... no strong evidence of complex ..."

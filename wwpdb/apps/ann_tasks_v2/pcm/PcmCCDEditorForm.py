@@ -3,17 +3,19 @@ Manage the generating of PCM missing annotation table.
 
 """
 
-import os
 import csv
-import sys
 import logging
+import os
+import sys
 import traceback
 
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
+logger = logging.getLogger(__name__)
 
 
-class PcmCCDEditorForm(object):
+class PcmCCDEditorForm:
     """
     The CoordEditorForm class generates coordinate editor form.
 
@@ -42,7 +44,7 @@ class PcmCCDEditorForm(object):
         self.__tableTemplate = '<table id="table_%s" class="table table-condensed table-bordered table-striped">\n'
         self.__tdTagTemplate = '<td style="border-style:none">%s</td>\n'
         self.__editableTemplate = '<b class="%s" id="%s" style="display:inline">%s</b>'
-        logging.info("Processing entry %s", self.__entryId)
+        logger.info("Processing entry %s", self.__entryId)
 
     def setLogHandle(self, log=sys.stderr):
         """Reset the stream for logging output."""
@@ -54,7 +56,7 @@ class PcmCCDEditorForm(object):
 
     def run(self):
         """Generate JSON format data"""
-        logging.info("Processing entry %s", self.__entryId)
+        logger.info("Processing entry %s", self.__entryId)
 
         if not self.__identifier:
             return False
@@ -72,10 +74,10 @@ class PcmCCDEditorForm(object):
         self.__entryFile = self.__reqObj.getValue("entryfilename")
         inpPdbxPath = os.path.join(self.__sessionPath, self.__entryFile)
         if not os.access(inpPdbxPath, os.F_OK):
-            logging.error("Missing entry file %s", inpPdbxPath)
+            logger.error("Missing entry file %s", inpPdbxPath)
             return
         #
-        logging.info("Processing entry file %s", self.__entryFile)
+        logger.info("Processing entry file %s", self.__entryFile)
         #
         if os.access(self.__csvPath, os.F_OK):
             os.remove(self.__csvPath)
@@ -113,7 +115,7 @@ class PcmCCDEditorForm(object):
             myD["statustext"] = "Failed to build form for %s. Couldn't find output csv file" % self.__entryId
             return myD
 
-        with open(self.__csvPath, 'r') as fp:
+        with open(self.__csvPath, "r") as fp:
             content = "PTM annotation is successfully updated. No missing pcm data found."
             if content in fp.read():
                 myD = {}
@@ -122,9 +124,7 @@ class PcmCCDEditorForm(object):
                 return myD
 
         htmlcontent = self.__tableTemplate % self.__identifier
-        htmlcontent += (
-            "<tr>\n<th>Comp Id</th>\n<th>Link Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
-        )
+        htmlcontent += "<tr>\n<th>Comp Id</th>\n<th>Link Id</th>\n<th>Modified Residue Id</th>\n<th>Type</th>\n<th>Category</th>\n<th>Position</th>\n<th>Polypeptide Position</th>\n<th>Comp Id Linking Atom</th>\n<th>Modified Residue Id Linking Atom</th>\n<th>First Instance Model Db Code</th>\n<th>ChemRefUI Link</th>\n</tr>\n"  # noqa: E501
         #
         # column change will affect webapp/AnnTasksWebAppWorker.py & /py-wwpdb_utils_wf/wwpdb/utils/wf/plugins/PcmCsvUtils.py files. Both files need to be updated accordlingly.
         #
@@ -141,13 +141,13 @@ class PcmCCDEditorForm(object):
             "First_instance_model_db_code": {"editable": False},
         }
 
-        with open(self.__csvPath, 'r') as csvfile:
+        with open(self.__csvPath, "r") as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                comp_id = row['Comp_id']
+                comp_id = row["Comp_id"]
 
                 for c in columns:
-                    if columns[c]['editable']:
+                    if columns[c]["editable"]:
                         ed_id = f"{comp_id}_{c}"
                         ed_text = self.__editableTemplate % ("editable_text", ed_id, row[c])
                         htmlcontent += self.__tdTagTemplate % ed_text

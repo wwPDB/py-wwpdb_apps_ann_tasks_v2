@@ -13,6 +13,7 @@
 DOM parser for PISA assembly data files.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -29,7 +30,7 @@ from xml.dom import minidom
 from wwpdb.io.misc.FormatOut import FormatOut
 
 
-class PisaAssemblyReader(object):
+class PisaAssemblyReader:
     def __init__(self, verbose=True, log=sys.stderr):
         self.__lfh = log
         self.__verbose = verbose
@@ -50,8 +51,7 @@ class PisaAssemblyReader(object):
     def getAssemblySetCount(self):
         if "total_asm" in self.__gD and (self.__gD["total_asm"] is not None):
             return int(self.__gD["total_asm"])
-        else:
-            return 0
+        return 0
 
     def read(self, filePath):
         #
@@ -62,7 +62,7 @@ class PisaAssemblyReader(object):
             #
             if not os.access(filePath, os.F_OK):
                 return False
-            self.__dom = minidom.parse(filePath)
+            self.__dom = minidom.parse(filePath)  # noqa: S318
             return self.__getData()
         except:  # noqa: E722 pylint: disable=bare-except
             self.__lfh.write("+PisaAssemblyReader(read) read failed for file  %s\n" % filePath)
@@ -98,7 +98,7 @@ class PisaAssemblyReader(object):
 
         # make assembly dictionary
         aD = {}
-        for _k, v in sD.items():
+        for v in sD.values():
             for assem in v["assembly_list"]:
                 uId = str(assem["serial_no"])
                 assem["set_ser_no"] = int(v["ser_no"])
@@ -220,7 +220,7 @@ class PisaAssemblyReader(object):
 
     def __reCalculateCompositions(self):
         chainOrder = self.__getAsuChainOrder()
-        for _k, sD in self.__sD.items():
+        for sD in self.__sD.values():
             for aD in sD["assembly_list"]:
                 aD["composition"] = self.__reCalculateComposition(aD["molecule_list"], chainOrder)
                 #
@@ -283,8 +283,7 @@ class PisaAssemblyReader(object):
         #
         if chainOrder:
             return self.__reCalculateCompositionBasedAsuOrder(orderList, myMap)
-        else:
-            return self.__reCalculateCompositionBasedCurOrder(chnList, myMap)
+        return self.__reCalculateCompositionBasedCurOrder(chnList, myMap)
         #
 
     def __reCalculateCompositionBasedAsuOrder(self, orderList, myMap):

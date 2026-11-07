@@ -10,19 +10,20 @@ Manage map header updates in model file -
 
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
 import json
+import sys
 import traceback
 
-from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoUtil
-from mmcif_utils.style.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
 from mmcif.io.IoAdapterCore import IoAdapterCore
+from mmcif_utils.style.PdbxEmExtensionCategoryStyle import PdbxEmExtensionCategoryStyle
+from mmcif_utils.style.PdbxStyleIoUtil import PdbxStyleIoUtil
 
 #
 
@@ -189,8 +190,7 @@ class EmModelUtils(PdbxStyleIoUtil):
         try:
             if self.readFile(modelFilePath):
                 return self.setContainer(containerIndex=0)
-            else:
-                return False
+            return False
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+EmModelUtils.setModelHeaderFilePath - failed for file %s\n" % modelFilePath)
@@ -203,7 +203,11 @@ class EmModelUtils(PdbxStyleIoUtil):
 
         Return these as a dictionary and store internally for export --
         """
-        d = {"contour_level": "_em_map.contour_level", "contour_level_source": "_em_map.contour_level_source", "annotation_details": "_em_map.annotation_details"}
+        d = {
+            "contour_level": "_em_map.contour_level",
+            "contour_level_source": "_em_map.contour_level_source",
+            "annotation_details": "_em_map.annotation_details",
+        }
         rD = {}
         for ky in d.keys():
             rD[ky] = ""
@@ -220,7 +224,7 @@ class EmModelUtils(PdbxStyleIoUtil):
                     self.__lfh.write("+EmModelUtils.getDepositorMapDetails - found matching rows %d \n" % len(rL))
                 if len(rL) > 0:
                     iRow = rL[0]
-                    for ky, _itemName in d.items():
+                    for ky in d.keys():
                         val = cObj.getValue(attributeName=ky, rowIndex=iRow)
                         rD[ky] = val
         except:  # noqa: E722 pylint: disable=bare-except
@@ -268,10 +272,10 @@ class EmModelUtils(PdbxStyleIoUtil):
                     # update/append the next row -
                     if nRows > 0:
                         tIdList = []
-                        for ii in range(0, nRows):
+                        for ii in range(nRows):
                             tId = cObj.getValue(attributeName="id", rowIndex=ii)
                             tIdList.append(int(tId))
-                        nId = sorted(tIdList)[-1]
+                        nId = sorted(tIdList)[-1]  # noqa: FURB192
                     else:
                         nId = "1"
                     self.__headD["id"] = nId
@@ -285,10 +289,9 @@ class EmModelUtils(PdbxStyleIoUtil):
                             self.updateItem(itemName, val, iRow=iRow)
                 #
                 return self.writeFile(outModelFilePath)
-            else:
-                if self.__verbose:
-                    self.__lfh.write("+EmModelUtils.updateModelFromHeader - cannot create em_map category for %s\n" % entryId)
-                return False
+            if self.__verbose:
+                self.__lfh.write("+EmModelUtils.updateModelFromHeader - cannot create em_map category for %s\n" % entryId)
+            return False
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
                 self.__lfh.write("+EmModelUtils.updateModelFromHeader - failed for file %s\n" % outModelFilePath)

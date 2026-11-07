@@ -10,22 +10,23 @@
 Common methods for managing web download path information and markup.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
 import os
 import os.path
+import sys
 
 
-class SessionWebDownloadUtils(object):
+class SessionWebDownloadUtils:
     """Common methods for managing web download path information and markup."""
 
     #
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         """Input request object is used to determine session context."""
         # self.__verbose = verbose
         # self.__lfh = log
@@ -78,13 +79,13 @@ class SessionWebDownloadUtils(object):
             pass
         return False
 
-    def getAnchorTagList(self, label=None, target="_blank", cssClass=""):
+    def getAnchorTagList(self, label=None, target="_blank", cssClass=""):  # noqa: ARG002 pylint: disable=unused-argument
         """Return the anchor tag corresponding the current download file selection."""
         tagList = []
         try:
-            for fn, label in self.__downloadFileNameList:
+            for fn, label2 in self.__downloadFileNameList:
                 wP = os.path.join(self.__webDownloadDirPath, fn)
-                tagList.append('<a class="%s" href="%s" target="%s">%s</a>' % (cssClass, wP, target, label))
+                tagList.append('<a class="%s" href="%s" target="%s">%s</a>' % (cssClass, wP, target, label2))
         except:  # noqa: E722 pylint: disable=bare-except
             pass
         return tagList

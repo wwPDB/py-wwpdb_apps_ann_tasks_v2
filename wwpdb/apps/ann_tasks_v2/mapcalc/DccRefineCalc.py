@@ -10,18 +10,20 @@
 Manage DCC refinement calculation from model coordinates and structure factors.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -49,7 +51,7 @@ class DccRefineCalc(SessionWebDownloadUtils):
     def setArguments(self, dccArgs):
         self.__dccArgs = dccArgs
 
-    def run(self, entryId, modelInputFile=None, expInputFile=None, updateInput=True):  # pylint: disable=unused-argument
+    def run(self, entryId, modelInputFile=None, expInputFile=None, updateInput=True):  # noqa: ARG002 pylint: disable=unused-argument
         """Run the DCC calculation"""
         try:
             if modelInputFile is None:

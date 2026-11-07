@@ -7,6 +7,7 @@
 Manage the generating coordinate editor form
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -16,7 +17,7 @@ __version__ = "V0.07"
 try:
     import cPickle as pickle
 except ImportError:
-    import pickle as pickle
+    import pickle
 
 import json
 import os
@@ -27,7 +28,7 @@ import traceback
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
 
 
-class CoordEditorForm(object):
+class CoordEditorForm:
     """
     The CoordEditorForm class generates coordinate editor form.
 
@@ -69,7 +70,7 @@ class CoordEditorForm(object):
             return self.__generateEntryJson()
         #
         splitList = self.__identifier.split("_")
-        if len(splitList) == 3 and splitList[0] == "chain":
+        if len(splitList) == 3 and splitList[0] == "chain":  # noqa: PLR2004
             return self.__geterateChainJson(splitList[1], splitList[2])
         #
         return False
@@ -86,13 +87,13 @@ class CoordEditorForm(object):
             return self.__topEntryHtml()
         #
         splitList = self.__identifier.split("_")
-        if len(splitList) == 3:
+        if len(splitList) == 3:  # noqa: PLR2004
             if splitList[0] == "chain":
                 return self.__topChainHtml(splitList[1], splitList[2])
-            elif (splitList[0] == "Polymer") or (splitList[0] == "Nonpolymer") or (splitList[0] == "Water"):
+            if (splitList[0] == "Polymer") or (splitList[0] == "Nonpolymer") or (splitList[0] == "Water"):
                 return self.__typeChainHtml(splitList[0], splitList[1], splitList[2], self.__identifier)
             #
-        elif len(splitList) == 7 and splitList[0] == "res":
+        elif len(splitList) == 7 and splitList[0] == "res":  # noqa: PLR2004
             residueID = splitList[2] + " " + splitList[3] + " " + splitList[4] + splitList[5]
             return self.__residueHtml(splitList[1], splitList[2], residueID, "_".join(splitList[1:]))
         #
@@ -212,7 +213,12 @@ class CoordEditorForm(object):
                 entityLabel = "Entity ID: " + jsonObj["entity_id"] + ","
             #
             typeDict = {}
-            typeDict["Label"] = [entityLabel, jsonObj[Type][0]["Label"][3], jsonObj[Type][-1]["Label"][3], jsonObj[Type][-1]["Label"][2]]
+            typeDict["Label"] = [
+                entityLabel,
+                jsonObj[Type][0]["Label"][3],
+                jsonObj[Type][-1]["Label"][3],
+                jsonObj[Type][-1]["Label"][2],
+            ]
             #
             resList = []
             for residue in jsonObj[Type]:
@@ -349,9 +355,21 @@ class CoordEditorForm(object):
                 continue
             #
             if int(pickleObj[Type]["Label"][3]) > 1:
-                label = labelTemplates % (Type, pickleObj[Type]["Label"][0], pickleObj[Type]["Label"][1], pickleObj[Type]["Label"][2], pickleObj[Type]["Label"][3])
+                label = labelTemplates % (
+                    Type,
+                    pickleObj[Type]["Label"][0],
+                    pickleObj[Type]["Label"][1],
+                    pickleObj[Type]["Label"][2],
+                    pickleObj[Type]["Label"][3],
+                )
             else:
-                label = labelTemplate % (Type, pickleObj[Type]["Label"][0], pickleObj[Type]["Label"][1], pickleObj[Type]["Label"][2], pickleObj[Type]["Label"][3])
+                label = labelTemplate % (
+                    Type,
+                    pickleObj[Type]["Label"][0],
+                    pickleObj[Type]["Label"][1],
+                    pickleObj[Type]["Label"][2],
+                    pickleObj[Type]["Label"][3],
+                )
             #
             type_id = Type + "_" + mol_idx + "_" + chainID
             htmlcontent += self.__listItemTemplate % (type_id, label, type_id)
@@ -378,7 +396,7 @@ class CoordEditorForm(object):
     def __readPickleFile(self, filename):
         """Read pickle file"""
         fb = open(filename, "rb")
-        pickleObj = pickle.load(fb)
+        pickleObj = pickle.load(fb)  # noqa: S301
         fb.close()
         return pickleObj
 

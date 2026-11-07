@@ -8,18 +8,20 @@
 Resolve pdbx_database_related that point at other deposition s
 """
 
-import sys
-import os
-import tempfile
 import logging
+import os
+import sys
+import tempfile
+
 from mmcif.io.IoAdapterCore import IoAdapterCore
+
 from wwpdb.apps.ann_tasks_v2.related.DaInternalDb import DaInternalDb
 
 logger = logging.getLogger(__name__)
 
 
-class UpdateRelated(object):
-    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+class UpdateRelated:
+    def __init__(self, siteId=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         # self.__verbose = verbose
         # self.__lfh = log
         self.__siteId = siteId
@@ -93,6 +95,7 @@ class UpdateRelated(object):
         for dp in [os.path.dirname(fPath), ".", tempfile.gettempdir()]:
             if os.access(dp, os.W_OK):
                 return dp
+        return None  # which will cause an error upstream
 
     def __getContainerList(self, fPath):
         outDirPath = self.__getOutDir(fPath)
@@ -105,7 +108,7 @@ class UpdateRelated(object):
     def __writeContainerList(self, fPath, containerList):
         try:
             return self.__ioObj.writeFile(fPath, containerList)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("Failed to write out %s error: %s", fPath, str(e))
             return False
 

@@ -9,6 +9,7 @@
 Tests for model update using map header data  -
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -23,9 +24,10 @@ import time
 import traceback
 import unittest
 
-from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.utils.session.WebRequest import InputRequest
+
 from wwpdb.apps.ann_tasks_v2.nmr.NmrChemShiftProcessUtils import NmrChemShiftProcessUtils
 
 
@@ -56,7 +58,13 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         self.__inputModelFile = pI.getFilePath(self.__entryId, contentType="model", formatType="pdbx", fileSource="session", versionId="next")
         shutil.copyfile(archiveModelFile, self.__inputModelFile)
         #
-        archiveCsFile = pI.getFilePath(self.__entryId, contentType="nmr-chemical-shifts", formatType="pdbx", fileSource="archive", versionId="latest")
+        archiveCsFile = pI.getFilePath(
+            self.__entryId,
+            contentType="nmr-chemical-shifts",
+            formatType="pdbx",
+            fileSource="archive",
+            versionId="latest",
+        )
         self.__inputCsFile = pI.getFilePath(self.__entryId, contentType="nmr-chemical-shifts", formatType="pdbx", fileSource="session", versionId="next")
         shutil.copyfile(archiveCsFile, self.__inputCsFile)
         #
@@ -67,13 +75,43 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         self.__outputModelFile = pI.getFilePath(self.__entryId, contentType="model", formatType="pdbx", fileSource="session", versionId="next")
         self.__outputCsFile = pI.getFilePath(self.__entryId, contentType="nmr-chemical-shifts", formatType="pdbx", fileSource="session", versionId="next")
         self.__outputNefFile = pI.getFilePath(self.__entryId, contentType="nmr-data-str", formatType="pdbx", fileSource="session", versionId="next")
-        self.__outputReportFile = pI.getFilePath(self.__entryId, contentType="nmr-shift-error-report", formatType="json", fileSource="session", versionId="next")
+        self.__outputReportFile = pI.getFilePath(
+            self.__entryId,
+            contentType="nmr-shift-error-report",
+            formatType="json",
+            fileSource="session",
+            versionId="next",
+        )
         self.__validationReportFile = pI.getFilePath(self.__entryId, contentType="validation-report", formatType="pdf", fileSource="session", versionId="next")
         self.__validationDataFile = pI.getFilePath(self.__entryId, contentType="validation-data", formatType="xml", fileSource="session", versionId="next")
-        self.__fullReportFile = pI.getFilePath(self.__entryId, contentType="validation-report-full", formatType="pdf", fileSource="session", versionId="next")
-        self.__sliderPngFile = pI.getFilePath(self.__entryId, contentType="validation-report-slider", formatType="png", fileSource="session", versionId="next")
-        self.__sliderSvgFile = pI.getFilePath(self.__entryId, contentType="validation-report-slider", formatType="svg", fileSource="session", versionId="next")
-        self.__imageTargFile = pI.getFilePath(self.__entryId, contentType="validation-report-images", formatType="tar", fileSource="session", versionId="next")
+        self.__fullReportFile = pI.getFilePath(
+            self.__entryId,
+            contentType="validation-report-full",
+            formatType="pdf",
+            fileSource="session",
+            versionId="next",
+        )
+        self.__sliderPngFile = pI.getFilePath(
+            self.__entryId,
+            contentType="validation-report-slider",
+            formatType="png",
+            fileSource="session",
+            versionId="next",
+        )
+        self.__sliderSvgFile = pI.getFilePath(
+            self.__entryId,
+            contentType="validation-report-slider",
+            formatType="svg",
+            fileSource="session",
+            versionId="next",
+        )
+        self.__imageTargFile = pI.getFilePath(
+            self.__entryId,
+            contentType="validation-report-images",
+            formatType="tar",
+            fileSource="session",
+            versionId="next",
+        )
         self.__validationCifFile = pI.getFilePath(self.__entryId, contentType="validation-data", formatType="pdbx", fileSource="session", versionId="next")
 
     def tearDown(self):
@@ -88,7 +126,14 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
     def testUpdateModel(self):
         """Test case -  model file update with map header data"""
         startTime = time.time()
-        self.__lfh.write("\nStarting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+        self.__lfh.write(
+            "\nStarting %s %s at %s\n"
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+            )
+        )
         try:
             util = NmrChemShiftProcessUtils(siteId=self.__siteId, verbose=self.__verbose, log=self.__lfh)
             util.setWorkingDirPath(dirPath=self.__sessionPath)
@@ -120,7 +165,12 @@ class NmrChemShiftProcessUtilsTests(unittest.TestCase):
         endTime = time.time()
         self.__lfh.write(
             "\nCompleted %s %s at %s (%.2f seconds)\n"
-            % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+            % (
+                self.__class__.__name__,
+                inspect.currentframe().f_code.co_name,
+                time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                endTime - startTime,
+            )
         )
 
 

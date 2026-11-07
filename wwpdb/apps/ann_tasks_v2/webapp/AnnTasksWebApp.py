@@ -18,18 +18,19 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
 import os
 import sys
-import inspect
 
-from wwpdb.utils.session.WebRequest import InputRequest
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
+from wwpdb.utils.session.WebRequest import InputRequest
 
 from wwpdb.apps.ann_tasks_v2.webapp.AnnTasksWebAppWorker import AnnTasksWebAppWorker
 from wwpdb.apps.ann_tasks_v2.webapp.ReviewDataWebAppWorker import ReviewDataWebAppWorker
@@ -37,7 +38,7 @@ from wwpdb.apps.ann_tasks_v2.webapp.StatusUpdateWebAppWorker import StatusUpdate
 from wwpdb.apps.ann_tasks_v2.webapp.ValidationTasksWebAppWorker import ValidationTasksWebAppWorker
 
 
-class AnnTasksWebApp(object):
+class AnnTasksWebApp:
     """Handle request and response object processing for miscellaneous annotation tasks."""
 
     def __init__(self, parameterDict=None, verbose=False, log=sys.stderr, siteId="WWPDB_DEV"):

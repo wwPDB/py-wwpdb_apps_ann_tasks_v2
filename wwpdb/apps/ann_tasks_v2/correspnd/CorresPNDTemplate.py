@@ -7,20 +7,22 @@
 Generating correspondence to depositor template.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
-from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
+from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 
 
 class CorresPNDTemplate:
@@ -136,7 +138,7 @@ class CorresPNDTemplate:
             if "from_corres_info" in vdir and vdir["from_corres_info"] == "y":
                 self.__corres_items.append(vdir["token"])
             #
-            if "question" in vdir and vdir["question"]:
+            if vdir.get("question"):
                 self.__token_question_mapping[vdir["token"]] = vdir["question"]
                 if "include_in_em_map_only" in vdir and vdir["include_in_em_map_only"] == "y":
                     self.__em_map_only_questionList.append(vdir["question"])
@@ -183,7 +185,7 @@ class CorresPNDTemplate:
         try:
             cifObj = mmCIFUtil(filePath=reportPath)
             rows = cifObj.GetValue("pdbx_density")
-        except Exception:
+        except Exception:  # noqa: BLE001
             traceback.print_exc(file=self.__lfh)
             return
         #
@@ -229,7 +231,7 @@ class CorresPNDTemplate:
         #
         text = ""
         for dldir in dlist:
-            if not dldir["name"] in self.__valueMap:
+            if dldir["name"] not in self.__valueMap:
                 continue
             #
             if text:
@@ -247,7 +249,7 @@ class CorresPNDTemplate:
         #
         text = ""
         for dldir in dlist:
-            if not dldir["label"] in self.__valueMap:
+            if dldir["label"] not in self.__valueMap:
                 continue
             #
             if text:
@@ -270,7 +272,7 @@ class CorresPNDTemplate:
             calculated = self.__corresInfo.get("calculated_completeness")
             if calculated:
                 try:
-                    if float(calculated) < 65:
+                    if float(calculated) < 65:  # noqa: PLR2004
                         self.__corresInfo["calculated_completeness_low"] = calculated
                 except (TypeError, ValueError):
                     pass
@@ -279,13 +281,12 @@ class CorresPNDTemplate:
                 c1 = float(self.__corresInfo["reported_completeness"])
                 c2 = float(self.__corresInfo["calculated_completeness"])
                 cmin = c1
-                if c2 < cmin:
-                    cmin = c2
+                cmin = min(cmin, c2)
                 #
-                if (abs(c1 - c2) / cmin) > 0.1:
+                if (abs(c1 - c2) / cmin) > 0.1:  # noqa: PLR2004
                     self.__corresInfo["completeness_warning"] = "yes"
                 #
-                if abs(c1 - c2) > 20:
+                if abs(c1 - c2) > 20:  # noqa: PLR2004
                     self.__corresInfo["completeness_difference"] = "reported %s, calculated %s" % (
                         self.__corresInfo["reported_completeness"],
                         self.__corresInfo["calculated_completeness"],
@@ -628,8 +629,7 @@ class CorresPNDTemplate:
         #
         if self.__EmMapOnly:
             return self.__processTemplate(self.__ContentTemplateFileMapOnly, myD)
-        else:
-            return self.__processTemplate(self.__ContentTemplateFile, myD)
+        return self.__processTemplate(self.__ContentTemplateFile, myD)
 
     def __getMajorMinorText(self, checked_count, selectD, additionalD, flag):
         text = ""
@@ -644,7 +644,7 @@ class CorresPNDTemplate:
                 checked_count += 1
                 text += "\n" + str(checked_count) + ". " + qdir["question"] + "\n" + self.__getLigandText(qdir["text"]) + "\n"
             else:
-                if not qdir["question"] in selectD:
+                if qdir["question"] not in selectD:
                     continue
                 #
                 checked_count += 1
@@ -713,8 +713,8 @@ class CorresPNDTemplate:
                 if "text" in qdir:
                     context = qdir["text"] % self.__corresInfo
                 #
-                if ("additional_text" in qdir) and qdir["additional_text"]:
-                    if ("text_index" in qdir) and qdir["text_index"]:
+                if qdir.get("additional_text"):
+                    if qdir.get("text_index"):
                         if self.__javascript_text_mapping:
                             self.__javascript_text_mapping += ","
                         self.__javascript_text_mapping += '"' + qdir["text_index"] + '_text":"' + context.replace("\n", "$line_break$") + '",'
@@ -758,18 +758,16 @@ class CorresPNDTemplate:
         for item in ("pdbid", "entryid", "emdbid", "title", "title_em", "author", "author_em", "status_em"):
             myD[item] = self.__corresInfo[item]
         #
-        if ("emdbid" in myD) and myD["emdbid"]:
-            if ("pdbid" in myD) and myD["pdbid"]:
+        if myD.get("emdbid"):
+            if myD.get("pdbid"):
                 return self.__letterTemplateMap["header_pdb_em"] % myD
-            else:
-                self.__EmMapOnly = True
-                myD["warning"] = ""
-                if self.__em_map_only_question_text != "":
-                    myD["warning"] = "\nWarning:\n\n" + self.__em_map_only_question_text
-                #
-                return self.__letterTemplateMap["letter_em_only"] % myD
-        else:
-            return self.__letterTemplateMap["header"] % myD
+            self.__EmMapOnly = True
+            myD["warning"] = ""
+            if self.__em_map_only_question_text != "":
+                myD["warning"] = "\nWarning:\n\n" + self.__em_map_only_question_text
+            #
+            return self.__letterTemplateMap["letter_em_only"] % myD
+        return self.__letterTemplateMap["header"] % myD
 
     def __getEncourage(self):
         myD = {}
@@ -777,16 +775,15 @@ class CorresPNDTemplate:
             myD[item] = self.__corresInfo.get(item, "")
 
         if len(myD["nmr_entry"]) > 0:
-            print("NMR ENTRY - no encouragement")
+            self.__lfh.write("NMR ENTRY - no encouragement\n")
             return None
 
         if myD["emdbid"]:
             if myD["status_em"]:
                 # map only or map + model
                 return self.__letterTemplateMap["encourage_em"]
-            else:
-                # EM model only
-                return None
+            # EM model only
+            return None
 
         # Not EM and not NMR -- Xray
         return self.__letterTemplateMap["encourage_xray"]

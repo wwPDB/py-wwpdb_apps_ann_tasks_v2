@@ -15,6 +15,7 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
@@ -27,10 +28,10 @@ import sys
 #
 
 
-class CorresPNDGenerator(object):
+class CorresPNDGenerator:
     """Class responsible for parsing submitted form and generating correspondence"""
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         # self.__verbose = verbose
         # self.__lfh = log
         self.__reqObj = reqObj
@@ -57,11 +58,10 @@ class CorresPNDGenerator(object):
         """Encoding unicode/utf-8 content into cif friendly ascii
         Have to replace any ';' that begin a newline with a ' ;' in order to preserve ; matching required for multiline items
         """
-        if sys.version_info[0] < 3:
+        if sys.version_info[0] < 3:  # noqa: UP036,PLR2004
             return p_content.encode("ascii", "xmlcharrefreplace").replace("\n;", "\n ;").replace("\\xa0", " ")
-        else:
-            # Coming in as string already - no need to encode to bytes, however, we would like the xml character replacement
-            return p_content.encode("ascii", "xmlcharrefreplace").decode("ascii").replace("\n;", "\n ;").replace("\\xa0", " ")
+        # Coming in as string already - no need to encode to bytes, however, we would like the xml character replacement
+        return p_content.encode("ascii", "xmlcharrefreplace").decode("ascii").replace("\n;", "\n ;").replace("\\xa0", " ")
 
     # def __parseForm(self):
     #     number = int(str(self.__reqObj.getValue("number_question")))

@@ -8,20 +8,21 @@
 Manage tabular presentation of local electron maps with options for 3D display --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 
 from mmcif_utils.pdbx.PdbxIo import PdbxLocalMapIndexIo
 
 
-class MapDisplay(object):
+class MapDisplay:
     """
     Manage tabular presentation of local electron maps with options for 3D display --
 
@@ -46,10 +47,14 @@ class MapDisplay(object):
         ok = pio.setFilePath(filePath=indexPath)
         if ok:
             return pio.getAttribDictList("dcc_ligand")
-        else:
-            return {}
+        return {}
 
-    def renderLocalMapTable(self, rowDL, title="Table of local electron density maps for non-polymer chemical components", subdir="np-cc-maps"):
+    def renderLocalMapTable(
+        self,
+        rowDL,
+        title="Table of local electron density maps for non-polymer chemical components",
+        subdir="np-cc-maps",
+    ):
         """ """
 
         colList = [
@@ -92,7 +97,15 @@ class MapDisplay(object):
         # column headers --
         oL.append("<tr>")
         for col in colList:
-            if col not in ["id", "residue_name", "chain_id", "dcc_correlation", "real_space_R", "Biso_mean", "occupancy_mean"]:
+            if col not in [
+                "id",
+                "residue_name",
+                "chain_id",
+                "dcc_correlation",
+                "real_space_R",
+                "Biso_mean",
+                "occupancy_mean",
+            ]:
                 continue
             oL.append("<th>")
             oL.append("%s" % colDisplayD[col])
@@ -124,7 +137,14 @@ class MapDisplay(object):
                         viewoptD = "<a href='%s'>&sigma;=0.8</a>" % (jsurl)
 
                         oL.append('<td class="width15">%s&nbsp;|&nbsp;%s&nbsp;|&nbsp;%s&nbsp;|&nbsp;%s</td>' % (viewoptA, viewoptB, viewoptC, viewoptD))
-                elif col in ["residue_name", "chain_id", "dcc_correlation", "real_space_R", "Biso_mean", "occupancy_mean"]:
+                elif col in [
+                    "residue_name",
+                    "chain_id",
+                    "dcc_correlation",
+                    "real_space_R",
+                    "Biso_mean",
+                    "occupancy_mean",
+                ]:
                     oL.append('<td class="width10 textleft">%s</td>' % rowD[col])
                 else:
                     # self.__lfh.write("+MapDisplay.renderLocalMapTable() missing columnn %r\n" % col)

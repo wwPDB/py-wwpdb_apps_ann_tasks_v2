@@ -8,19 +8,21 @@
 Manage utility to convert mtz to mmCIF
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
 from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon
+
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
@@ -54,10 +56,9 @@ class MtzTommCIF(SessionWebDownloadUtils):
             #
             if self.__taskFormId == "#mtz-mmcif-conversion-form":
                 return self.__generateInputForm(logPath)
-            elif self.__taskFormId == "#mtz-mmcif-semi-auto-conversion-form":
+            if self.__taskFormId == "#mtz-mmcif-semi-auto-conversion-form":
                 return self.__convertMtzTommCIF(expFileName, retPath, logPath)
-            else:
-                return False
+            return False
             #
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
@@ -97,10 +98,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
 
     def __bashSetting(self, html=False):
         setting = (
-            " PACKAGE_DIR="
-            + self.__packagePath
-            + "; export PACKAGE_DIR; "
-            + " SF_PATH=${PACKAGE_DIR}/sf-valid; export SF_PATH; "
+            " PACKAGE_DIR=" + self.__packagePath + "; export PACKAGE_DIR; " + " SF_PATH=${PACKAGE_DIR}/sf-valid; export SF_PATH; "
             # + " CCP4_PATH=${PACKAGE_DIR}/ccp4; export CCP4_PATH; "
             # + " PHENIX_PATH=${PACKAGE_DIR}/phenix; export PHENIX_PATH; "
             # + " source ${CCP4_PATH}/bin/ccp4.setup-sh; source ${PHENIX_PATH}/phenix_env.sh; "
@@ -131,7 +129,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
         #
         if os.access(self.__mtzLogPath, os.R_OK) and os.access(self.__htmlPath, os.R_OK):
             cmd = "cat " + self.__mtzLogPath + " >> " + logPath + " ; "
-            os.system(cmd)
+            os.system(cmd)  # noqa: S605
             self.addDownloadPath(logPath)
             #
             self.__readHtmlText()
@@ -176,7 +174,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
         cmd = "cd " + self.__sessionPath + " ; " + self.__bashSetting(html) + options
         if self.__verbose:
             self.__lfh.write("MtzTommCIF command: %s\n" % cmd)
-        os.system(cmd)
+        os.system(cmd)  # noqa: S605
 
     def __readHtmlText(self):
         """ """
@@ -194,7 +192,7 @@ class MtzTommCIF(SessionWebDownloadUtils):
                 # elif line.startswith('<input type="hidden"  name='):
                 #    break
                 elif (
-                    (not start)
+                    (not start)  # noqa: PIE810
                     or line.startswith("<form ENCTYPE=")
                     or line.startswith("<INPUT TYPE=SUBMIT NAME=")
                     or line.startswith("<INPUT TYPE=RESET VALUE")
@@ -311,4 +309,4 @@ if __name__ == "__main__":
     #
     calc = MtzTommCIF(reqObj=myReqObj, verbose=True, log=sys.stderr)
     calc.run("D_1000223249", "D_1000223249_sf_P1.cif")
-    print(calc.getHtmlText())
+    print(calc.getHtmlText())  # noqa: T201

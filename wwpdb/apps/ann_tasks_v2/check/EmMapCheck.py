@@ -9,21 +9,23 @@
 Check consistencies between em_map category vs. map files in archival directory
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
-import os.path
-import os
 import inspect
 import logging
+import os
+import os.path
+import sys
 
 from mmcif.io.IoAdapterCore import IoAdapterCore
-from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 from wwpdb.io.locator.PathInfo import PathInfo
+
+from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 logger = logging.getLogger()
 
@@ -85,7 +87,14 @@ class EmMapCheck(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s em_map check completed for entryId %s file %s report %s size %d\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, modelInputFile, self.__reportPath, self.__reportFileSize)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        entryId,
+                        modelInputFile,
+                        self.__reportPath,
+                        self.__reportFileSize,
+                    )
                 )
             #
         except Exception as e:
@@ -110,7 +119,7 @@ class EmMapCheck(SessionWebDownloadUtils):
         #
 
 
-class EmMapCheckTask(object):
+class EmMapCheckTask:
     """ """
 
     def __init__(self, siteId=None, sessionPath=None, verbose=False, log=sys.stderr):
@@ -132,16 +141,15 @@ class EmMapCheckTask(object):
         if not cObj:
             # No em_admin
             return
-        else:
-            has_deposition_date = False
-            valueList = self.__getValueList(cObj)
-            for valueD in valueList:
-                if ("deposition_date" in valueD) and valueD["deposition_date"]:
-                    has_deposition_date = True
-                #
+        has_deposition_date = False
+        valueList = self.__getValueList(cObj)
+        for valueD in valueList:
+            if valueD.get("deposition_date"):
+                has_deposition_date = True
             #
-            if not has_deposition_date:
-                return
+        #
+        if not has_deposition_date:
+            return
             #
         #
         recordedMapList = []
@@ -149,7 +157,7 @@ class EmMapCheckTask(object):
         if emMapObj:
             valueList = self.__getValueList(emMapObj)
             for valueD in valueList:
-                if ("file" in valueD) and valueD["file"]:
+                if valueD.get("file"):
                     recordedMapList.append(valueD["file"])
                 #
             #
@@ -174,7 +182,13 @@ class EmMapCheckTask(object):
             partNum = 1
             while True:
                 archiveFilePath = pI.getFilePath(
-                    dataSetId=entryId, wfInstanceId=None, contentType=mapType, formatType="map", fileSource="archive", versionId="latest", partNumber=str(partNum)
+                    dataSetId=entryId,
+                    wfInstanceId=None,
+                    contentType=mapType,
+                    formatType="map",
+                    fileSource="archive",
+                    versionId="latest",
+                    partNumber=str(partNum),
                 )
                 if (not archiveFilePath) or (not os.access(archiveFilePath, os.F_OK)):
                     break

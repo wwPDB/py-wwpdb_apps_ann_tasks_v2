@@ -10,23 +10,24 @@
 Test cases for the PISA XML parser.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.001"
 
-import sys
-import unittest
-import traceback
 import os
 import os.path
+import sys
+import traceback
+import unittest
 
 if __package__ is None or __package__ == "":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from commonsetup import HERE, TESTOUTPUT  # noqa:  F401 pylint: disable=import-error,unused-import
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from commonsetup import HERE, TESTOUTPUT  # pylint: disable=import-error
 else:
-    from .commonsetup import HERE, TESTOUTPUT  # noqa: F401 pylint: disable=relative-beyond-top-level
+    from .commonsetup import HERE, TESTOUTPUT
 
 from wwpdb.apps.ann_tasks_v2.io.PisaReader import PisaAssemblyReader
 
@@ -62,7 +63,5 @@ def suitePisaTests():
 
 
 if __name__ == "__main__":
-    #
     mySuite = suitePisaTests()
     unittest.TextTestRunner(verbosity=2).run(mySuite)
-    #

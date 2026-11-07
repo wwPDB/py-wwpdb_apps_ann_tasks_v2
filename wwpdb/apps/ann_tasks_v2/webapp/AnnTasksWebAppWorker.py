@@ -27,19 +27,24 @@ This software is provided under a Creative Commons Attribution 3.0 Unported
 License described at http://creativecommons.org/licenses/by/3.0/.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
 import json
+import logging
 import os
 import sys
-import inspect
-import logging
 
-from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
+from wwpdb.io.file.DataExchange import DataExchange
+from wwpdb.io.file.mmCIFUtil import mmCIFUtil
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.session.WebRequest import ResponseContent
+
 from wwpdb.apps.ann_tasks_v2.assembly.AssemblySelect import AssemblySelect
 from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.expIoUtils.MtzTommCIF import MtzTommCIF
@@ -53,11 +58,7 @@ from wwpdb.apps.ann_tasks_v2.utils.TaskSessionState import TaskSessionState
 from wwpdb.apps.ann_tasks_v2.utils.TlsRange import TlsRange
 from wwpdb.apps.ann_tasks_v2.utils.UpdateCloseContact import UpdateCloseContact
 from wwpdb.apps.ann_tasks_v2.utils.UpdateCovalentBond import UpdateCovalentBond
-
-from wwpdb.utils.session.WebRequest import ResponseContent
-from wwpdb.io.file.DataExchange import DataExchange
-from wwpdb.io.file.mmCIFUtil import mmCIFUtil
-from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.apps.ann_tasks_v2.webapp.CommonTasksWebAppWorker import CommonTasksWebAppWorker
 
 logger = logging.getLogger(__name__)
 
@@ -214,9 +215,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             wfStatusUpdate = False
         else:
             skipStatus = str(self._reqObj.getValue("skipstatus")).strip()
-            if skipStatus.lower() in ["yes", "y"]:
-                wfStatusUpdate = False
-            elif skipStatus.lower() in ["no", "n"]:
+            if skipStatus.lower() in ["yes", "y"] or skipStatus.lower() in ["no", "n"]:
                 wfStatusUpdate = False
         #
         #
@@ -227,7 +226,14 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if self._verbose:
             self._lfh.write(
                 "+%s.%s() -- fileSource: %s identifier %s instance %s standalonemode %s\n"
-                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, fileSource, identifier, instanceWf, standaloneMode)
+                % (
+                    self.__class__.__name__,
+                    inspect.currentframe().f_code.co_name,
+                    fileSource,
+                    identifier,
+                    instanceWf,
+                    standaloneMode,
+                )
             )
         if bIsWorkflow:
             # save wf state for status update --
@@ -256,9 +262,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                 self._lfh.write(
                     "+%s.%s() - TRACKING status, update to 'open' failed for session %s \n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
-            else:
-                if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
+            elif self._verbose:
+                self._lfh.write("+%s.%s() Tracking status set to open\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
             #
             if bSuccess:
                 wfStatus = "completed"
@@ -309,7 +314,9 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             data = ifh.read()
             ifh.close()
             #
-            title = "Comp_id,Link_id,Modified_residue_id,Type,Category,Position,Polypeptide_position,Comp_id_linking_atom,Modified_residue_id_linking_atom,First_instance_model_db_code"
+            title = (
+                "Comp_id,Link_id,Modified_residue_id,Type,Category,Position,Polypeptide_position,Comp_id_linking_atom,Modified_residue_id_linking_atom,First_instance_model_db_code"
+            )
             if data.startswith(title):
                 missingpcmstatus = "yes"
             #
@@ -365,17 +372,41 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if sfOk:
             htmlList.append(
                 '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entryexpfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
-                % (sessionId, entryId, entryFileName, entryExpFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+                % (
+                    sessionId,
+                    entryId,
+                    entryFileName,
+                    entryExpFileName,
+                    wfStatus,
+                    standaloneMode,
+                    auto_assembly_status_url,
+                )
             )
         elif nmrDataOk:
             htmlList.append(
                 '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrynmrdatafilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
-                % (sessionId, entryId, entryFileName, entryNmrDataFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+                % (
+                    sessionId,
+                    entryId,
+                    entryFileName,
+                    entryNmrDataFileName,
+                    wfStatus,
+                    standaloneMode,
+                    auto_assembly_status_url,
+                )
             )
         elif csOk:
             htmlList.append(
                 '<meta http-equiv="REFRESH" content="0;url=/ann_tasks_v2/wf-startup-template.html?sessionid=%s&entryid=%s&entryfilename=%s&entrycsfilename=%s&wfstatus=%s&standalonemode=%s%s"></head>'  # noqa: E501
-                % (sessionId, entryId, entryFileName, entryCsFileName, wfStatus, standaloneMode, auto_assembly_status_url)
+                % (
+                    sessionId,
+                    entryId,
+                    entryFileName,
+                    entryCsFileName,
+                    wfStatus,
+                    standaloneMode,
+                    auto_assembly_status_url,
+                )
             )
         else:
             htmlList.append(
@@ -511,7 +542,14 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         if os.access(pdbxPath, os.F_OK):
             filelist.append([entryId + "_correspondence-to-depositor_P1.txt", "correspondence-to-depositor", "txt"])
         #
-        dE = DataExchange(reqObj=self._reqObj, depDataSetId=identifier, wfInstanceId=instanceWf, fileSource=fileSource, verbose=self._verbose, log=self._lfh)
+        dE = DataExchange(
+            reqObj=self._reqObj,
+            depDataSetId=identifier,
+            wfInstanceId=instanceWf,
+            fileSource=fileSource,
+            verbose=self._verbose,
+            log=self._lfh,
+        )
         #
         for flist in filelist:
             pdbxPath = os.path.join(self._sessionPath, flist[0])
@@ -548,9 +586,8 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
                 self._lfh.write(
                     "+%s.%s() - updating tracking status to closed(0) failed for session %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, self._sessionId)
                 )
-            else:
-                if self._verbose:
-                    self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
+            elif self._verbose:
+                self._lfh.write("+%s.%s() Tracking status set to closed(0)\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name))
         #
         else:
             bSuccess = True
@@ -585,7 +622,15 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="TLS range correction", formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(
+            name="TLS range correction",
+            formId=taskFormId,
+            args=taskArgs,
+            completionFlag=ok,
+            tagList=tagL,
+            entryId=entryId,
+            entryFileName=fileName,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -620,7 +665,15 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name=displayName, formId=displayTaskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryExpFileName=expFileName)
+        tss.assign(
+            name=displayName,
+            formId=displayTaskFormId,
+            args=taskArgs,
+            completionFlag=ok,
+            tagList=tagL,
+            entryId=entryId,
+            entryExpFileName=expFileName,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
         if ok:
             html = calc.getHtmlText()
@@ -653,7 +706,15 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Correcting free R set form", formId=taskFormId, args=taskArgs, completionFlag=ok, tagList=tagL, entryId=entryId, entryExpFileName=expFileName)
+        tss.assign(
+            name="Correcting free R set form",
+            formId=taskFormId,
+            args=taskArgs,
+            completionFlag=ok,
+            tagList=tagL,
+            entryId=entryId,
+            entryExpFileName=expFileName,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
         #
         return rC
@@ -703,7 +764,14 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             #
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Chemical shift processing", formId=taskFormId, args="", completionFlag=True, tagList=tagL, entryId=entryId)
+        tss.assign(
+            name="Chemical shift processing",
+            formId=taskFormId,
+            args="",
+            completionFlag=True,
+            tagList=tagL,
+            entryId=entryId,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
         rC.setHtmlText(self.__getNmrDiagnosticsHtmlText(entryId))
 
@@ -730,7 +798,14 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
             #
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Chemical shift processing", formId=taskFormId, args="", completionFlag=True, tagList=tagL, entryId=entryId)
+        tss.assign(
+            name="Chemical shift processing",
+            formId=taskFormId,
+            args="",
+            completionFlag=True,
+            tagList=tagL,
+            entryId=entryId,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
         rC.setHtmlText(self.__getNmrDiagnosticsHtmlText(entryId))
 
@@ -780,7 +855,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         close_contact_num_str = self._reqObj.getValue("total_close_contact_num")
         if close_contact_num_str:
             close_contact_num = int(close_contact_num_str)
-            for i in range(0, close_contact_num):
+            for i in range(close_contact_num):
                 close_contact = self._reqObj.getValue("close_contact_" + str(i))
                 if close_contact:
                     close_contact_list.append(close_contact)
@@ -802,7 +877,15 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Update link from close contact", formId="#review-close-contact-form", args="", completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(
+            name="Update link from close contact",
+            formId="#review-close-contact-form",
+            args="",
+            completionFlag=ok,
+            tagList=tagL,
+            entryId=entryId,
+            entryFileName=fileName,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC
@@ -837,7 +920,7 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         covalent_bond_num_str = self._reqObj.getValue("total_covalent_bond_num")
         if covalent_bond_num_str:
             covalent_bond_num = int(covalent_bond_num_str)
-            for i in range(0, covalent_bond_num):
+            for i in range(covalent_bond_num):
                 covalent_bond = self._reqObj.getValue("covalent_bond_" + str(i))
                 if covalent_bond:
                     covalent_bond_list.append(covalent_bond)
@@ -859,7 +942,15 @@ class AnnTasksWebAppWorker(CommonTasksWebAppWorker):
         tagL = calc.getAnchorTagList(label=None, target="_blank", cssClass="")
         #
         tss = TaskSessionState(reqObj=self._reqObj, verbose=self._verbose, log=self._lfh)
-        tss.assign(name="Remove covalent bond(s)", formId="#review-covalent-bond-form", args="", completionFlag=ok, tagList=tagL, entryId=entryId, entryFileName=fileName)
+        tss.assign(
+            name="Remove covalent bond(s)",
+            formId="#review-covalent-bond-form",
+            args="",
+            completionFlag=ok,
+            tagList=tagL,
+            entryId=entryId,
+            entryFileName=fileName,
+        )
         rC = self._makeTaskResponse(tssObj=tss)
 
         return rC

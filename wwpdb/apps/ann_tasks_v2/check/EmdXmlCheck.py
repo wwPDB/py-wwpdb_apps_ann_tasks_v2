@@ -9,20 +9,22 @@
 EMD XML generation check
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Ezra Peisach"
 __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
-import os.path
-import os
 import logging
+import os
+import os.path
+import sys
+
+from mmcif.io.IoAdapterCore import IoAdapterCore
 
 from wwpdb.apps.ann_tasks_v2.em3d.EmHeaderUtils import EmHeaderUtils
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
-from mmcif.io.IoAdapterCore import IoAdapterCore
 
 logger = logging.getLogger()
 

@@ -10,6 +10,7 @@
 Wrapper for reading NMR chemical shifts validation information from PDB Validation XML report.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zukang.feng@rcsb.org"
@@ -22,9 +23,8 @@ from wwpdb.apps.ann_tasks_v2.correspnd.ValidateXml import ValidateXml
 from wwpdb.apps.ann_tasks_v2.report.styles.CSValidationReport import CSValidationReportStyle
 
 
-class CSValidationReportIo(object):
-    """ Methods for reading NMR chemical shifts validation information details.
-    """
+class CSValidationReportIo:
+    """Methods for reading NMR chemical shifts validation information details."""
 
     def __init__(self, verbose=True, log=sys.stderr):
         self.__verbose = verbose
@@ -38,8 +38,7 @@ class CSValidationReportIo(object):
         self.__dataDict = {}
 
     def setFilePath(self, filePath, idCode=None):
-        """ Specify the file path for the target.
-        """
+        """Specify the file path for the target."""
         self.__filePath = filePath
         self.__idCode = idCode
         #
@@ -49,19 +48,17 @@ class CSValidationReportIo(object):
         self.__readFile()
 
     def getCurrentContainerId(self):
-        """
-        """
+        """ """
         return self.__idCode
 
     def getCurrentCategoryNameList(self):
-        """
-        """
+        """ """
         try:
             catList = []
             #
             categoryList = self.__st.getCategoryList()
             for category in categoryList:
-                if (category in self.__dataDict) and self.__dataDict[category]:
+                if self.__dataDict.get(category):
                     catList.append(category)
                 #
             #
@@ -75,16 +72,14 @@ class CSValidationReportIo(object):
         #
 
     def getCategory(self, catName="pdbx_nmr_chemical_shift_validation_statistics"):
-        """
-        """
-        if (catName in self.__dataDict) and self.__dataDict[catName]:
+        """ """
+        if self.__dataDict.get(catName):
             return self.__dataDict[catName]
         #
         return []
 
     def __readFile(self):
-        """ Read XML Validation Report
-        """
+        """Read XML Validation Report"""
         try:
             categoryList = self.__st.getCategoryList()
 

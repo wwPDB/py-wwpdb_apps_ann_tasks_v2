@@ -12,14 +12,16 @@ Create tabular HTML reports from chemical reference definitions.
 This version uses Bootstrap CSS framework constructs.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.01"
 
-import sys
 import random
+import sys
+
 from wwpdb.apps.ann_tasks_v2.depict.PdbxDepictBootstrapBase import PdbxDepictBootstrapBase
 
 
@@ -56,10 +58,11 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         [(categoryName, categoryAbbrev, displayStyle (row-wise,column-wise)], ... ]
         """
         #
-        if self.__st.getStyleId() in ["PDBX_T1"]:
-            self.__reportCategories = [("citation", "citation", "row-wise"), ("citation_author", "citation_author", "row-wise")]
-        elif self.__st.getStyleId() in ["PDBX_T2"]:
-            self.__reportCategories = [("citation", "citation", "row-wise"), ("citation_author", "citation_author", "row-wise")]
+        if self.__st.getStyleId() in ["PDBX_T1"] or self.__st.getStyleId() in ["PDBX_T2"]:
+            self.__reportCategories = [
+                ("citation", "citation", "row-wise"),
+                ("citation_author", "citation_author", "row-wise"),
+            ]
         elif self.__st.getStyleId() in ["PDBX_REPORT_V1"]:
             self.__reportCategories = [
                 ("pdbx_data_processing_status", "Data Processing Skip Tasks", "row-wise"),
@@ -146,8 +149,16 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
             ]
         elif self.__st.getStyleId() in ["NMR_CHEMICAL_SHIFT_VALIDATION_REPORT_V1"]:
             self.__reportCategories = [
-                ("pdbx_nmr_chemical_shift_validation_statistics", "The number of nuclei with statistically unusual chemical shifts", "column-wise"),
-                ("pdbx_nmr_chemical_shift_not_found_list", "List of chemical shifts with no matching atom found in the structure", "row-wise")
+                (
+                    "pdbx_nmr_chemical_shift_validation_statistics",
+                    "The number of nuclei with statistically unusual chemical shifts",
+                    "column-wise",
+                ),
+                (
+                    "pdbx_nmr_chemical_shift_not_found_list",
+                    "List of chemical shifts with no matching atom found in the structure",
+                    "row-wise",
+                ),
             ]
         else:
             self.__lfh.write("Error: PdbxReportDepict.__setup unknown style %s\n" % self.__st.getStyleId())
@@ -157,12 +168,11 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         """ """
         if style in ["tabs"]:
             return self.__doRenderTabs(eD)
-        elif style in ["accordion", "multiaccordion"]:
+        if style in ["accordion", "multiaccordion"]:
             return self.__doRenderAccordion(eD)
-        elif style in ["page-multiaccordion", "page-accordion"]:
+        if style in ["page-multiaccordion", "page-accordion"]:
             return self.__doRenderPage(eD, leadingHtmlL, trailingHtmlL)
-        else:
-            return []
+        return []
 
     def __doRenderPage(self, eD, leadingHtmlL, trailingHtmlL):
         """
@@ -215,7 +225,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         </div>
 
         """
-        idPrefix = "tab" + str(random.randint(0, 100000))
+        idPrefix = "tab" + str(random.randint(0, 100000))  # noqa: S311
         catList = self.__reportCategories
         #
         if self.__debug:
@@ -239,7 +249,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         oL.append('<ul class="nav nav-tabs">')
         oL.append('<li><a  class="active" href="#%s-tabs-id" data-toggle="tab">%s</a></li>' % (idPrefix, idCode))
 
-        for ii, (catName, catNameAbbrev, catStyle) in enumerate(catList):
+        for ii, (catName, catNameAbbrev, _catStyle) in enumerate(catList):
             # For only popuated categories
             if catName in cD and (len(cD[catName]) > 0):
                 oL.append('<li><a href="#%s-tabs-%d" data-toggle="tab">%s</a></li>' % (idPrefix, ii, catNameAbbrev))
@@ -251,7 +261,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         #
         oL.append('<div class="tab-pane active"  id="%s-tabs-id"></div>' % (idPrefix))
 
-        for ii, (catName, catNameAbbrev, catStyle) in enumerate(catList):
+        for ii, (catName, _catNameAbbrev, catStyle) in enumerate(catList):
             # For only popuated categories
             if catName in cD and (len(cD[catName]) > 0):
                 oL.append('<div class="tab-pane"  id="%s-tabs-%d">' % (idPrefix, ii))
@@ -301,7 +311,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         #
 
         #
-        idPrefix = "acc" + str(random.randint(0, 100000))
+        idPrefix = "acc" + str(random.randint(0, 100000))  # noqa: S311
         oL = []
         catList = self.__reportCategories
         self.__requestHost = eD["requestHost"]
@@ -419,7 +429,7 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         #
         #
 
-    def __renderRow(self, catName, row, iRow, oL, insertDefault=False, insertCode="", opNum=0):  # pylint: disable=unused-argument
+    def __renderRow(self, catName, row, iRow, oL, insertDefault=False, insertCode="", opNum=0):  # noqa: ARG002 pylint: disable=unused-argument
         """Render a row in a multirow table."""
         oL.append("<tr>")
         #
@@ -496,13 +506,22 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
                     rD[itemName2] = '<a target="_blank" href="%s">%s</a>' % (srcValue, srcValue)
 
                 if srcType == "PMCID" and len(srcValue) > 2:
-                    rD[itemName2] = '<a target="_blank" href="http://www.ncbi.nlm.nih.gov/pmc/?term=%s">%s</a>' % (srcValue, srcValue)
+                    rD[itemName2] = '<a target="_blank" href="http://www.ncbi.nlm.nih.gov/pmc/?term=%s">%s</a>' % (
+                        srcValue,
+                        srcValue,
+                    )
 
                 if srcType == "PMC" and len(srcValue) > 2:
-                    rD[itemName2] = '<a target="_blank" href="http://www.ncbi.nlm.nih.gov/pmc/?term=%s">%s</a>' % (srcValue, srcValue)
+                    rD[itemName2] = '<a target="_blank" href="http://www.ncbi.nlm.nih.gov/pmc/?term=%s">%s</a>' % (
+                        srcValue,
+                        srcValue,
+                    )
 
                 if srcType == "UNIPROT" and len(srcValue) > 2:
-                    rD[itemName2] = '<a target="_blank" href="http://www.uniprot.org/uniprot/%s">%s</a>' % (srcValue, srcValue)
+                    rD[itemName2] = '<a target="_blank" href="http://www.uniprot.org/uniprot/%s">%s</a>' % (
+                        srcValue,
+                        srcValue,
+                    )
 
         if catName == "citation":
             itemName = "_citation.pdbx_database_id_DOI"
@@ -572,5 +591,4 @@ class PdbxReportDepictBootstrap(PdbxDepictBootstrapBase):
         i = name.find(".")
         if i == -1:
             return None
-        else:
-            return name[i + 1 :]
+        return name[i + 1 :]

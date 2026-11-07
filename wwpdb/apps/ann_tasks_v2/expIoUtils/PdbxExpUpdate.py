@@ -6,8 +6,9 @@
 #
 ##
 """
-    Extract selected items from the current model file and update these in experimental reflection file -
+Extract selected items from the current model file and update these in experimental reflection file -
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -17,9 +18,9 @@ __version__ = "V0.07"
 
 import inspect
 import os
+import re
 import sys
 import time
-import re
 import traceback
 
 from wwpdb.apps.ann_tasks_v2.expIoUtils.PdbxExpIoUtils import PdbxExpFileIo, PdbxExpIoUtils
@@ -58,10 +59,10 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             return
         #
         input_number = int(self.__reqObj.getValue("total_input_text_count"))
-        if input_number < 6:
+        if input_number < 6:  # noqa: PLR2004
             return
         #
-        for i in range(0, input_number):
+        for i in range(input_number):
             wavelength = self.__reqObj.getValue("wavelength_" + str(i))
             if not wavelength:
                 continue
@@ -108,7 +109,14 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
         startTime = time.time()
         if self.__verbose:
             self.__lfh.write("\n\n========================================================================================================\n")
-            self.__lfh.write("Starting %s %s at %s\n" % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime())))
+            self.__lfh.write(
+                "Starting %s %s at %s\n"
+                % (
+                    self.__class__.__name__,
+                    inspect.currentframe().f_code.co_name,
+                    time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                )
+            )
         #
         returnFlag = True
         try:
@@ -205,8 +213,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                         modelMuList.append((str(len(modelWvList)), mu, wt))
                     #
                 #
-                if len(modelWvList) > self.__maximalWavelengthNumber:
-                    self.__maximalWavelengthNumber = len(modelWvList)
+                self.__maximalWavelengthNumber = max(self.__maximalWavelengthNumber, len(modelWvList))
                 #
                 # Get wavelength list from current reflection data section ...
                 #
@@ -250,8 +257,7 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                         #
                     #
                 #
-                if len(expWvList) > self.__maximalWavelengthNumber:
-                    self.__maximalWavelengthNumber = len(expWvList)
+                self.__maximalWavelengthNumber = max(self.__maximalWavelengthNumber, len(expWvList))
                 #
                 diffFlag = False
                 updateFlag = True
@@ -273,14 +279,13 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                     elif expModelFlag:
                         # sf file has more wavelengths, set diffFlag
                         diffFlag = True
+                    # check if has wavelength = 1 in sf file
+                    elif (len(expWvList) == 1) and exp_wavelength_1:
+                        expMuList = modelMuList
+                        expWvList = modelWvList
                     else:
-                        # check if has wavelength = 1 in sf file
-                        if (len(expWvList) == 1) and exp_wavelength_1:
-                            expMuList = modelMuList
-                            expWvList = modelWvList
-                        else:
-                            # real difference
-                            diffFlag = True
+                        # real difference
+                        diffFlag = True
                         #
                     #
                 elif modelMuList:
@@ -359,7 +364,12 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             endTime = time.time()
             self.__lfh.write(
                 "\nCompleted %s %s at %s (%.2f seconds)\n"
-                % (self.__class__.__name__, inspect.currentframe().f_code.co_name, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - startTime)
+                % (
+                    self.__class__.__name__,
+                    inspect.currentframe().f_code.co_name,
+                    time.strftime("%Y %m %d %H:%M:%S", time.localtime()),
+                    endTime - startTime,
+                )
             )
         #
         return returnFlag
@@ -372,9 +382,8 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
             replacement = r"\n#END\ndata_"
             reObj = re.compile(pattern, re.MULTILINE | re.DOTALL | re.VERBOSE)
             # Flush changes made to the in-memory copy of the file back to disk
-            with open(outFn, "w") as ofh:
-                with open(inpFn, "r") as ifh:
-                    ofh.write(reObj.sub(replacement, ifh.read()) + "\n#END OF REFLECTIONS\n")
+            with open(outFn, "w") as ofh, open(inpFn, "r") as ifh:
+                ofh.write(reObj.sub(replacement, ifh.read()) + "\n#END OF REFLECTIONS\n")
             return True
         except:  # noqa: E722 pylint: disable=bare-except
             if self.__verbose:
@@ -404,16 +413,17 @@ class PdbxExpUpdate(SessionWebDownloadUtils):
                 newWvlist.append(val)
                 continue
             #
-            while val[-1] == "0":
-                val = val[:-1]
+            val2 = val  # To not update iterator
+            while val2[-1] == "0":
+                val2 = val2[:-1]
             #
-            newWvlist.append(val)
+            newWvlist.append(val2)
         #
         return newWvlist
 
     def __comparisonList(self, firstList, secondList):
         """ """
-        for val in secondList:
+        for val in secondList:  # noqa: SIM110
             if val not in firstList:
                 return False
             #
@@ -436,7 +446,12 @@ if __name__ == "__main__":
     myReqObj.setValue("sessionid", "eb961ee10712d1afe48efb151dd8dd9a1b45e673")
     #
     calc = PdbxExpUpdate(reqObj=myReqObj, verbose=True, log=sys.stderr)
-    calc.doUpdate("D_1000001900", modelInputFile="D_1000001900_model_P1.cif", expInputFile="D_1000001900_sf_P1.cif", expOutputFile="D_1000001900_sf_P1.cif")
+    calc.doUpdate(
+        "D_1000001900",
+        modelInputFile="D_1000001900_model_P1.cif",
+        expInputFile="D_1000001900_sf_P1.cif",
+        expOutputFile="D_1000001900_sf_P1.cif",
+    )
 #   print calc.getDiffFlag()
 #   print calc.getWarningMessage()
 #   print calc.getWavelengthInfo()

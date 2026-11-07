@@ -8,22 +8,24 @@
 Updates versions numbers of components in em_map category
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Ezra Peisach"
 __email__ = "peisach@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 
 
-import sys
 import logging
+import sys
+
 from mmcif.io.IoAdapterCore import IoAdapterCore
 from wwpdb.io.locator.PathInfo import PathInfo
 
 logger = logging.getLogger()
 
 
-class EmMapAutoFixVers(object):
-    def __init__(self, sessionPath, siteId=None, verbose=True, log=sys.stderr):  # pylint: disable=unused-argument
+class EmMapAutoFixVers:
+    def __init__(self, sessionPath, siteId=None, verbose=True, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         self.__verbose = verbose
         self.__lfh = log
         # self.__siteId = siteId
@@ -68,7 +70,14 @@ class EmMapAutoFixVers(object):
                 logger.error("Could not parse filename in em_map category %s", fname)
                 continue
 
-            newname = self.__pI.getFileName(datasetid, contentType=ct_type, formatType=ct_format, partNumber=partno, fileSource=location, versionId="latest")
+            newname = self.__pI.getFileName(
+                datasetid,
+                contentType=ct_type,
+                formatType=ct_format,
+                partNumber=partno,
+                fileSource=location,
+                versionId="latest",
+            )
             if newname != fname:
                 logger.debug("Updating fname from %s to %s", fname, newname)
                 updated = True
@@ -90,11 +99,11 @@ if __name__ == "__main__":
     logger.addHandler(ch)
     logger.setLevel(logging.INFO)
 
-    pI = PathInfo(sessionPath="/tmp")
+    pI = PathInfo(sessionPath="/tmp")  # noqa: S108
 
     dep = "D_800037"
     modellocation = "session"
-    modin = "/tmp/D_800037/D_800037_model_P1.cif.V17"
-    modout = "/tmp/D_800037/D_800037_model_P1.cif.V18"
-    ema = EmMapAutoFixVers(sessionPath="/tmp/D_800037")
+    modin = "/tmp/D_800037/D_800037_model_P1.cif.V17"  # noqa: S108
+    modout = "/tmp/D_800037/D_800037_model_P1.cif.V18"  # noqa: S108
+    ema = EmMapAutoFixVers(sessionPath="/tmp/D_800037")  # noqa: S108
     ema.autoFixEmMapVersions(datasetid=dep, modelin=modin, modelout=modout, location="session")

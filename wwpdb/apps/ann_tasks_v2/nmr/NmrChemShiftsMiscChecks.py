@@ -8,6 +8,7 @@
 Chemical shift miscellaneous checks implemented in the validation pipeline --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -15,14 +16,15 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 import inspect
-import sys
-import os.path
 import os
+import os.path
+import sys
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
+
 from wwpdb.apps.ann_tasks_v2.utils.NmrRemediationUtils import remediate_cs_file, starToPdbx
+from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
 # UI appears to no longer invoke - commented out - so blindly fixing

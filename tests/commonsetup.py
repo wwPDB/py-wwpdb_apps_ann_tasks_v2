@@ -1,9 +1,8 @@
-import sys
 import os
 import platform
+import sys
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 TESTOUTPUT = os.path.join(HERE, "test-output", platform.python_version())
 if not os.path.exists(TESTOUTPUT):
     os.makedirs(TESTOUTPUT)
@@ -11,9 +10,9 @@ if not os.path.exists(TESTOUTPUT):
 # We do this here - as unittest loads all at once - need to insure common
 
 try:
-    from unittest.mock import Mock, MagicMock
+    from unittest.mock import MagicMock, Mock
 except ImportError:
-    from mock import Mock, MagicMock
+    from unittest.mock import MagicMock, Mock
 
 configInfo = {
     "SITE_REFDATA_PROJ_NAME_CC": "ligand-dict-v3",
@@ -28,7 +27,7 @@ configInfoMockConfig = {
 configMock = MagicMock(**configInfoMockConfig)
 
 
-def getSiteIdReplace(defaultSiteId=None):  # pylint: disable=unused-argument
+def getSiteIdReplace(defaultSiteId=None):  # noqa: ARG001 pylint: disable=unused-argument
     return "WWPDB_DEPLOY"
 
 

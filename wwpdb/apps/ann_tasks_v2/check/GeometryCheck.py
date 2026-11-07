@@ -10,19 +10,21 @@
 Geometry-level PDBx/mmCIF checking
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
 import inspect
+import os
+import os.path
+import sys
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -61,7 +63,7 @@ class GeometryCheck(SessionWebDownloadUtils):
     def setArguments(self, checkArgs):
         self.__checkArgs = checkArgs
 
-    def run(self, entryId, inpPath, updateInput=True):  # pylint: disable=unused-argument
+    def run(self, entryId, inpPath, updateInput=True):  # noqa: ARG002 pylint: disable=unused-argument
         """Run the geometry-level check on the input PDBx/mmCIF data file -"""
         try:
             logPath = os.path.join(self.__exportPath, entryId + "_geometry-check-report.log")
@@ -88,7 +90,13 @@ class GeometryCheck(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s geometry check completed for entryId %s file %s report size %d\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        entryId,
+                        inpPath,
+                        self.__reportFileSize,
+                    )
                 )
 
             if self.__cleanup:

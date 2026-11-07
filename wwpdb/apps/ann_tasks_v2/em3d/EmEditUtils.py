@@ -9,20 +9,23 @@
 Edit volume data file header records and related data stored in model files.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
-import os
 import json
+import os
+import os.path
+import sys
 import traceback
-from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
-from wwpdb.io.locator.PathInfo import PathInfo
+
 from wwpdb.io.locator.DataReference import ReferenceFileComponents
+from wwpdb.io.locator.PathInfo import PathInfo
+from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -79,7 +82,13 @@ class EmEditUtils(SessionWebDownloadUtils):
         """
         Return:  dictionary content type and file partition number for the input file name.
         """
-        mD = {"em-volume": "primary map", "em-mask-volume": "mask", "em-additional-volume": "additional map", "em-half-volume": "half map", "em-volume-header": "map header"}
+        mD = {
+            "em-volume": "primary map",
+            "em-mask-volume": "mask",
+            "em-additional-volume": "additional map",
+            "em-half-volume": "half map",
+            "em-volume-header": "map header",
+        }
         try:
             rfc = ReferenceFileComponents(fileName=fileName, verbose=self.__verbose, log=self.__lfh)
             cT = rfc.getContentType()
@@ -142,7 +151,14 @@ class EmEditUtils(SessionWebDownloadUtils):
             #
             if self.__debug:
                 self.__lfh.write("Map header keys: %r\n" % mD.keys())
-            oL = self.__renderHeaderTable(mD["input_header"], modelD=modelD, entryId=entryId, mapFileName=mapFileName, mapType=mapType, partition=partition)
+            oL = self.__renderHeaderTable(
+                mD["input_header"],
+                modelD=modelD,
+                entryId=entryId,
+                mapFileName=mapFileName,
+                mapType=mapType,
+                partition=partition,
+            )
             #
             return True, "\n".join(oL)
 
@@ -208,7 +224,7 @@ class EmEditUtils(SessionWebDownloadUtils):
             if selectKey:
                 sels = self.__selectKeyList[selectKey]
                 # '[{"label":"author",value:"author"}, {"label":"emdb",value:"emdb"}]'
-                dataSelVars = "'[%s]'" % ", ".join(map(lambda x: '{"label":"%s","value":"%s"}' % (x, x), sels))
+                dataSelVars = "'[%s]'" % ", ".join(map(lambda x: '{"label":"%s","value":"%s"}' % (x, x), sels))  # noqa: C417
 
             dVal = modelD[opid]
             if eFlag:

@@ -11,20 +11,22 @@
 Extra  PDBx/mmCIF checking
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import inspect
+import os
+import os.path
 import shutil
 import sys
-import os.path
-import os
-import inspect
 import traceback
 
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
 from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
@@ -61,7 +63,7 @@ class ExtraCheck(SessionWebDownloadUtils):
         """Set the path where output files are copyied."""
         self.__exportPath = exportPath
 
-    def run(self, entryId, inpPath, updateInput=True):  # pylint: disable=unused-argument
+    def run(self, entryId, inpPath, updateInput=True):  # noqa: ARG002 pylint: disable=unused-argument
         """Run the extra checks on the input PDBx/mmCIF data file -"""
         try:
             self.clearFileList()
@@ -102,7 +104,13 @@ class ExtraCheck(SessionWebDownloadUtils):
             if self.__verbose:
                 self.__lfh.write(
                     "+%s.%s extra check completed for entryId %s file %s report size %d\n"
-                    % (self.__class__.__name__, inspect.currentframe().f_code.co_name, entryId, inpPath, self.__reportFileSize)
+                    % (
+                        self.__class__.__name__,
+                        inspect.currentframe().f_code.co_name,
+                        entryId,
+                        inpPath,
+                        self.__reportFileSize,
+                    )
                 )
             self.addDownloadPath(self.__reportPath)
             self.addDownloadPath(logPath)

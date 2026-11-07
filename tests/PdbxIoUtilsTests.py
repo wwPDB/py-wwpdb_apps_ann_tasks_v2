@@ -9,6 +9,7 @@
 Test cases for extracting assembly info
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -16,29 +17,25 @@ __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
 
+import os.path
 import sys
 import unittest
-import os.path
 
 if __package__ is None or __package__ == "":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from commonsetup import HERE  # noqa:  F401 pylint: disable=import-error,unused-import
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from commonsetup import HERE  # pylint: disable=import-error
 else:
-    from .commonsetup import HERE  # noqa: F401 pylint: disable=relative-beyond-top-level
+    from .commonsetup import HERE
 
 from wwpdb.apps.ann_tasks_v2.io.PdbxIoUtils import ModelFileIo, PdbxFileIo
-
-TOPDIR = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 
 
 class PdbxIoUtilsTests(unittest.TestCase):
     def setUp(self):
-        #
         self.__verbose = True
         self.__lfh = sys.stdout
         # Old examples -
         self.__pathExamples = os.path.abspath(os.path.join(HERE, "tests"))
-        #
         self.__examFileList = ["3rer.cif"]
 
     def tearDown(self):
@@ -70,7 +67,6 @@ class PdbxIoUtilsTests(unittest.TestCase):
             assemRcsbL = sdf.getDepositorAssemblyDetailsRcsb()
             self.assertNotEqual(assemRcsbL, [])
 
-            #
             ed = sdf.getPolymerEntityChainDict()
             self.assertNotEqual(ed, {})
 

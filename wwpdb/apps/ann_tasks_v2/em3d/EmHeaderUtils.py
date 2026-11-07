@@ -10,15 +10,16 @@ Manage map header file operations -
 
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
+import logging
 import sys
 import traceback
-import logging
 
 # from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppEm
 # from mmcif_utils.trans.InstanceMapper import InstanceMapper
@@ -29,7 +30,7 @@ from wwpdb.utils.emdb.cif_emdb_translator.cif_emdb_translator import CifEMDBTran
 logger = logging.getLogger(__name__)
 
 
-class EmHeaderUtils(object):
+class EmHeaderUtils:
     """
     Manage map header file operations -
 
@@ -60,7 +61,7 @@ class EmHeaderUtils(object):
 
     def transHeader(self, inpFilePath, outFilePath, logFilePath, validateXml=True):
         ok = False
-        logging.info("Starting conversion for %s", inpFilePath)
+        logger.info("Starting conversion for %s", inpFilePath)
         #
         try:
             translator = CifEMDBTranslator()

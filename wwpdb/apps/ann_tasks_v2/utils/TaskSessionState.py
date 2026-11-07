@@ -9,6 +9,7 @@
 Accessors to encapsulate common task session details --
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -19,11 +20,11 @@ import sys
 import traceback
 
 
-class TaskSessionState(object):
+class TaskSessionState:
     """Accessors to encapsulate common task session details --"""
 
     #
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         """Input request object is used to determine session context."""
         # self.__verbose = verbose
         self.__lfh = log
@@ -66,7 +67,17 @@ class TaskSessionState(object):
     def get(self):
         return self.__D
 
-    def assign(self, name, formId=None, args=None, completionFlag=None, tagList=None, entryId=None, entryFileName=None, entryExpFileName=None):
+    def assign(
+        self,
+        name,
+        formId=None,
+        args=None,
+        completionFlag=None,
+        tagList=None,
+        entryId=None,
+        entryFileName=None,
+        entryExpFileName=None,
+    ):
         try:
             if name is not None:
                 self.setTaskName(name)

@@ -9,23 +9,24 @@
 Common methods for managing download operations for project files within the session context.
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
 import os
 import os.path
 import shutil
+import sys
 import traceback
 
-from wwpdb.io.locator.PathInfo import PathInfo
 from wwpdb.io.locator.DataReference import ReferenceFileComponents
+from wwpdb.io.locator.PathInfo import PathInfo
 
 
-class SessionDownloadUtils(object):
+class SessionDownloadUtils:
     """Common methods for managing download operations for project files within the session context."""
 
     #
@@ -59,8 +60,25 @@ class SessionDownloadUtils(object):
         if not os.access(self.__downloadDirPath, os.W_OK):
             os.makedirs(self.__downloadDirPath, 0o755)
 
-    def getFilePath(self, idCode, contentType="model", formatType="pdbx", fileSource="archive", instance=None, mileStone=None, versionId="latest"):
-        return self.__pI.getFilePath(idCode, contentType=contentType, formatType=formatType, fileSource=fileSource, wfInstanceId=instance, mileStone=mileStone, versionId=versionId)
+    def getFilePath(
+        self,
+        idCode,
+        contentType="model",
+        formatType="pdbx",
+        fileSource="archive",
+        instance=None,
+        mileStone=None,
+        versionId="latest",
+    ):
+        return self.__pI.getFilePath(
+            idCode,
+            contentType=contentType,
+            formatType=formatType,
+            fileSource=fileSource,
+            wfInstanceId=instance,
+            mileStone=mileStone,
+            versionId=versionId,
+        )
 
     def getWebDownloadPath(self):
         return self.__webDownloadDirPath
@@ -127,10 +145,27 @@ class SessionDownloadUtils(object):
                 self.__lfh.write("+SessionDownloadUtils.getContetFormatFromFileName() + failed for file %s\n" % filePath)
             return 1
 
-    def fetchId(self, idCode, contentType="model", formatType="pdbx", fileSource="archive", instance=None, mileStone=None, versionId="latest", partNumber="1"):
+    def fetchId(
+        self,
+        idCode,
+        contentType="model",
+        formatType="pdbx",
+        fileSource="archive",
+        instance=None,
+        mileStone=None,
+        versionId="latest",
+        partNumber="1",
+    ):
         """Copy the file with the input signature from the fileSource directory to the session download directory."""
         filePath = self.__pI.getFilePath(
-            idCode, contentType=contentType, formatType=formatType, fileSource=fileSource, wfInstanceId=instance, mileStone=mileStone, versionId=versionId, partNumber=partNumber
+            idCode,
+            contentType=contentType,
+            formatType=formatType,
+            fileSource=fileSource,
+            wfInstanceId=instance,
+            mileStone=mileStone,
+            versionId=versionId,
+            partNumber=partNumber,
         )
         if self.__verbose:
             self.__lfh.write(
@@ -139,8 +174,7 @@ class SessionDownloadUtils(object):
             )
         if filePath is not None:
             return self.__fetchFile(filePath)
-        else:
-            return False
+        return False
 
     def removeFromDownload(self, filePath):
         """Removes a previously setuop download file"""

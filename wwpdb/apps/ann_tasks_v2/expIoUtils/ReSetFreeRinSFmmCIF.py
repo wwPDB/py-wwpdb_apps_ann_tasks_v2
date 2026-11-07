@@ -8,6 +8,7 @@
 Utility to reset free R set of sf file in mmCIF format
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "jwest@rcsb.rutgers.edu"
@@ -20,8 +21,9 @@ import traceback
 
 from wwpdb.io.file.mmCIFUtil import mmCIFUtil
 from wwpdb.utils.config.ConfigInfo import ConfigInfo
-from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 from wwpdb.utils.dp.RcsbDpUtility import RcsbDpUtility
+
+from wwpdb.apps.ann_tasks_v2.utils.SessionWebDownloadUtils import SessionWebDownloadUtils
 
 
 class ReSetFreeRinSFmmCIF(SessionWebDownloadUtils):
@@ -104,7 +106,7 @@ class ReSetFreeRinSFmmCIF(SessionWebDownloadUtils):
                 data = fh.read()
                 fh.close()
                 #
-                if (data == "") or (data == "Finished!\n"):
+                if (data == "") or (data == "Finished!\n"):  # noqa: PLR1714
                     continue
                 #
                 if self.__message:
@@ -178,12 +180,19 @@ class ReSetFreeRinSFmmCIF(SessionWebDownloadUtils):
                     #
                     cifObj = mmCIFUtil(filePath=outputPath)
                     tlist = cifObj.GetValue("pdbx_density_corr")
-                    items = ("ls_d_res_high", "ls_R_factor_R_work", "ls_R_factor_R_all", "ls_R_factor_R_free", "correlation_coeff_Fo_to_Fc", "details")
+                    items = (
+                        "ls_d_res_high",
+                        "ls_R_factor_R_work",
+                        "ls_R_factor_R_all",
+                        "ls_R_factor_R_free",
+                        "correlation_coeff_Fo_to_Fc",
+                        "details",
+                    )
                     #
                     for tdir in tlist:
                         data = []
                         for item in items:
-                            if (item in tdir) and tdir[item]:
+                            if tdir.get(item):
                                 data.append(tdir[item])
                             else:
                                 data.append("")
@@ -227,7 +236,7 @@ class ReSetFreeRinSFmmCIF(SessionWebDownloadUtils):
                         res_best[3],
                     )
                     #
-                    if (res_tls[2] - res_tls[1]) > 0.02:
+                    if (res_tls[2] - res_tls[1]) > 0.02:  # noqa: PLR2004
                         os.path.join(self.__sessionPath, self.__entryId + "_sf.cif")
                         ifh = open(os.path.join(self.__sessionPath, self.__entryId + "_sf.cif"), "r")
                         sfData = ifh.read()

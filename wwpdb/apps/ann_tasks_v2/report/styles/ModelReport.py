@@ -12,19 +12,26 @@
 Report style details for PDBx data categories.
 
 """
-from __future__ import absolute_import
 
 __docformat__ = "restructuredtext en"
 __author__ = "John Westbrook"
 __email__ = "john.westbrook@rcsb.org"
 __license__ = "Apache 2.0"
 
-from mmcif_utils.style.PdbxCategoryStyleBase import PdbxCategoryStyleBase
+from typing import ClassVar
+
+from mmcif_utils.style.PdbxCategoryStyleBase import (
+    PdbxCategoryStyleBase,
+    PdbxStyleCatExL,
+    PdbxStyleCatInfoL,
+    PdbxStyleCatItemD,
+    PdbxStyleCatSupL,
+)
 
 
 class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
     _styleId = "PDBX_REPORT_V1"
-    _categoryInfo = [
+    _categoryInfo: ClassVar[PdbxStyleCatInfoL] = [
         ("audit_contact_author", "table"),
         ("pdbx_contact_author", "table"),
         ("pdbx_SG_project", "table"),
@@ -137,7 +144,7 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ("pdbx_molecule", "table"),
         ("pdbx_molecule_features", "table"),
     ]
-    _cDict = {
+    _cDict: ClassVar[PdbxStyleCatItemD] = {
         "audit_contact_author": [
             ("_audit_contact_author.name", "%s", "str", ""),
             ("_audit_contact_author.address", "%s", "str", ""),
@@ -185,7 +192,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_SG_project.full_name_of_center", "%s", "str", ""),
             ("_pdbx_SG_project.initial_of_center", "%s", "str", ""),
         ],
-        "audit_author": [("_audit_author.name", "%s", "str", ""), ("_audit_author.pdbx_ordinal", "%s", "str", ""), ("_audit_author.identifier_ORCID", "%s", "str", "")],
+        "audit_author": [
+            ("_audit_author.name", "%s", "str", ""),
+            ("_audit_author.pdbx_ordinal", "%s", "str", ""),
+            ("_audit_author.identifier_ORCID", "%s", "str", ""),
+        ],
         "pdbx_database_status": [
             ("_pdbx_database_status.status_code", "%s", "str", ""),
             ("_pdbx_database_status.author_release_status_code", "%s", "str", ""),
@@ -293,7 +304,8 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ],
         "pdbx_database_PDB_remark": [
             ("_pdbx_database_PDB_remark.id", "%s", "str", ""),
-            ("_pdbx_database_PDB_remark.text", "%s", "str", "")],
+            ("_pdbx_database_PDB_remark.text", "%s", "str", ""),
+        ],
         "pdbx_entity_instance_feature": [
             ("_pdbx_entity_instance_feature.ordinal", "%s", "str", ""),
             ("_pdbx_entity_instance_feature.comp_id", "%s", "str", ""),
@@ -326,7 +338,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             # ('_struct_ref.pdbx_pdb_end', '%s', 'str', ''),
             # ('_struct_ref.biol_id', '%s', 'str', '')
         ],
-        "struct_keywords": [("_struct_keywords.entry_id", "%s", "str", ""), ("_struct_keywords.pdbx_keywords", "%s", "str", ""), ("_struct_keywords.text", "%s", "str", "")],
+        "struct_keywords": [
+            ("_struct_keywords.entry_id", "%s", "str", ""),
+            ("_struct_keywords.pdbx_keywords", "%s", "str", ""),
+            ("_struct_keywords.text", "%s", "str", ""),
+        ],
         "pdbx_struct_assembly": [
             ("_pdbx_struct_assembly.id", "%s", "str", ""),
             ("_pdbx_struct_assembly.details", "%s", "str", ""),
@@ -379,7 +395,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_helical_symmetry.dyad_axis", "%s", "str", ""),
             ("_pdbx_helical_symmetry.circular_symmetry", "%s", "str", ""),
         ],
-        "struct_biol": [("_struct_biol.id", "%s", "str", ""), ("_struct_biol.pdbx_description", "%s", "str", ""), ("_struct_biol.details", "%s", "str", "")],
+        "struct_biol": [
+            ("_struct_biol.id", "%s", "str", ""),
+            ("_struct_biol.pdbx_description", "%s", "str", ""),
+            ("_struct_biol.details", "%s", "str", ""),
+        ],
         "exptl_crystal_grow": [
             ("_exptl_crystal_grow.crystal_id", "%s", "str", ""),
             ("_exptl_crystal_grow.method", "%s", "str", ""),
@@ -604,8 +624,14 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_refine_ls_shell.redundancy_reflns_obs", "%s", "str", ""),
             ("_refine_ls_shell.pdbx_refine_id", "%s", "str", ""),
         ],
-        "atom_sites_footnote": [("_atom_sites_footnote.id", "%s", "str", ""), ("_atom_sites_footnote.text", "%s", "str", "")],
-        "database_PDB_caveat": [("_database_PDB_caveat.id", "%s", "str", ""), ("_database_PDB_caveat.text", "%s", "str", "")],
+        "atom_sites_footnote": [
+            ("_atom_sites_footnote.id", "%s", "str", ""),
+            ("_atom_sites_footnote.text", "%s", "str", ""),
+        ],
+        "database_PDB_caveat": [
+            ("_database_PDB_caveat.id", "%s", "str", ""),
+            ("_database_PDB_caveat.text", "%s", "str", ""),
+        ],
         "database_PDB_matrix": [
             ("_database_PDB_matrix.entry_id", "%s", "str", ""),
             ("_database_PDB_matrix.origx[1][1]", "%s", "str", ""),
@@ -621,8 +647,15 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_database_PDB_matrix.origx_vector[2]", "%s", "str", ""),
             ("_database_PDB_matrix.origx_vector[3]", "%s", "str", ""),
         ],
-        "database_PDB_remark": [("_database_PDB_remark.id", "%s", "str", ""), ("_database_PDB_remark.text", "%s", "str", "")],
-        "exptl": [("_exptl.entry_id", "%s", "str", ""), ("_exptl.method", "%s", "str", ""), ("_exptl.crystals_number", "%s", "str", "")],
+        "database_PDB_remark": [
+            ("_database_PDB_remark.id", "%s", "str", ""),
+            ("_database_PDB_remark.text", "%s", "str", ""),
+        ],
+        "exptl": [
+            ("_exptl.entry_id", "%s", "str", ""),
+            ("_exptl.method", "%s", "str", ""),
+            ("_exptl.crystals_number", "%s", "str", ""),
+        ],
         "pdbx_data_processing_status": [("_pdbx_data_processing_status.task_name", "%s", "str", "")],
         "pdbx_reflns_twin": [
             ("_pdbx_reflns_twin.domain_id", "%s", "str", ""),
@@ -632,8 +665,15 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_reflns_twin.operator", "%s", "str", ""),
             ("_pdbx_reflns_twin.fraction", "%s", "str", ""),
         ],
-        "struct_biol_keywords": [("_struct_biol_keywords.biol_id", "%s", "str", ""), ("_struct_biol_keywords.text", "%s", "str", "")],
-        "struct_ncs_dom": [("_struct_ncs_dom.id", "%s", "str", ""), ("_struct_ncs_dom.details", "%s", "str", ""), ("_struct_ncs_dom.pdbx_ens_id", "%s", "str", "")],
+        "struct_biol_keywords": [
+            ("_struct_biol_keywords.biol_id", "%s", "str", ""),
+            ("_struct_biol_keywords.text", "%s", "str", ""),
+        ],
+        "struct_ncs_dom": [
+            ("_struct_ncs_dom.id", "%s", "str", ""),
+            ("_struct_ncs_dom.details", "%s", "str", ""),
+            ("_struct_ncs_dom.pdbx_ens_id", "%s", "str", ""),
+        ],
         "struct_ncs_dom_lim": [
             ("_struct_ncs_dom_lim.dom_id", "%s", "str", ""),
             ("_struct_ncs_dom_lim.beg_auth_asym_id", "%s", "str", ""),
@@ -659,8 +699,15 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_struct_ncs_ens_gen.ens_id", "%s", "str", ""),
             ("_struct_ncs_ens_gen.oper_id", "%s", "str", ""),
         ],
-        "struct_site": [("_struct_site.id", "%s", "str", ""), ("_struct_site.pdbx_evidence_code", "%s", "str", ""), ("_struct_site.details", "%s", "str", "")],
-        "struct_site_keywords": [("_struct_site_keywords.site_id", "%s", "str", ""), ("_struct_site_keywords.text", "%s", "str", "")],
+        "struct_site": [
+            ("_struct_site.id", "%s", "str", ""),
+            ("_struct_site.pdbx_evidence_code", "%s", "str", ""),
+            ("_struct_site.details", "%s", "str", ""),
+        ],
+        "struct_site_keywords": [
+            ("_struct_site_keywords.site_id", "%s", "str", ""),
+            ("_struct_site_keywords.text", "%s", "str", ""),
+        ],
         "struct_ref_seq": [
             ("_struct_ref_seq.align_id", "%s", "str", ""),
             ("_struct_ref_seq.ref_id", "%s", "str", ""),
@@ -756,7 +803,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_citation.pdbx_database_id_PubMed", "%s", "str", ""),
             ("_citation.pdbx_database_id_DOI", "%s", "str", ""),
         ],
-        "citation_author": [("_citation_author.citation_id", "%s", "str", ""), ("_citation_author.name", "%s", "str", ""), ("_citation_author.ordinal", "%s", "str", "")],
+        "citation_author": [
+            ("_citation_author.citation_id", "%s", "str", ""),
+            ("_citation_author.name", "%s", "str", ""),
+            ("_citation_author.ordinal", "%s", "str", ""),
+        ],
         "computing": [
             ("_computing.entry_id", "%s", "str", ""),
             ("_computing.pdbx_data_reduction_ii", "%s", "str", ""),
@@ -795,8 +846,14 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_entity_keywords.pdbx_ec", "%s", "str", ""),
             ("_entity_keywords.pdbx_biological_unit", "%s", "str", ""),
         ],
-        "entity_name_com": [("_entity_name_com.entity_id", "%s", "str", ""), ("_entity_name_com.name", "%s", "str", "")],
-        "entity_name_sys": [("_entity_name_sys.entity_id", "%s", "str", ""), ("_entity_name_sys.name", "%s", "str", "")],
+        "entity_name_com": [
+            ("_entity_name_com.entity_id", "%s", "str", ""),
+            ("_entity_name_com.name", "%s", "str", ""),
+        ],
+        "entity_name_sys": [
+            ("_entity_name_sys.entity_id", "%s", "str", ""),
+            ("_entity_name_sys.name", "%s", "str", ""),
+        ],
         "entity_poly_seq": [
             ("_entity_poly_seq.entity_id", "%s", "str", ""),
             ("_entity_poly_seq.num", "%s", "str", ""),
@@ -1016,7 +1073,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_struct_conf.details", "%s", "str", ""),
             ("_struct_conf.pdbx_length", "%s", "str", ""),
         ],
-        "struct_conf_type": [("_struct_conf_type.id", "%s", "str", ""), ("_struct_conf_type.criteria", "%s", "str", ""), ("_struct_conf_type.reference", "%s", "str", "")],
+        "struct_conf_type": [
+            ("_struct_conf_type.id", "%s", "str", ""),
+            ("_struct_conf_type.criteria", "%s", "str", ""),
+            ("_struct_conf_type.reference", "%s", "str", ""),
+        ],
         "pdbx_struct_mod_residue": [
             ("_pdbx_struct_mod_residue.id", "%s", "str", ""),
             ("_pdbx_struct_mod_residue.label_asym_id", "%s", "str", ""),
@@ -1029,7 +1090,11 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_pdbx_struct_mod_residue.parent_comp_id", "%s", "str", ""),
             ("_pdbx_struct_mod_residue.details", "%s", "str", ""),
         ],
-        "struct_conn_type": [("_struct_conn_type.id", "%s", "str", ""), ("_struct_conn_type.criteria", "%s", "str", ""), ("_struct_conn_type.reference", "%s", "str", "")],
+        "struct_conn_type": [
+            ("_struct_conn_type.id", "%s", "str", ""),
+            ("_struct_conn_type.criteria", "%s", "str", ""),
+            ("_struct_conn_type.reference", "%s", "str", ""),
+        ],
         "struct_ncs_oper": [
             ("_struct_ncs_oper.id", "%s", "str", ""),
             ("_struct_ncs_oper.code", "%s", "str", ""),
@@ -1138,7 +1203,10 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
             ("_struct_mon_prot_cis.pdbx_model_num", "%s", "str", ""),
             ("_struct_mon_prot_cis.pdbx_omega_angle", "%s", "str", ""),
         ],
-        "pdbx_coordinate_model": [("_pdbx_coordinate_model.asym_id", "%s", "str", ""), ("_pdbx_coordinate_model.type", "%s", "str", "")],
+        "pdbx_coordinate_model": [
+            ("_pdbx_coordinate_model.asym_id", "%s", "str", ""),
+            ("_pdbx_coordinate_model.type", "%s", "str", ""),
+        ],
         "pdbx_validate_rmsd_angle": [
             ("_pdbx_validate_rmsd_angle.id", "%s", "str", ""),
             ("_pdbx_validate_rmsd_angle.PDB_model_num", "%s", "str", ""),
@@ -1373,10 +1441,8 @@ class PdbxReportCategoryStyle(PdbxCategoryStyleBase):
         ],
     }
 
-    _excludeList = []
-    _suppressList = []
-
-    #
+    _excludeList: ClassVar[PdbxStyleCatExL] = []
+    _suppressList: ClassVar[PdbxStyleCatSupL] = []
 
     def __init__(self):
         super(PdbxReportCategoryStyle, self).__init__(

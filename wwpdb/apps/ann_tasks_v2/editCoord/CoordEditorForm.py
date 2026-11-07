@@ -7,26 +7,27 @@
 Manage the generating coordinate editor form
 
 """
+
 __docformat__ = "restructuredtext en"
 __author__ = "Zukang Feng"
 __email__ = "zfeng@rcsb.rutgers.edu"
 __license__ = "Creative Commons Attribution 3.0 Unported"
 __version__ = "V0.07"
 
-import sys
-import os.path
 import os
+import os.path
+import sys
 
-from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCommon, ConfigInfoAppCc
+from wwpdb.utils.config.ConfigInfoApp import ConfigInfoAppCc, ConfigInfoAppCommon
 
 
-class CoordEditorForm(object):
+class CoordEditorForm:
     """
     The CoordEditorForm class generates coordinate editor form.
 
     """
 
-    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # pylint: disable=unused-argument
+    def __init__(self, reqObj=None, verbose=False, log=sys.stderr):  # noqa: ARG002 pylint: disable=unused-argument
         # self.__verbose = verbose
         # self.__lfh = log
         self.__reqObj = reqObj
@@ -96,7 +97,7 @@ class CoordEditorForm(object):
         f.write("#\n")
         f.close()
         cmd = "cd " + self.__sessionPath + "; chmod 755 " + self.__entryId + "_script.csh; " + " ./" + self.__entryId + "_script.csh >& summary_log"
-        os.system(cmd)
+        os.system(cmd)  # noqa: S605
 
     def __getHtmlcontent(self):
         content = "No result found!"
